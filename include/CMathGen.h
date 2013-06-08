@@ -7,9 +7,12 @@
 #include <cmath>
 #include <cassert>
 #include <iostream>
+#include <sys/types.h>
 
 #define DEG_TO_RAD(d) (M_PI*(d)/180.0)
 #define RAD_TO_DEG(r) ((180.0*(r))/M_PI)
+
+#define REAL_EQ(r1,r2) (fabs((r1)-(r2))<1E-6)
 
 namespace CMathGen {
   enum Handedness {
@@ -65,10 +68,26 @@ namespace CMathGen {
     std::cerr << msg << std::endl;
   }
 
+  //-----
+
   inline long sign(long x) {
     if      (x > 0) return 1;
     else if (x < 0) return -1;
     else            return 0;
+  }
+
+  inline long sign(double x) {
+    if      (x > 1E-6) return 1;
+    else if (x < 1E-6) return -1;
+    else               return 0;
+  }
+
+  inline double DegToRad(double d) {
+    return DEG_TO_RAD(d);
+  }
+
+  inline double RadToDeg(double r) {
+    return RAD_TO_DEG(r);
   }
 
   inline double sqrt(double real) {
@@ -230,6 +249,31 @@ namespace CMathGen {
     double r = n - int(n);
 
     return (r < 1E-10);
+  }
+
+  template<typename T>
+  bool solveQuadratic(T a, T b, T c, T *r1, T *r2) {
+    if (a == 0.0) return false;
+
+    T b2_4ac = b*b - 4.0*a*c;
+
+    if (b2_4ac < 0) return false;
+
+    T sqrt_b2_4ac = ::sqrt(b2_4ac);
+
+    T q;
+
+    if (b < 0.0)
+      q = -0.5*(b - sqrt_b2_4ac);
+    else
+      q = -0.5*(b + sqrt_b2_4ac);
+
+    *r1 = q/a;
+    *r2 = c/q;
+
+    if (*r1 > *r2) std::swap(*r1, *r2);
+
+    return true;
   }
 }
 

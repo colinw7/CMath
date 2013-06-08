@@ -22,7 +22,8 @@ namespace CMathGeom2D {
   };
 
   //! get clip zone for point
-  ClipZone getClipZone(double x, double y, double xmin, double ymin, double xmax, double ymax) {
+  inline ClipZone getClipZone(double x, double y, double xmin, double ymin,
+                              double xmax, double ymax) {
     ClipZone zone;
 
     if      (x < xmin) {
@@ -54,9 +55,9 @@ namespace CMathGeom2D {
   }
 
   //! get clip sector for start and end points of line
-  bool clipBySector(double xmin, double ymin, double xmax, double ymax,
-                    double *x1, double *y1, double *x2, double *y2,
-                    ClipZone *zone1, ClipZone *zone2, bool *intersect) {
+  inline bool clipBySector(double xmin, double ymin, double xmax, double ymax,
+                           double *x1, double *y1, double *x2, double *y2,
+                           ClipZone *zone1, ClipZone *zone2, bool *intersect) {
     if (xmin >= xmax || ymin >= ymax) {
       *intersect = false;
 
@@ -132,8 +133,8 @@ namespace CMathGeom2D {
   }
 
   //! Clip line (x1,y1) -> (x2,y2) in region (xmin,xmax,ymin,ymax)
-  bool clipLine(double xmin, double ymin, double xmax, double ymax,
-                double *x1, double *y1, double *x2, double *y2) {
+  inline bool clipLine(double xmin, double ymin, double xmax, double ymax,
+                       double *x1, double *y1, double *x2, double *y2) {
     bool     intersect;
     ClipZone zone1, zone2;
 
@@ -220,6 +221,76 @@ namespace CMathGeom2D {
                            double x1, double y1, double x2, double y2,
                            double *xi1, double *yi1,
                            double *xi2, double *yi2, uint *num_i);
+}
+
+#include <CBBox2D.h>
+#include <CPolygonOrientation.h>
+
+namespace CMathGeom2D {
+  inline CPolygonOrientation PolygonOrientation(double x1, double y1, double x2, double y2,
+                                                double x3, double y3) {
+    double dx1 = x2 - x1;
+    double dy1 = y2 - y1;
+
+    double dx2 = x3 - x2;
+    double dy2 = y3 - y2;
+
+    return (CPolygonOrientation) CMathGen::sign(dx1*dy2 - dy1*dx2);
+  }
+
+  inline CPolygonOrientation PolygonOrientation(const double *x, const double *y, uint num_xy) {
+    int i = 2;
+
+    while (i < (int) num_xy) {
+      CPolygonOrientation orient =
+        PolygonOrientation(x[i - 2], y[i - 2], x[i - 1], y[i - 1], x[i], y[i]);
+
+      if (orient != CPOLYGON_ORIENTATION_UNKNOWN)
+        return orient;
+
+      ++i;
+    }
+
+    return CPOLYGON_ORIENTATION_UNKNOWN;
+  }
+
+  inline bool PointInsideConvex(double x, double y, const double *px, const double *py, uint np) {
+    CPolygonOrientation orient = PolygonOrientation(px, py, np);
+
+    if (orient == CPOLYGON_ORIENTATION_UNKNOWN) return false;
+
+    if (orient == CPOLYGON_ORIENTATION_ANTICLOCKWISE) {
+      int i1 = np - 1;
+
+      // iterate forwards through polygon lines (i1 -> i2)
+      for (int i2 = 0; i2 < (int) np; i1 = i2++) {
+        // test orientation of triangle made from point and
+        // line matches polygon orientation
+        double f = (px[i2] - px[i1])*(y - py[i1]) - (py[i2] - py[i1])*(x - px[i1]);
+
+        if (f < 0)
+          return false;
+      }
+    }
+    else {
+      int i1 = 0;
+
+      // iterate backwards through polygon lines (i1 -> i2)
+      for (int i2 = np - 1; i2 >= 0; i1 = i2--) {
+        // test orientation of triangle made from point and
+        // line matches polygon orientation
+        double f = (px[i2] - px[i1])*(y - py[i1]) - (py[i2] - py[i1])*(x - px[i1]);
+
+        if (f < 0)
+          return false;
+      }
+    }
+
+    return true;
+  }
+
+  CPolygonOrientation PolygonOrientation(double x1, double y1, double x2, double y2,
+                                         double x3, double y3);
 }
 
 #endif
