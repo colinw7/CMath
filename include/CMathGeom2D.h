@@ -1,6 +1,8 @@
 #ifndef CMathGeom2D_H
 #define CMathGeom2D_H
 
+#include <CMathGen.h>
+
 #define EPSILON_E6 1E-6
 
 namespace CMathGeom2D {
@@ -223,6 +225,119 @@ namespace CMathGeom2D {
                            double *xi2, double *yi2, uint *num_i);
 }
 
+namespace CMathGeom2D {
+  inline bool ConvertFromSVGArc(double x1, double y1, double x2, double y2,
+                                double phi, double rx, double ry, int fa, int fs,
+                                double *cx, double *cy, double *theta, double *delta) {
+    if (x1 == x2 && y1 == y2) return false;
+
+    if (rx == 0.0 || ry == 0.0) return false;
+
+    // Step 1
+
+    double dx2 = (x1 - x2)/2.0;
+    double dy2 = (y1 - y2)/2.0;
+
+    double phi1 = CMathGen::DegToRad(phi);
+
+    double c = cos(phi1);
+    double s = sin(phi1);
+
+    double xx =  c*dx2 + s*dy2;
+    double yy = -s*dx2 + c*dy2;
+
+    rx = fabs(rx);
+    ry = fabs(ry);
+
+    double rx2 = rx*rx;
+    double ry2 = ry*ry;
+    double xx2 = xx*xx;
+    double yy2 = yy*yy;
+
+    double rc = xx2/rx2 + yy2/ry2;
+
+    if (rc > 1) {
+      double rc2 = sqrt(rc);
+
+      rx *= rc2;
+      ry *= rc2;
+
+      rx2 = rx*rx;
+      ry2 = ry*ry;
+    }
+
+    // Step 2
+
+    int sign = (fa == fs) ? -1 : 1;
+
+    double sq = (rx2*ry2 - rx2*yy2 - ry2*xx2)/(rx2*yy2 + ry2*xx2);
+
+    sq = (sq < 0) ? 0 : sq;
+
+    double coef = sign*sqrt(sq);
+
+    double cx1 =  coef*((rx*yy)/ry);
+    double cy1 = -coef*((ry*xx)/rx);
+
+    // Step 3
+
+    double sx2 = (x1 + x2)/2.0;
+    double sy2 = (y1 + y2)/2.0;
+
+    *cx = sx2 + c*cx1 - s*cy1;
+    *cy = sy2 + s*cx1 + c*cy1;
+
+    // Step 4
+
+    double ux = ( xx - cx1)/rx;
+    double uy = ( yy - cy1)/ry;
+
+    double vx = (-xx - cx1)/rx;
+    double vy = (-yy - cy1)/ry;
+
+    double mod_u = CMathGen::Hypot(ux, uy);
+    double mod_v = ux;
+
+    sign = (uy < 0) ? -1 : 1;
+
+    *theta = sign*acos(mod_v/mod_u);
+
+    *theta = CMathGen::RadToDeg(*theta);
+
+    while (*theta >  360)
+      *theta -= 360;
+
+    while (*theta < -360)
+      *theta += 360;
+
+    mod_u = sqrt((ux*ux + uy*uy) * (vx*vx + vy*vy));
+    mod_v = ux*vx + uy*vy;
+
+    sign = ((ux*vy - uy*vx) < 0) ? -1 : 1;
+
+    *delta = sign*acos(mod_v/mod_u);
+
+    *delta = CMathGen::RadToDeg(*delta);
+
+    if      (fs == 0 && *delta > 0)
+      *delta -= 360;
+    else if (fs == 1 && *delta < 0)
+      *delta += 360;
+
+    while (*delta > 360)
+      *delta -= 360;
+
+    while (*delta < -360)
+      *delta += 360;
+
+    return true;
+  }
+
+  bool ConvertToSVGArc(double cx, double cy, double rx, double ry, double theta,
+                       double delta, double phi, double *x0, double *y0,
+                       double *x1, double *y1, int *fa, int *fs);
+}
+
 #include <CBBox2D.h>
 #include <CPolygonOrientation.h>
 
@@ -288,9 +403,6 @@ namespace CMathGeom2D {
 
     return true;
   }
-
-  CPolygonOrientation PolygonOrientation(double x1, double y1, double x2, double y2,
-                                         double x3, double y3);
 }
 
 #endif

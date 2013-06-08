@@ -6,6 +6,7 @@
 #include <cerrno>
 #include <cmath>
 #include <cassert>
+#include <cstdlib>
 #include <iostream>
 #include <sys/types.h>
 
@@ -249,6 +250,24 @@ namespace CMathGen {
     double r = n - int(n);
 
     return (r < 1E-10);
+  }
+
+  inline double Hypot(double a, double b) {
+    double r;
+
+    if      (abs(a) > abs(b)) {
+      r = b/a;
+      r = abs(a)*sqrt(1 + r*r);
+    }
+    else if (b != 0) {
+      r = a/b;
+      r = abs(b)*sqrt(1 + r*r);
+    }
+    else {
+      r = 0.0;
+    }
+
+    return r;
   }
 
   template<typename T>
