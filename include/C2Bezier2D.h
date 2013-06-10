@@ -4,6 +4,7 @@
 #include <CPoint2D.h>
 #include <CMathGen.h>
 #include <CBBox2D.h>
+#include <vector>
 
 template<typename T>
 class C2Bezier2DT {

@@ -165,13 +165,11 @@ class CLine2DT : public CShape2DT<T> {
     return type;
   }
 
-#if 0
   bool intersects(const Line &line) const;
 
   bool leftOrOn(const Point &point) const;
 
   bool left(const Point &point) const;
-#endif
 
 #if 0
   bool intersectsProperly(const Line &line) {
@@ -267,7 +265,6 @@ typedef CLine2DT<double> CLine2D;
 
 #include <CMathGeom2D.h>
 
-#if 0
 template<class T>
 bool
 CLine2DT<T>::
@@ -291,7 +288,6 @@ left(const Point &point) const
 {
   return CMathGeom2D::PointLineLeft(p1_, p2_, point);
 }
-#endif
 
 template<class T>
 bool

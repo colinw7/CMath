@@ -3,6 +3,7 @@
 
 #include <CIPoint2D.h>
 
+#include <cmath>
 #include <cassert>
 
 template<typename T>

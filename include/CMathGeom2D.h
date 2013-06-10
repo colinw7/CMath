@@ -2,8 +2,28 @@
 #define CMathGeom2D_H
 
 #include <CMathGen.h>
+#include <vector>
 
 #define EPSILON_E6 1E-6
+
+struct CPoint2DParam {
+  CPoint2D p;
+  double   t;
+
+  CPoint2DParam(const CPoint2D &tp, double tt) :
+   p(tp), t(tt) {
+  }
+};
+
+struct CPoint2DParam2 {
+  CPoint2D p;
+  double   t1;
+  double   t2;
+
+  CPoint2DParam2(const CPoint2D &tp, double tt1, double tt2) :
+   p(tp), t1(tt1), t2(tt2) {
+  }
+};
 
 namespace CMathGeom2D {
   enum ClipZone {
@@ -226,6 +246,26 @@ namespace CMathGeom2D {
 }
 
 namespace CMathGeom2D {
+  bool IntersectPolygons(const double *x1, const double *y1, uint n1,
+                         const double *x2, const double *y2, uint n2,
+                         double **xi, double **yi, uint *ni);
+
+  bool PolygonLineIntersect(const double *x, const double *y, uint nxy,
+                            double x1, double y1, double x2, double y2,
+                            double *xi, double *yi, uint *num_i);
+
+  bool PointLineLeft   (const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
+  bool PointLineRight  (const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
+  bool PointLineOn     (const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
+  bool PointLineLeftOn (const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
+  bool PointLineRightOn(const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
+
+  double TriangleArea2(const CPoint2D &point1, const CPoint2D &point2, const CPoint2D &point3);
+
+  void PolygonCentroid(const double *x, const double *y, int num_xy, double *xc, double *yc);
+}
+
+namespace CMathGeom2D {
   inline bool ConvertFromSVGArc(double x1, double y1, double x2, double y2,
                                 double phi, double rx, double ry, int fa, int fs,
                                 double *cx, double *cy, double *theta, double *delta) {
@@ -403,6 +443,31 @@ namespace CMathGeom2D {
 
     return true;
   }
+
+  void EllipsePointAtAngle(double cx, double cy, double xr, double yr, double a,
+                           double *x, double *y);
+
+  bool PointInsideEvenOdd(const CPoint2D &point, const std::vector<CPoint2D> &points);
+  bool PointInsideEvenOdd(const CPoint2D &point, const CPoint2D *points, uint num_points);
+
+  double PolygonArea(const double *x, const double *y, uint num_xy);
+
+  bool Intersects(const CPoint2D &l1point1, const CPoint2D &l1point2,
+                  const CPoint2D &l2point1, const CPoint2D &l2point2);
+}
+
+#include <CLine2D.h>
+
+namespace CMathGeom2D {
+  bool PolygonIsConvex(const std::vector<CLine2D> &lines);
+
+  bool PointLineDistance(const CPoint2D &point, const CLine2D &line, double *dist);
+
+  bool IntersectLine(const CLine2D &line1, const CLine2D &line2,
+                     CPoint2D *point, double *mu1, double *mu2);
+
+  bool SlicePolygonByLines(const std::vector<CPoint2D> &poly, const CLine2D &line,
+                           std::vector< std::vector<CPoint2D> > &opolys);
 }
 
 #endif
