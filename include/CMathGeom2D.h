@@ -263,9 +263,85 @@ namespace CMathGeom2D {
   double TriangleArea2(const CPoint2D &point1, const CPoint2D &point2, const CPoint2D &point3);
 
   void PolygonCentroid(const double *x, const double *y, int num_xy, double *xc, double *yc);
+
+  inline double IncludedAngle(const CPoint2D &point1, const CPoint2D &point2,
+                              const CPoint2D &point3) {
+    double s1 = (point2.x - point1.x)*(point2.x - point1.x) +
+                (point2.y - point1.y)*(point2.y - point1.y);
+    double s2 = (point3.x - point2.x)*(point3.x - point2.x) +
+                (point3.y - point2.y)*(point3.y - point2.y);
+
+    if (s1 == 0.0 || s2 == 0.0)
+      return 0.0;
+
+    double d1 = sqrt(s1);
+    double d2 = sqrt(s2);
+
+    double s3 = (point3.x - point1.x)*(point3.x - point1.x) +
+                (point3.y - point1.y)*(point3.y - point1.y);
+
+    double cs = fabs((s1 + s2 - s3)/(2.0*d1*d2));
+
+    double theta = acos(cs);
+
+    return theta;
+  }
 }
 
 namespace CMathGeom2D {
+  inline bool ArcThrough(double x1, double y1, double x2, double y2, double x3, double y3,
+                         double xr, double yr, double *xc, double *yc, double *xt1, double *yt1,
+                         double *xt2, double *yt2) {
+    if (xr <= 0.0 || yr <= 0.0)
+      return false;
+
+    double s1 = (x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1);
+    double s2 = (x3 - x2)*(x3 - x2) + (y3 - y2)*(y3 - y2);
+    double s3 = (x3 - x1)*(x3 - x1) + (y3 - y1)*(y3 - y1);
+
+    if (s1 == 0.0 || s2 == 0.0)
+      return false;
+
+    double d1 = sqrt(s1);
+    double d2 = sqrt(s2);
+
+    double cs = fabs((s1 + s2 - s3)/(2.0*d1*d2));
+
+    double theta = acos(cs);
+
+    if (s1 + s2 - s3 < 0)
+      theta = M_PI - theta;
+
+    if (theta == 0.0)
+      return false;
+
+    double xd = 0.0;
+    double yd = 0.0;
+
+    if (theta != M_PI)  {
+      xd = xr/tan(theta/2.0);
+      yd = yr/tan(theta/2.0);
+    }
+
+    *xt1 = x2 + xd*(x1 - x2)/d1;
+    *yt1 = y2 + yd*(y1 - y2)/d1;
+
+    *xt2 = x2 + xd*(x3 - x2)/d2;
+    *yt2 = y2 + yd*(y3 - y2)/d2;
+
+    double dc = CMathGen::Hypot(xr, xd);
+
+    double xtm = (*xt1 + *xt2)/2.0;
+    double ytm = (*yt1 + *yt2)/2.0;
+
+    double dm = CMathGen::Hypot(xtm - x2, ytm - y2);
+
+    *xc = x2 + dc*(xtm - x2)/dm;
+    *yc = y2 + dc*(ytm - y2)/dm;
+
+    return true;
+  }
+
   inline bool ConvertFromSVGArc(double x1, double y1, double x2, double y2,
                                 double phi, double rx, double ry, int fa, int fs,
                                 double *cx, double *cy, double *theta, double *delta) {
@@ -373,9 +449,28 @@ namespace CMathGeom2D {
     return true;
   }
 
-  bool ConvertToSVGArc(double cx, double cy, double rx, double ry, double theta,
-                       double delta, double phi, double *x0, double *y0,
-                       double *x1, double *y1, int *fa, int *fs);
+  inline bool ConvertToSVGArc(double cx, double cy, double rx, double ry, double theta,
+                              double delta, double phi, double *x0, double *y0,
+                              double *x1, double *y1, int *fa, int *fs) {
+    // Convert angles to radians
+
+    double theta1 = CMathGen::DegToRad(theta);
+    double theta2 = CMathGen::DegToRad(theta + delta);
+    double phi_r  = CMathGen::DegToRad(phi);
+
+    // Figure out the coordinates of the beginning and ending points
+
+    *x0 = cx + cos(phi_r) * rx * cos(theta1) + sin(-phi_r) * ry * sin(theta1);
+    *y0 = cy + sin(phi_r) * rx * cos(theta1) + cos( phi_r) * ry * sin(theta1);
+
+    *x1 = cx + cos(phi_r) * rx * cos(theta2) + sin(-phi_r) * ry * sin(theta2);
+    *y1 = cy + sin(phi_r) * rx * cos(theta2) + cos( phi_r) * ry * sin(theta2);
+
+    *fa = (delta > 180) ? 1 : 0;
+    *fs = (delta > 0  ) ? 1 : 0;
+
+    return true;
+  }
 }
 
 #include <CBBox2D.h>
@@ -463,8 +558,60 @@ namespace CMathGeom2D {
 
   bool PointLineDistance(const CPoint2D &point, const CLine2D &line, double *dist);
 
-  bool IntersectLine(const CLine2D &line1, const CLine2D &line2,
-                     CPoint2D *point, double *mu1, double *mu2);
+  inline bool IntersectLine(double x11, double y11, double x21, double y21,
+                            double x12, double y12, double x22, double y22,
+                            double *xi, double *yi, double *mu1, double *mu2) {
+    double offset_x1 = x21 - x11;
+    double offset_y1 = y21 - y11;
+    double offset_x2 = x22 - x12;
+    double offset_y2 = y22 - y12;
+
+    double delta = offset_x1*offset_y2 - offset_y1*offset_x2;
+
+    if (fabs(delta) < 1E-6) { // parallel
+      if (xi != NULL) *xi = 0.0;
+      if (yi != NULL) *yi = 0.0;
+
+      if (mu1 != NULL) *mu1 = 0.0;
+      if (mu2 != NULL) *mu2 = 0.0;
+
+      return false;
+    }
+
+    double idelta = 1.0/delta;
+
+    double dx = x12 - x11;
+    double dy = y12 - y11;
+
+    double m1 = (dx*offset_y1 - dy*offset_x1)*idelta;
+    double m2 = (dx*offset_y2 - dy*offset_x2)*idelta;
+
+    if (xi != NULL) *xi = x11 + m2*offset_x1;
+    if (yi != NULL) *yi = y12 + m1*offset_y2;
+
+    if (mu1 != NULL) *mu1 = m2;
+    if (mu2 != NULL) *mu2 = m1;
+
+    return true;
+  }
+
+  inline bool IntersectLine(const CPoint2D &line1s, const CPoint2D &line1e,
+                            const CPoint2D &line2s, const CPoint2D &line2e,
+                            CPoint2D *point, double *mu1, double *mu2) {
+    if (point != NULL)
+      return IntersectLine(line1s.x, line1s.y, line1e.x, line1e.y,
+                           line2s.x, line2s.y, line2e.x, line2e.y,
+                           &point->x, &point->y, mu1, mu2);
+    else
+      return IntersectLine(line1s.x, line1s.y, line1e.x, line1e.y,
+                           line2s.x, line2s.y, line2e.x, line2e.y,
+                           NULL, NULL, mu1, mu2);
+  }
+
+  inline bool IntersectLine(const CLine2D &line1, const CLine2D &line2,
+                            CPoint2D *point, double *mu1, double *mu2) {
+    return IntersectLine(line1.start(), line1.end(), line2.start(), line2.end(), point, mu1, mu2);
+  }
 
   bool SlicePolygonByLines(const std::vector<CPoint2D> &poly, const CLine2D &line,
                            std::vector< std::vector<CPoint2D> > &opolys);
