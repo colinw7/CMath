@@ -2,6 +2,7 @@
 #define CISIZE_2D_H
 
 #include <iostream>
+#include <sys/types.h>
 
 template<typename T>
 class CISize2DT {

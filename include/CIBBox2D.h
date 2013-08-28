@@ -1,10 +1,11 @@
 #ifndef CIBBOX_2D_H
 #define CIBBOX_2D_H
 
-#include <iostream>
 #include <CIPoint2D.h>
 #include <CISize2D.h>
 #include <CIVector2D.h>
+#include <cmath>
+#include <iostream>
 
 template<typename T>
 class CIBBox2DT {
@@ -222,11 +223,11 @@ class CIBBox2DT {
   }
 
   T getWidth() const {
-    return abs((T) (getXMax() - getXMin()));
+    return std::abs((T) (getXMax() - getXMin()));
   }
 
   T getHeight() const {
-    return abs((T) (getYMax() - getYMin()));
+    return std::abs((T) (getYMax() - getYMin()));
   }
 
   T getMinDim() const {
