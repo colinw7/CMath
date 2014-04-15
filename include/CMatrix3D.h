@@ -2,6 +2,7 @@
 #define CMATRIX_3D_H
 
 #include <cassert>
+#include <cstring>
 
 #include <CMatrixType.h>
 #include <CMathGen.h>

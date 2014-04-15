@@ -349,7 +349,7 @@ class CPolygon2DT : public CShape2DT<T> {
     typename PointList::iterator pe = points_.end  ();
 
     for ( ; ps != pe; ++ps)
-      *ps = rotatePoint(*ps, da, o);
+      *ps = CShape2D::rotatePoint(*ps, da, o);
 
     array_set_ = false;
   }

@@ -113,8 +113,8 @@ class CLine2DT : public CShape2DT<T> {
   }
 
   void rotateBy(double da, const Point &o) {
-    p1_ = rotatePoint(p1_, da, o);
-    p2_ = rotatePoint(p2_, da, o);
+    p1_ = CShape2D::rotatePoint(p1_, da, o);
+    p2_ = CShape2D::rotatePoint(p2_, da, o);
   }
 
   CMathGen::IntersectType

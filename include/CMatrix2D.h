@@ -6,6 +6,7 @@
 #include <CVector2D.h>
 #include <CMatrixType.h>
 #include <CThrow.h>
+#include <cstring>
 
 /* / a b tx \ */
 /* | c d ty | */
