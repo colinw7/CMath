@@ -1,7 +1,7 @@
 #ifndef CMathGen_H
 #define CMathGen_H
 
-#include <COSNaN.h>
+#include <NaN.h>
 
 #include <cerrno>
 #include <cmath>
@@ -94,8 +94,8 @@ namespace CMathGen {
   inline double sqrt(double real) {
      double result;
 
-    if (COSNaN::is_nan(real)) {
-      COSNaN::set_nan(&result);
+    if (IsNaN(real)) {
+      SetNaN(result);
       return real;
     }
 
@@ -112,8 +112,8 @@ namespace CMathGen {
   inline double pow(double real1, double real2) {
     double real;
 
-    if (COSNaN::is_nan(real1) || COSNaN::is_nan(real2)) {
-      COSNaN::set_nan(&real);
+    if (IsNaN(real1) || IsNaN(real2)) {
+      SetNaN(real);
       return real;
     }
 
@@ -170,8 +170,8 @@ namespace CMathGen {
   inline double log(double real) {
     double result;
 
-    if (COSNaN::is_nan(real)) {
-      COSNaN::set_nan(&result);
+    if (IsNaN(real)) {
+      SetNaN(result);
       return real;
     }
 
@@ -186,8 +186,8 @@ namespace CMathGen {
   inline double logN(int n, double real) {
     double result;
 
-    if (COSNaN::is_nan(real)) {
-      COSNaN::set_nan(&result);
+    if (IsNaN(real)) {
+      SetNaN(result);
       return real;
     }
 
@@ -202,8 +202,8 @@ namespace CMathGen {
   inline double log10(double real) {
     double result;
 
-    if (COSNaN::is_nan(real)) {
-      COSNaN::set_nan(&result);
+    if (IsNaN(real)) {
+      SetNaN(result);
       return real;
     }
 
@@ -218,8 +218,8 @@ namespace CMathGen {
   inline double modulus(double real1, double real2) {
     double result = 0;
 
-    if (COSNaN::is_nan(real1) || COSNaN::is_nan(real2)) {
-      COSNaN::set_nan(&result);
+    if (IsNaN(real1) || IsNaN(real2)) {
+      SetNaN(result);
       return result;
     }
 
@@ -293,6 +293,16 @@ namespace CMathGen {
     if (*r1 > *r2) std::swap(*r1, *r2);
 
     return true;
+  }
+
+  //-----
+
+  inline double getNaN() {
+    double r;
+
+    SetNaN(r);
+
+    return r;
   }
 }
 
