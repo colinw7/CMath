@@ -112,7 +112,8 @@ typedef union {
 #define FloatNaN(X)   IsNaNF(X)
 
 #else
-#include <bits/nan.h>
+//#include <bits/nan.h>
+#include <cmath>
 
 #define IsNaN(X) isnan(X)
 #define IsNaNF(X) isnan((double) (X))

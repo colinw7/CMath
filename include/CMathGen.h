@@ -96,7 +96,7 @@ namespace CMathGen {
 
     if (IsNaN(real)) {
       SetNaN(result);
-      return real;
+      return result;
     }
 
     if (real < 0.0)
