@@ -560,7 +560,7 @@ namespace CMathGeom2D {
 
   inline bool IntersectLine(double x11, double y11, double x21, double y21,
                             double x12, double y12, double x22, double y22,
-                            double *xi, double *yi, double *mu1, double *mu2) {
+                            double *xi, double *yi, double *mu1=0, double *mu2=0) {
     double offset_x1 = x21 - x11;
     double offset_y1 = y21 - y11;
     double offset_x2 = x22 - x12;
