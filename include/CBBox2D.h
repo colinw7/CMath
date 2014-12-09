@@ -14,11 +14,6 @@ class CBBox2DT {
   typedef CBBox2DT<T>   BBox;
   typedef CSize2DT<T>   Size;
 
- private:
-  Point pmin_;
-  Point pmax_;
-  bool  set_;
-
  public:
   CBBox2DT() :
    pmin_(), pmax_(), set_(false) {
@@ -212,10 +207,10 @@ class CBBox2DT {
   Point getMin() const { return set_ ? pmin_ : Point(0,0); }
   Point getMax() const { return set_ ? pmax_ : Point(0,0); }
 
-  T getLeft  () const { return set_ ? pmin_.x : 0; }
-  T getBottom() const { return set_ ? pmin_.y : 0; }
-  T getRight () const { return set_ ? pmax_.x : 0; }
-  T getTop   () const { return set_ ? pmax_.y : 0; }
+  T getLeft  () const { return getXMin(); }
+  T getBottom() const { return getYMin(); }
+  T getRight () const { return getXMax(); }
+  T getTop   () const { return getYMax(); }
 
   T getXMin() const { return set_ ? pmin_.x : 0.0; }
   T getYMin() const { return set_ ? pmin_.y : 0.0; }
@@ -266,6 +261,11 @@ class CBBox2DT {
     pmax_.y = pmin_.y + height;
     set_    = true;
   }
+
+  void setLeft  (T x) { setXMin(x); }
+  void setBottom(T y) { setYMin(y); }
+  void setRight (T x) { setXMax(x); }
+  void setTop   (T y) { setYMax(y); }
 
   void setXMin(T x) {
     pmin_.x = x;
@@ -355,6 +355,11 @@ class CBBox2DT {
     if (pmin_.x > pmax_.x) std::swap(pmin_.x, pmax_.x);
     if (pmin_.y > pmax_.y) std::swap(pmin_.y, pmax_.y);
   }
+
+ private:
+  Point pmin_;
+  Point pmax_;
+  bool  set_;
 };
 
 typedef CBBox2DT<double> CBBox2D;
