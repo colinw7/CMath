@@ -29,6 +29,16 @@ class CRange2DT {
   T xmax() const { return max(x1, x2); }
   T ymax() const { return max(y1, y2); }
 
+  T left  () const { return x1; }
+  T bottom() const { return y1; }
+  T right () const { return x2; }
+  T top   () const { return y2; }
+
+  void setLeft  (const T &t) { x1 = t; }
+  void setBottom(const T &t) { y1 = t; }
+  void setRight (const T &t) { x2 = t; }
+  void setTop   (const T &t) { y2 = t; }
+
   T xsize() const { return fabs(x2 - x1); }
   T ysize() const { return fabs(y2 - y1); }
 
