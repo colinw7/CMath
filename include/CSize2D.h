@@ -2,6 +2,7 @@
 #define CSIZE_2D_H
 
 #include <CISize2D.h>
+#include <CPoint2D.h>
 
 template<typename T>
 class CSize2DT {

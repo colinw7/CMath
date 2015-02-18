@@ -129,6 +129,16 @@ class CBBox2DT {
     return (pmax_.y >= bbox.pmin_.y && pmin_.y <= bbox.pmax_.y);
   }
 
+  bool intersect(const BBox &bbox) const {
+    if (! set_ || ! bbox.set_) return false;
+
+    if ((pmax_.x < bbox.pmin_.x || pmin_.x > bbox.pmax_.x) ||
+        (pmax_.y < bbox.pmin_.y || pmin_.y > bbox.pmax_.y))
+      return false;
+
+    return true;
+  }
+
   bool intersect(const BBox &bbox, BBox &ibbox) const {
     if (! set_ || ! bbox.set_) return false;
 
@@ -136,6 +146,7 @@ class CBBox2DT {
         (pmax_.y < bbox.pmin_.y || pmin_.y > bbox.pmax_.y))
       return false;
 
+    ibbox.set_    = true;
     ibbox.pmin_.x = std::max(pmin_.x, bbox.pmin_.x);
     ibbox.pmin_.y = std::max(pmin_.y, bbox.pmin_.y);
     ibbox.pmax_.x = std::min(pmax_.x, bbox.pmax_.x);
