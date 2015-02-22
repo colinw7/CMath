@@ -327,25 +327,31 @@ class CBBox2DT {
     return fabs(getYMax() - getYMin());
   }
 
-  void moveBy(const Vector &delta) {
+  BBox &moveBy(const Vector &delta) {
     pmin_ += delta;
     pmax_ += delta;
 
     update();
+
+    return *this;
   }
 
-  void moveBy(const Point &delta) {
+  BBox &moveBy(const Point &delta) {
     pmin_ += delta;
     pmax_ += delta;
 
     update();
+
+    return *this;
   }
 
-  void moveBy(const Point &dmin, const Point &dmax) {
+  BBox &moveBy(const Point &dmin, const Point &dmax) {
     pmin_ += dmin;
     pmax_ += dmax;
 
     update();
+
+    return *this;
   }
 
   void print(std::ostream &os) const {
