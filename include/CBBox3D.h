@@ -72,6 +72,9 @@ class CBBox3DT {
   T getYMax() const { return pmax_.y; }
   T getZMax() const { return pmax_.z; }
 
+  Point getBottomMax() const { return Point(pmax_.x, pmax_.y, pmin_.z); }
+  Point getTopMin   () const { return Point(pmin_.x, pmin_.y, pmax_.z); }
+
   CBBox3DT operator+(const Point &rhs) const {
     CBBox3DT t(*this);
 

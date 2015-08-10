@@ -52,9 +52,13 @@ class CLine3DT {
   //------
 
   // accessors
-  const Point  &start () const { return p0_; }
-  const Point  &end   () const { return p1_; }
-  const Vector &vector() const { return v_ ; }
+  Point &start() { return p0_; }
+  Point &end  () { return p1_; }
+
+  const Point &start() const { return p0_; }
+  const Point &end  () const { return p1_; }
+
+  const Vector &vector() const { return v_; }
 
   Point point(double mu) const { return p0_ + mu*v_; }
 
@@ -73,6 +77,10 @@ class CLine3DT {
   void setVector(const Vector &v) {
     v_  = v;
     p1_ = p0_ + v;
+  }
+
+  void flip() {
+    std::swap(p0_, p1_);
   }
 
   //------
