@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <cmath>
 #include <CIPoint3D.h>
 
 template<typename T>
@@ -95,15 +96,21 @@ class CPoint3DT {
   //-----
 
   friend bool operator==(const CPoint3DT &lhs, const CPoint3DT &rhs) {
-    T dx = fabs(lhs.x - rhs.x);
-    T dy = fabs(lhs.y - rhs.y);
-    T dz = fabs(lhs.z - rhs.z);
-
-    return (dx < 1E-6 && dy < 1E-6 && dz < 1E-6);
+    return isEqual(lhs, rhs);
   }
 
   friend bool operator!=(const CPoint3DT &lhs, const CPoint3DT &rhs) {
     return ! (lhs == rhs);
+  }
+
+  //------
+
+  static bool isEqual(const CPoint3DT &lhs, const CPoint3DT &rhs, double tol=1E-6) {
+    T dx = fabs(lhs.x - rhs.x);
+    T dy = fabs(lhs.y - rhs.y);
+    T dz = fabs(lhs.z - rhs.z);
+
+    return (dx < tol && dy < tol && dz < tol);
   }
 
   //------
