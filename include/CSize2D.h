@@ -14,7 +14,7 @@ class CSize2DT {
   T width, height;
 
   CSize2DT() :
-   width(0), height() {
+   width(0), height(0) {
   }
 
   CSize2DT(T w, T h) :
@@ -69,6 +69,14 @@ class CSize2DT {
 
   friend Point operator+(const Point &p, const Size &s) {
     return (s + p);
+  }
+
+  friend bool operator==(const Size &lhs, const Size &rhs) {
+    return (lhs.width == rhs.width && lhs.height == rhs.height);
+  }
+
+  friend bool operator!=(const Size &lhs, const Size &rhs) {
+    return ! (lhs == rhs);
   }
 };
 
