@@ -11,11 +11,6 @@ class CBBox3DT {
   typedef CPoint3DT<T>  Point;
   typedef CVector3DT<T> Vector;
 
- protected:
-  Point pmin_;
-  Point pmax_;
-  bool  set_;
-
  public:
   CBBox3DT() :
    pmin_(), pmax_(), set_(false) {
@@ -330,6 +325,11 @@ class CBBox3DT {
 
     return os;
   }
+
+ protected:
+  Point pmin_;
+  Point pmax_;
+  bool  set_;
 };
 
 typedef CBBox3DT<double> CBBox3D;

@@ -10,14 +10,10 @@
 template<typename T>
 class CLine3DT {
  private:
-  typedef CPoint3DT<T>  Point;
-  typedef CVector3DT<T> Vector;
-  typedef CLine3DT<T>   Line;
-
- private:
-  Point  p0_;
-  Point  p1_;
-  Vector v_;
+  typedef CPoint3DT<T>            Point;
+  typedef CVector3DT<T>           Vector;
+  typedef CLine3DT<T>             Line;
+  typedef CMathGen::IntersectType IntersectType;
 
  public:
   // constructor/destructor
@@ -134,8 +130,7 @@ class CLine3DT {
   //------
 
   // intersect
-  CMathGen::IntersectType
-  intersect(const Line &line, T *t1, T *t2) {
+  IntersectType intersect(const Line &line, T *t1, T *t2) {
     T det = (v_.x_*line.v_.y_ - v_.y_*line.v_.x_);
 
     if (::fabs(det) == 0.0)
@@ -153,11 +148,10 @@ class CLine3DT {
       return CMathGen::INTERSECT_OUTSIDE;
   }
 
-  CMathGen::IntersectType
-  intersect(const Line &line, Point &point) {
+  IntersectType intersect(const Line &line, Point &point) {
     T t1, t2;
 
-    CMathGen::IntersectType type = intersect(line, &t1, &t2);
+    IntersectType type = intersect(line, &t1, &t2);
 
     if (type != CMathGen::INTERSECT_NONE) {
       point.x = p0_.x + v_.x_*t1;
@@ -177,6 +171,11 @@ class CLine3DT {
   T length() const {
     return ::sqrt(lengthSqr());
   }
+
+ private:
+  Point  p0_;
+  Point  p1_;
+  Vector v_;
 };
 
 typedef CLine3DT<double> CLine3D;

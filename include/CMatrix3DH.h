@@ -790,12 +790,12 @@ class CMatrix3DHT {
   //------
 
   void transpose() {
-    swap(m10_, m01_);
-    swap(m20_, m02_);
-    swap(m21_, m12_);
-    swap(m30_, m03_);
-    swap(m31_, m13_);
-    swap(m32_, m23_);
+    std::swap(m10_, m01_);
+    std::swap(m20_, m02_);
+    std::swap(m21_, m12_);
+    std::swap(m30_, m03_);
+    std::swap(m31_, m13_);
+    std::swap(m32_, m23_);
   }
 
   MatrixH transposed() const {

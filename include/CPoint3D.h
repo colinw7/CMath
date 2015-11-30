@@ -4,12 +4,14 @@
 #include <cassert>
 #include <iostream>
 #include <cmath>
+#include <CPoint2D.h>
 #include <CIPoint3D.h>
 
 template<typename T>
 class CPoint3DT {
  private:
   typedef CIPoint3DT<int> IPoint;
+  typedef CPoint2DT<T>    Point2D;
 
  public:
   T x, y, z;
@@ -31,7 +33,13 @@ class CPoint3DT {
    x(point.x), y(point.y), z(point.z) {
   }
 
-  IPoint toIPoint() { return IPoint(int(x), int(y), int(z)); }
+  CPoint3DT(const Point2D &point, double z=0) :
+   x(point.x), y(point.y), z(z) {
+  }
+
+  IPoint toIPoint() const { return IPoint(int(x), int(y), int(z)); }
+
+  Point2D toPoint2D() const { return Point2D(x, y); }
 
   T getX() const { return x; }
   T getY() const { return y; }

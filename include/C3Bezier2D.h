@@ -484,7 +484,7 @@ class C3Bezier2DT {
       int    oldI1 = minI1;
       double minD1 = 1E50;
 
-      for (uint i = 1; i < steps; ++i) {
+      for (int i = 1; i < steps; ++i) {
         double x11, y11;
 
         if (use_dx) {
@@ -534,7 +534,7 @@ class C3Bezier2DT {
       int    oldI2 = minI2;
       double minD2 = 1E50;
 
-      for (uint i = 1; i < steps; ++i) {
+      for (int i = 1; i < steps; ++i) {
         double x21, y21;
 
         if (use_dx) {

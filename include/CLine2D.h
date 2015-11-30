@@ -15,10 +15,6 @@ class CLine2DT : public CShape2DT<T> {
   typedef CVector2DT<T> Vector;
   typedef CBBox2DT<T>   BBox;
 
- private:
-  Point  p1_, p2_;
-  Vector v_;
-
  public:
   static void setInsideTolerance(T t) {
     *CLine2DT<T>::insideToleranceP() = t;
@@ -132,8 +128,7 @@ class CLine2DT : public CShape2DT<T> {
     *t1 = (line.v_.getX()*dy - line.v_.getY()*dx)*idet;
     *t2 = (     v_.getX()*dy -      v_.getY()*dx)*idet;
 
-    if (*t1 >= 0.0 && *t1 <= 1.0 &&
-        *t2 >= 0.0 && *t2 <= 1.0)
+    if (*t1 >= 0.0 && *t1 <= 1.0 && *t2 >= 0.0 && *t2 <= 1.0)
       return CMathGen::INTERSECT_INSIDE;
     else
       return CMathGen::INTERSECT_OUTSIDE;
@@ -257,6 +252,10 @@ class CLine2DT : public CShape2DT<T> {
            (point3.x - point1.x)*(point2.y - point1.y);
 
   }
+
+ private:
+  Point  p1_, p2_;
+  Vector v_;
 };
 
 typedef CLine2DT<double> CLine2D;

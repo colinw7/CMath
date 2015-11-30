@@ -210,7 +210,7 @@ class CVector3DT {
   // v = vector2 - vector1
   CVector3DT(const Vector &vector1, const Vector &vector2) :
    x_(vector2.x_ - vector1.x_), y_(vector2.y_ - vector1.y_),
-   x_(vector2.z_ - vector1.z_), normalized_(false) {
+   z_(vector2.z_ - vector1.z_), normalized_(false) {
   }
 
   //------

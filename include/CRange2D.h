@@ -4,57 +4,78 @@
 template<typename T>
 class CRange2DT {
  public:
-  T x1, y1, x2, y2;
-
-  explicit CRange2DT(T x1=0.0, T y1=0.0, T x2=0.0, T y2=0.0) {
-    set(x1, y1, x2, y2);
+  CRange2DT() :
+   set_(false), x1_(0), y1_(0), x2_(0), y2_(0) {
   }
 
-  void set(T x11, T y11, T x21, T y21) {
-    x1 = x11, y1 = y11, x2 = x21, y2 = y21;
+  CRange2DT(T x1, T y1, T x2, T y2) :
+   set_(true), x1_(x1), y1_(y1), x2_(x2), y2_(y2) {
   }
 
-  void get(T *x11, T *y11, T *x21, T *y21) const {
-    *x11 = x1, *y11 = y1, *x21 = x2, *y21 = y2;
+  bool isSet() const { return set_; }
+
+  void set(T x1, T y1, T x2, T y2) {
+    set_ = true;
+
+    x1_ = x1; y1_ = y1;
+    x2_ = x2; y2_ = y2;
   }
 
-  T dx() const { return x2 - x1; }
-  T dy() const { return y2 - y1; }
+  bool get(T *x1, T *y1, T *x2, T *y2) const {
+    *x1 = x1_; *y1 = y1_;
+    *x2 = x2_; *y2 = y2_;
 
-  T xmid() const { return 0.5*(x2 + x1); }
-  T ymid() const { return 0.5*(y2 + y1); }
+    return set_;
+  }
 
-  T xmin() const { return min(x1, x2); }
-  T ymin() const { return min(y1, y2); }
-  T xmax() const { return max(x1, x2); }
-  T ymax() const { return max(y1, y2); }
+  T dx() const { assert(set_); return x2_ - x1_; }
+  T dy() const { assert(set_); return y2_ - y1_; }
 
-  T left  () const { return x1; }
-  T bottom() const { return y1; }
-  T right () const { return x2; }
-  T top   () const { return y2; }
+  T xmid() const { assert(set_); return (x2_ + x1_)/2; }
+  T ymid() const { assert(set_); return (y2_ + y1_)/2; }
 
-  void setLeft  (const T &t) { x1 = t; }
-  void setBottom(const T &t) { y1 = t; }
-  void setRight (const T &t) { x2 = t; }
-  void setTop   (const T &t) { y2 = t; }
+  T xmin() const { assert(set_); return std::min(x1_, x2_); }
+  T ymin() const { assert(set_); return std::min(y1_, y2_); }
+  T xmax() const { assert(set_); return std::max(x1_, x2_); }
+  T ymax() const { assert(set_); return std::max(y1_, y2_); }
 
-  T xsize() const { return fabs(x2 - x1); }
-  T ysize() const { return fabs(y2 - y1); }
+  T left  () const { assert(set_); return x1_; }
+  T bottom() const { assert(set_); return y1_; }
+  T right () const { assert(set_); return x2_; }
+  T top   () const { assert(set_); return y2_; }
 
-  void inc(T dx, T dy) { x1 += dx; y1 += dy; x2 += dx; y2 += dy; }
+  void setLeft  (const T &t) { set_ = true; x1_ = t; }
+  void setBottom(const T &t) { set_ = true; y1_ = t; }
+  void setRight (const T &t) { set_ = true; x2_ = t; }
+  void setTop   (const T &t) { set_ = true; y2_ = t; }
 
-  void incX(T dx) { x1 += dx; x2 += dx; }
-  void incY(T dy) { y1 += dy; y2 += dy; }
+  T xsize() const { assert(set_); return fabs(x2_ - x1_); }
+  T ysize() const { assert(set_); return fabs(y2_ - y1_); }
+
+  void inc(T dx, T dy) {
+    assert(set_);
+
+    x1_ += dx; y1_ += dy;
+    x2_ += dx; y2_ += dy;
+  }
+
+  void incX(T dx) { assert(set_); x1_ += dx; x2_ += dx; }
+  void incY(T dy) { assert(set_); y1_ += dy; y2_ += dy; }
 
   CRange2DT &operator=(const CRange2DT &range) {
-    x1 = range.x1; y1 = range.y1;
-    x2 = range.x2; y2 = range.y2;
+    set_ = range.set_;
+    x1_  = range.x1_; y1_ = range.y1_;
+    x2_  = range.x2_; y2_ = range.y2_;
 
     return *this;
   }
+
+ private:
+  bool set_;
+  T    x1_, y1_, x2_, y2_;
 };
 
 typedef CRange2DT<double> CRange2D;
+typedef CRange2DT<int>    CIRange2D;
 
 #endif

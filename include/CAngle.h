@@ -22,7 +22,11 @@ class CAngle {
   static double Deg2Rad(double d) { return M_PI*d/180.0; }
   static double Rad2Deg(double d) { return 180.0*d/M_PI; }
 
-  CAngle(Type type=Type::DEGREES, double angle=0.0) :
+  explicit CAngle(double angle=0.0) :
+   type_(Type::DEGREES), angle_(angle) {
+  }
+
+  explicit CAngle(Type type, double angle=0.0) :
    type_(type), angle_(angle) {
   }
 
