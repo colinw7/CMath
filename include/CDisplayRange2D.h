@@ -2,8 +2,6 @@
 #define CDISPLAY_RANGE_2D_H
 
 #include <CMathGen.h>
-#include <CRange2D.h>
-#include <CIRange2D.h>
 #include <CMatrix2D.h>
 #include <CBBox2D.h>
 #include <CAlignType.h>
@@ -11,55 +9,34 @@
 // Class to represent a 2D mapping from window to pixel coordinates
 class CDisplayRange2D {
  public:
-  struct IRange {
-   int xmin, ymin, xmax, ymax;
+  template<typename T>
+  struct RangeT {
+   T xmin, ymin, xmax, ymax;
 
-   IRange(int xmin1=0, int ymin1=0, int xmax1=0, int ymax1=0) :
+   RangeT(T xmin1=0, T ymin1=0, T xmax1=0, T ymax1=0) :
     xmin(xmin1), ymin(ymin1), xmax(xmax1), ymax(ymax1) {
    }
 
-   void set(int xmin1, int ymin1, int xmax1, int ymax1) {
+   void set(T xmin1, T ymin1, T xmax1, T ymax1) {
      xmin = xmin1; ymin = ymin1; xmax = xmax1; ymax = ymax1;
    }
 
-   void get(int *xmin1, int *ymin1, int *xmax1, int *ymax1) const {
+   void get(T *xmin1, T *ymin1, T *xmax1, T *ymax1) const {
      *xmin1 = xmin; *ymin1 = ymin; *xmax1 = xmax; *ymax1 = ymax;
    }
 
-   int dx() const { return xmax - xmin; }
-   int dy() const { return ymax - ymin; }
+   T dx() const { return xmax - xmin; }
+   T dy() const { return ymax - ymin; }
 
-   int xmid() const { return (xmin + xmax)/2 ; }
-   int ymid() const { return (ymin + ymax)/2; }
+   T xmid() const { return (xmin + xmax)/2 ; }
+   T ymid() const { return (ymin + ymax)/2; }
 
-   void incX(int dx) { xmin += dx; xmax += dx; }
-   void incY(int dy) { ymin += dy; ymax += dy; }
+   void incX(T dx) { xmin += dx; xmax += dx; }
+   void incY(T dy) { ymin += dy; ymax += dy; }
   };
 
-  struct RRange {
-   double xmin, ymin, xmax, ymax;
-
-   RRange(double xmin1=0, double ymin1=0, double xmax1=0, double ymax1=0) :
-    xmin(xmin1), ymin(ymin1), xmax(xmax1), ymax(ymax1) {
-   }
-
-   void set(double xmin1, double ymin1, double xmax1, double ymax1) {
-     xmin = xmin1; ymin = ymin1; xmax = xmax1; ymax = ymax1;
-   }
-
-   void get(double *xmin1, double *ymin1, double *xmax1, double *ymax1) const {
-     *xmin1 = xmin; *ymin1 = ymin; *xmax1 = xmax; *ymax1 = ymax;
-   }
-
-   double dx() const { return xmax - xmin; }
-   double dy() const { return ymax - ymin; }
-
-   double xmid() const { return (xmin + xmax)/2 ; }
-   double ymid() const { return (ymin + ymax)/2; }
-
-   void incX(double dx) { xmin += dx; xmax += dx; }
-   void incY(double dy) { ymin += dy; ymax += dy; }
-  };
+  typedef RangeT<int>    IRange;
+  typedef RangeT<double> RRange;
 
  public:
   CDisplayRange2D(int    pixel_xmin  =   0, int    pixel_ymin  =   0,
@@ -93,13 +70,8 @@ class CDisplayRange2D {
     pixel_.get(pixel_xmin, pixel_ymin, pixel_xmax, pixel_ymax);
   }
 
-  int getPixelWidth() const {
-    return pixel_.dx();
-  }
-
-  int getPixelHeight() const {
-    return pixel_.dy();
-  }
+  int getPixelWidth () const { return pixel_.dx(); }
+  int getPixelHeight() const { return pixel_.dy(); }
 
   void getWindowRange(double *window_xmin, double *window_ymin,
                       double *window_xmax, double *window_ymax) const {
@@ -114,64 +86,35 @@ class CDisplayRange2D {
     bbox = CBBox2D(CPoint2D(window_xmin, window_ymin), CPoint2D(window_xmax, window_ymax));
   }
 
-  double getWindowWidth() const {
-    return window_.dx();
-  }
+  double getWindowWidth () const { return window_.dx(); }
+  double getWindowHeight() const { return window_.dy(); }
 
-  double getWindowHeight() const {
-    return window_.dy();
-  }
+  CPoint2D getWindowCenter() const { return CPoint2D(window_.xmid(), window_.ymid()); }
 
-  CPoint2D getWindowCenter() const {
-    return CPoint2D(window_.xmid(), window_.ymid());
-  }
-
-  void setEqualScale(bool flag) {
-    equal_scale_ = flag;
-
-    recalc();
-  }
-
+  // get/set equal scale flag
   bool getEqualScale() const { return equal_scale_; }
-
-  void setScaleMin(bool flag) {
-    scale_min_ = flag;
-
-    recalc();
-  }
+  void setEqualScale(bool flag) { equal_scale_ = flag; recalc(); }
 
   bool getScaleMin() const { return scale_min_; }
-
-  void setHAlign(CHAlignType halign) {
-    halign_ = halign;
-
-    recalc();
-  }
-
-  void setVAlign(CVAlignType valign) {
-    valign_ = valign;
-
-    recalc();
-  }
-
-  void setAlign(CHAlignType halign, CVAlignType valign) {
-    halign_ = halign;
-    valign_ = valign;
-
-    recalc();
-  }
+  void setScaleMin(bool flag) { scale_min_ = flag; recalc(); }
 
   CHAlignType getHAlign() const { return halign_; }
+  void setHAlign(CHAlignType halign) { halign_ = halign; recalc(); }
+
   CVAlignType getVAlign() const { return valign_; }
+  void setVAlign(CVAlignType valign) { valign_ = valign; recalc(); }
+
+  void setAlign(CHAlignType halign, CVAlignType valign) {
+    halign_ = halign; valign_ = valign;
+    recalc();
+  }
 
   bool getFlipX() const { return flip_x_; }
   bool getFlipY() const { return flip_y_; }
 
-  void zoomIn(double factor) {
-    zoomOut(1.0/factor);
-  }
+  void zoomIn(double factor=2.0) { zoomOut(1.0/factor); }
 
-  void zoomOut(double factor) {
+  void zoomOut(double factor=2.0) {
     double window_hwidth  = 0.5*window_width1_ *factor;
     double window_hheight = 0.5*window_height1_*factor;
 
@@ -190,23 +133,10 @@ class CDisplayRange2D {
     scrollY(offset_y);
   }
 
-  void scrollX(double offset_x) {
-    window1_.incX(offset_x);
+  void scrollX(double offset_x) { window1_.incX(offset_x); recalc(); }
+  void scrollY(double offset_y) { window1_.incY(offset_y); recalc(); }
 
-    recalc();
-  }
-
-  void scrollY(double offset_y) {
-    window1_.incY(offset_y);
-
-    recalc();
-  }
-
-  void reset() {
-    window1_ = window_;
-
-    recalc();
-  }
+  void reset() { window1_ = window_; recalc(); }
 
   void recalc() {
     window_xc1_ = window1_.xmid();
@@ -343,11 +273,39 @@ class CDisplayRange2D {
   }
 
   void pixelLengthToWindowLength(double pixel, double *window) const {
-    double window_x, window_y;
+    pixelWidthToWindowWidth(pixel, window);
+  }
 
-    pixelToWindow(pixel, pixel, &window_x, &window_y);
+  void pixelWidthToWindowWidth(double pixel, double *window) const {
+    if (pixel < 0) {
+      pixelWidthToWindowWidth(-pixel, window);
+      *window = -(*window);
+      return;
+    }
 
-    *window = window_x;
+    double window_x1, window_y1;
+    double window_x2, window_y2;
+
+    pixelToWindow(0    , 0    , &window_x1, &window_y1);
+    pixelToWindow(pixel, pixel, &window_x2, &window_y2);
+
+    *window = fabs(window_x2 - window_x1);
+  }
+
+  void pixelHeightToWindowHeight(double pixel, double *window) const {
+    if (pixel < 0) {
+      pixelHeightToWindowHeight(-pixel, window);
+      *window = -(*window);
+      return;
+    }
+
+    double window_x1, window_y1;
+    double window_x2, window_y2;
+
+    pixelToWindow(0    , 0    , &window_x1, &window_y1);
+    pixelToWindow(pixel, pixel, &window_x2, &window_y2);
+
+    *window = fabs(window_y2 - window_y1);
   }
 
   bool checkPixel(int x, int y) {
@@ -364,10 +322,10 @@ class CDisplayRange2D {
 
   RRange window1_;
 
-  double window_xc1_, window_yc1_;
+  double window_xc1_   , window_yc1_    ;
   double window_width1_, window_height1_;
 
-  double factor_x_, factor_y_;
+  double factor_x_ , factor_y_ ;
   double factor_x1_, factor_y1_;
 
   double pdx_, pdy_;
