@@ -10,6 +10,19 @@
 #include <iostream>
 #include <sys/types.h>
 
+#define PI2       6.283185407
+#define PI_DIV_2  1.570796327
+#define PI_DIV_4  0.785398163
+#define PI3_DIV_2 4.712388980
+#define PI_INV    0.318309886
+
+#define PI_F        3.141592654f
+#define PI2_F       6.283185407f
+#define PI_DIV_2_F  1.570796327f
+#define PI_DIV_4_F  0.785398163f
+#define PI3_DIV_2_F 4.712388980f
+#define PI_INV_F    0.318309886f
+
 #define DEG_TO_RAD(d) (M_PI*(d)/180.0)
 #define RAD_TO_DEG(r) ((180.0*(r))/M_PI)
 
@@ -268,6 +281,62 @@ namespace CMathGen {
     }
 
     return r;
+  }
+
+  // note: usual argument order of atan2 flipped - ugh
+  inline float atan2(float x, float y) {
+    if      (fabsf(x) < 1E-6) {
+      if      (fabsf(y) < 1E-6)
+        return 0.0f;
+      else if (y > 0.0f)
+        return PI_DIV_2_F;
+      else
+        return PI3_DIV_2_F;
+    }
+    else if (fabsf(y) < 1E-6) {
+      if      (fabsf(x) < 1E-6)
+        return 0.0f;
+      else if (x > 0.0f)
+        return 0.0f;
+      else
+        return PI_F;
+    }
+    else {
+      float angle = ::atan2(y, x);
+
+      if (angle >= 0.0f)
+        return angle;
+      else
+        return (PI2_F + angle);
+    }
+  }
+
+  // note: usual argument order of atan2 flipped - ugh
+  inline double atan2(double x, double y) {
+    if      (fabs(x) < 1E-6) {
+      if      (fabs(y) < 1E-6)
+        return 0.0;
+      else if (y > 0.0)
+        return PI_DIV_2;
+      else
+        return PI3_DIV_2;
+    }
+    else if (fabs(y) < 1E-6) {
+      if      (fabs(x) < 1E-6)
+        return 0.0;
+      else if (x > 0.0)
+        return 0.0;
+      else
+        return M_PI;
+    }
+    else {
+      double angle = ::atan2(y, x);
+
+      if (angle >= 0.0)
+        return angle;
+      else
+        return (PI2 + angle);
+    }
   }
 
   template<typename T>
