@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cassert>
 #include <cstdlib>
+#include <climits>
 #include <iostream>
 #include <sys/types.h>
 
@@ -61,6 +62,12 @@ namespace CMathGen {
     INTERSECT_VALID   = (INTERSECT_INSIDE | INTERSECT_OUTSIDE)
   };
 
+  enum Rounding {
+    ROUND_DOWN,
+    ROUND_UP,
+    ROUND_NEAREST
+  };
+
   inline int Round(double x) {
     if (x >= 0.0) return int(x + 0.5);
     else          return int(x - 0.5);
@@ -74,6 +81,46 @@ namespace CMathGen {
   inline int RoundUp(double x) {
     if (x >= 0.0) return int(x + 0.999999);
                   return int(x - 0.999999);
+  }
+
+  inline int RoundNearest(double x) {
+    double x1;
+
+    if (x <= 0.0)
+      x1 = (x - 0.499999);
+    else
+      x1 = (x + 0.500001);
+
+    if (x1 < INT_MIN || x1 > INT_MAX)
+      errno = ERANGE;
+
+    return int(x1);
+  }
+
+  inline int Round(double x, Rounding rounding) {
+     switch (rounding) {
+      case ROUND_UP  : return RoundUp(x);
+      case ROUND_DOWN: return RoundDown(x);
+      default        : return RoundNearest(x);
+    }
+  }
+
+  inline bool cmp(double a, double b, double prec=1E-5) {
+    return (std::fabs(a - b) < prec);
+  }
+
+  //-----
+
+  inline double DSin(double angle) {
+    return sin(DEG_TO_RAD(angle));
+  }
+
+  inline double DCos(double angle) {
+    return cos(DEG_TO_RAD(angle));
+  }
+
+  inline double DTan(double angle) {
+    return tan(DEG_TO_RAD(angle));
   }
 
   //-----

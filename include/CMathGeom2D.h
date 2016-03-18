@@ -616,6 +616,41 @@ namespace CMathGeom2D {
 
   bool SlicePolygonByLines(const std::vector<CPoint2D> &poly, const CLine2D &line,
                            std::vector< std::vector<CPoint2D> > &opolys);
+
+  //---
+
+  void PointsRange(const std::vector<CPoint2D> &points, CPoint2D &min_point, CPoint2D &max_point) {
+    uint num_points = points.size();
+
+    assert(num_points > 0);
+
+    min_point = points[0];
+    max_point = min_point;
+
+    for (uint i = 1; i < num_points; ++i) {
+      min_point.x = std::min(min_point.x, points[i].x);
+      min_point.y = std::min(min_point.y, points[i].y);
+      max_point.x = std::max(max_point.x, points[i].x);
+      max_point.y = std::max(max_point.y, points[i].y);
+    }
+  }
+
+  void PointsRange(const std::vector<CIPoint2D> &points, CIPoint2D &min_point,
+                   CIPoint2D &max_point) {
+    uint num_points = points.size();
+
+    assert(num_points > 0);
+
+    min_point = points[0];
+    max_point = min_point;
+
+    for (uint i = 1; i < num_points; ++i) {
+      min_point.x = std::min(min_point.x, points[i].x);
+      min_point.y = std::min(min_point.y, points[i].y);
+      max_point.x = std::max(max_point.x, points[i].x);
+      max_point.y = std::max(max_point.y, points[i].y);
+    }
+  }
 }
 
 #endif
