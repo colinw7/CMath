@@ -619,7 +619,8 @@ namespace CMathGeom2D {
 
   //---
 
-  void PointsRange(const std::vector<CPoint2D> &points, CPoint2D &min_point, CPoint2D &max_point) {
+  inline void PointsRange(const std::vector<CPoint2D> &points, CPoint2D &min_point,
+                          CPoint2D &max_point) {
     uint num_points = points.size();
 
     assert(num_points > 0);
@@ -635,8 +636,8 @@ namespace CMathGeom2D {
     }
   }
 
-  void PointsRange(const std::vector<CIPoint2D> &points, CIPoint2D &min_point,
-                   CIPoint2D &max_point) {
+  inline void PointsRange(const std::vector<CIPoint2D> &points, CIPoint2D &min_point,
+                          CIPoint2D &max_point) {
     uint num_points = points.size();
 
     assert(num_points > 0);

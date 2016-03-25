@@ -559,21 +559,35 @@ class CMatrix2DT {
   //------
 
   bool isIdentity() const {
-    return REAL_EQ(m00_, 1.0) && REAL_EQ(m11_, 1.0) && REAL_EQ(m22_, 1.0) &&
-           REAL_EQ(m10_, 0.0) && REAL_EQ(m01_, 0.0) &&
-           REAL_EQ(m20_, 0.0) && REAL_EQ(m02_, 0.0) &&
-           REAL_EQ(m12_, 0.0) && REAL_EQ(m21_, 0.0);
+    return isInnerIdentity() && isTranslateIdentity() &&
+           REAL_EQ(m20_, 0.0) && REAL_EQ(m21_, 0.0) && REAL_EQ(m22_, 1.0);
+  }
+
+  bool isInnerIdentity() const {
+    return REAL_EQ(m00_, 1.0) && REAL_EQ(m01_, 0.0) &&
+           REAL_EQ(m10_, 0.0) && REAL_EQ(m11_, 1.0);
+  }
+
+  bool isTranslateIdentity() const {
+    return REAL_EQ(m02_, 0.0) && REAL_EQ(m12_, 0.0);
+  }
+
+  bool isInnerRotation() const {
+    return ! REAL_EQ(m01_, 0.0) && ! REAL_EQ(m10_, 0.0);
   }
 
   double getAngle() const {
     return asin(m10_);
   }
 
-  //------
-
   void getSize(double *sx, double *sy) const {
     *sx = fabs(m00_ + m01_);
     *sy = fabs(m10_ + m11_);
+  }
+
+  void getTranslate(double *tx, double *ty) const {
+    *tx = m02_;
+    *ty = m12_;
   }
 
   //------

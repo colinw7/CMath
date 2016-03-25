@@ -68,21 +68,6 @@ namespace CMathGen {
     ROUND_NEAREST
   };
 
-  inline int Round(double x) {
-    if (x >= 0.0) return int(x + 0.5);
-    else          return int(x - 0.5);
-  }
-
-  inline int RoundDown(double x) {
-    if (x >= 0.0) return int(x);
-                  return int(x);
-  }
-
-  inline int RoundUp(double x) {
-    if (x >= 0.0) return int(x + 0.999999);
-                  return int(x - 0.999999);
-  }
-
   inline int RoundNearest(double x) {
     double x1;
 
@@ -97,8 +82,36 @@ namespace CMathGen {
     return int(x1);
   }
 
-  inline int Round(double x, Rounding rounding) {
-     switch (rounding) {
+  inline int RoundUp(double x) {
+    double x1;
+
+    if (x <= 0.0)
+      x1 = (x       - 1E-6);
+    else
+      x1 = (x + 1.0 - 1E-6);
+
+    if (x1 < INT_MIN || x1 > INT_MAX)
+      errno = ERANGE;
+
+    return int(x1);
+  }
+
+  inline int RoundDown(double x) {
+    double x1;
+
+    if (x >= 0.0)
+      x1 = (x       + 1E-6);
+    else
+      x1 = (x - 1.0 + 1E-6);
+
+    if (x1 < INT_MIN || x1 > INT_MAX)
+      errno = ERANGE;
+
+    return int(x1);
+  }
+
+  inline int Round(double x, Rounding rounding=ROUND_NEAREST) {
+    switch (rounding) {
       case ROUND_UP  : return RoundUp(x);
       case ROUND_DOWN: return RoundDown(x);
       default        : return RoundNearest(x);
