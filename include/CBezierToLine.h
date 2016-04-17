@@ -23,12 +23,12 @@ class CBezierToLine {
 
     //----
 
-    if (bezier_points_.size() <= MAX_BEZIER_DEPTH)
-      bezier_points_.resize(MAX_BEZIER_DEPTH + 1);
+    if (bezierPoints_.size() <= MAX_BEZIER_DEPTH)
+      bezierPoints_.resize(MAX_BEZIER_DEPTH + 1);
 
     uint num_points = 0;
 
-    bezier.getFirstPoint(&bezier_points_[0].x, &bezier_points_[0].y);
+    bezier.getFirstPoint(&bezierPoints_[0].x, &bezierPoints_[0].y);
 
     ++num_points;
 
@@ -36,7 +36,7 @@ class CBezierToLine {
 
     //----
 
-    bezier_points_.resize(num_points);
+    bezierPoints_.resize(num_points);
   }
 
   void calc(const C2Bezier2D &bezier) {
@@ -44,12 +44,12 @@ class CBezierToLine {
 
     //----
 
-    if (bezier_points_.size() <= MAX_BEZIER_DEPTH)
-      bezier_points_.resize(MAX_BEZIER_DEPTH + 1);
+    if (bezierPoints_.size() <= MAX_BEZIER_DEPTH)
+      bezierPoints_.resize(MAX_BEZIER_DEPTH + 1);
 
     uint num_points = 0;
 
-    bezier.getFirstPoint(&bezier_points_[0].x, &bezier_points_[0].y);
+    bezier.getFirstPoint(&bezierPoints_[0].x, &bezierPoints_[0].y);
 
     ++num_points;
 
@@ -57,7 +57,7 @@ class CBezierToLine {
 
     //----
 
-    bezier_points_.resize(num_points);
+    bezierPoints_.resize(num_points);
   }
 
   virtual void init(const C3Bezier2D &bezier) {
@@ -84,9 +84,9 @@ class CBezierToLine {
     return (s <= tol_);
   }
 
-  uint getNumPoints() const { return bezier_points_.size(); }
+  uint getNumPoints() const { return bezierPoints_.size(); }
 
-  const CPoint2D &getPoint(uint i) const { return bezier_points_[i]; }
+  const CPoint2D &getPoint(uint i) const { return bezierPoints_[i]; }
 
   void toLines(const C2Bezier2D &bezier, std::vector<CPoint2D> &points) {
     calc(bezier);
@@ -112,13 +112,13 @@ class CBezierToLine {
 
  private:
   void calc1(const C3Bezier2D &bezier, uint *num_points, uint depth) {
-    if (*num_points >= bezier_points_.size())
-      bezier_points_.resize(2*bezier_points_.size() + *num_points + 1);
+    if (*num_points >= bezierPoints_.size())
+      bezierPoints_.resize(2*bezierPoints_.size() + *num_points + 1);
 
     //-----
 
     if (depth >= MAX_BEZIER_DEPTH) {
-      bezier.getLastPoint(&bezier_points_[*num_points].x, &bezier_points_[*num_points].y);
+      bezier.getLastPoint(&bezierPoints_[*num_points].x, &bezierPoints_[*num_points].y);
 
       ++(*num_points);
 
@@ -161,20 +161,20 @@ class CBezierToLine {
       calc1(bezier2, num_points, depth + 1);
     }
     else {
-      bezier.getLastPoint(&bezier_points_[*num_points].x, &bezier_points_[*num_points].y);
+      bezier.getLastPoint(&bezierPoints_[*num_points].x, &bezierPoints_[*num_points].y);
 
       ++(*num_points);
     }
   }
 
   void calc1(const C2Bezier2D &bezier, uint *num_points, uint depth) {
-    if (*num_points >= bezier_points_.size())
-      bezier_points_.resize(2*bezier_points_.size() + *num_points + 1);
+    if (*num_points >= bezierPoints_.size())
+      bezierPoints_.resize(2*bezierPoints_.size() + *num_points + 1);
 
     //-----
 
     if (depth >= MAX_BEZIER_DEPTH) {
-      bezier.getLastPoint(&bezier_points_[*num_points].x, &bezier_points_[*num_points].y);
+      bezier.getLastPoint(&bezierPoints_[*num_points].x, &bezierPoints_[*num_points].y);
 
       ++(*num_points);
 
@@ -224,7 +224,7 @@ class CBezierToLine {
       calc1(bezier2, num_points, depth + 1);
     }
     else {
-      bezier.getLastPoint(&bezier_points_[*num_points].x, &bezier_points_[*num_points].y);
+      bezier.getLastPoint(&bezierPoints_[*num_points].x, &bezierPoints_[*num_points].y);
 
       ++(*num_points);
     }
@@ -232,7 +232,7 @@ class CBezierToLine {
 
  protected:
   double    tol_;
-  PointList bezier_points_;
+  PointList bezierPoints_;
 };
 
 #endif

@@ -10,12 +10,9 @@ enum CGradientSpreadType {
   CGRADIENT_SPREAD_REFLECT
 };
 
-class CGradientStop {
- private:
-  CRGBA  rgba_;
-  double offset_;
-  double offset1_;
+//---
 
+class CGradientStop {
  public:
   CGradientStop(const CRGBA &rgba, double offset) :
    rgba_(rgba), offset_(offset), offset1_(0.0) {
@@ -33,15 +30,18 @@ class CGradientStop {
 
   double getOffset1() const { return offset1_; }
   void setOffset1(double offset) { offset1_ = offset; }
+
+ private:
+  CRGBA  rgba_;
+  double offset_;
+  double offset1_;
 };
+
+//---
 
 class CGenGradient {
  public:
   typedef std::vector<CGradientStop> StopList;
-
- protected:
-  StopList            stops_;
-  CGradientSpreadType spread_;
 
  public:
   CGenGradient() :
@@ -90,6 +90,10 @@ class CGenGradient {
 
  private:
   const CGenGradient &operator=(const CGenGradient &g);
+
+ protected:
+  StopList            stops_;
+  CGradientSpreadType spread_;
 };
 
 #endif

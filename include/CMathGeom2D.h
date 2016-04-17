@@ -239,10 +239,89 @@ namespace CMathGeom2D {
     return true;
   }
 
-  bool CircleLineIntersect(double xc, double yc, double r,
-                           double x1, double y1, double x2, double y2,
-                           double *xi1, double *yi1,
-                           double *xi2, double *yi2, uint *num_i);
+  inline bool CircleLineIntersect(double xc, double yc, double r,
+                                  double x1, double y1, double x2, double y2,
+                                  double *xi1, double *yi1,
+                                  double *xi2, double *yi2, uint *num_i) {
+    // Transform to origin
+    x1 -= xc; y1 -= yc;
+    x2 -= xc; y2 -= yc;
+
+    // Calculate discriminant
+    double dx = x2 - x1;
+    double dy = y2 - y1;
+
+    double dr2 = dx*dx + dy*dy;
+
+    if (dr2 <= 0.0)
+      return false;
+
+    double idr2 = 1.0/dr2;
+
+    double dd = x1*y2 - x2*y1;
+
+    double dd2 = dd*dd;
+
+    double r2 = r*r;
+
+    double dis = r2*dr2 - dd2;
+
+    if (dis < 0.0) {
+      *num_i = 0;
+
+      return false;
+    }
+
+      // Calculate intersection
+    if (dis != 0) {
+      double sdy = (dy < 0.0 ? -1.0 : 1.0);
+
+      dis = sqrt(dis);
+
+      double dd_idr2 = dd*idr2;
+
+      double dddx_idr2 = dd_idr2*dx;
+      double dddy_idr2 = dd_idr2*dy;
+
+      double sdydis_idr2 = sdy*dis*idr2;
+
+      double sdydxdis_idr2 = sdydis_idr2*dx;
+      double sdydydis_idr2 = sdydis_idr2*dy;
+
+      if (xi1 != NULL)
+        *xi1 =  dddy_idr2 - sdydxdis_idr2 + xc;
+
+      if (yi1 != NULL)
+        *yi1 = -dddx_idr2 - sdydydis_idr2 + yc;
+
+      if (xi2 != NULL)
+        *xi2 =  dddy_idr2 + sdydxdis_idr2 + xc;
+
+      if (yi2 != NULL)
+        *yi2 = -dddx_idr2 + sdydydis_idr2 + yc;
+
+      *num_i = 2;
+    }
+    else {
+      *num_i = 1;
+
+      double dd_idr2 = dd*idr2;
+
+      if (xi1 != NULL)
+        *xi1 =  dd_idr2*dy + xc;
+
+      if (yi1 != NULL)
+        *yi1 = -dd_idr2*dx + yc;
+
+      if (xi2 != NULL)
+        *xi2 = *xi1;
+
+      if (yi2 != NULL)
+        *yi2 = *yi1;
+    }
+
+    return true;
+  }
 }
 
 namespace CMathGeom2D {

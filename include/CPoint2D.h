@@ -3,8 +3,8 @@
 
 #include <CIPoint2D.h>
 
-#include <cmath>
 #include <cassert>
+#include <cmath>
 
 template<typename T>
 class CPoint2DT {

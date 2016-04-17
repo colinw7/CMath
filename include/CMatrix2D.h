@@ -7,6 +7,7 @@
 #include <CMatrixType.h>
 #include <CThrow.h>
 #include <cstring>
+#include <sstream>
 
 /* / a b tx \ */
 /* | c d ty | */
@@ -100,6 +101,14 @@ class CMatrix2DT {
   }
 
   //------
+
+  std::string toString() const {
+    std::ostringstream ss;
+
+    ss << *this;
+
+    return ss.str();
+  }
 
   // output
   void print(std::ostream &os) const {

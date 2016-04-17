@@ -5,12 +5,6 @@
 #include <CMathGeom2D.h>
 
 class CRadialGradient : public CGenGradient {
- private:
-  double cx_, cy_, r_;
-  double fx_, fy_;
-  double cx1_, cy1_, r1_;
-  double fx1_, fy1_;
-
  public:
   CRadialGradient() :
    CGenGradient(), cx_(0), cy_(0), r_(1), fx_(0), fy_(0),
@@ -173,6 +167,12 @@ class CRadialGradient : public CGenGradient {
 
  private:
   const CRadialGradient &operator=(const CRadialGradient &rg);
+
+ private:
+  double cx_, cy_, r_;
+  double fx_, fy_;
+  double cx1_, cy1_, r1_;
+  double fx1_, fy1_;
 };
 
 #endif

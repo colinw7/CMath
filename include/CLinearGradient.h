@@ -7,11 +7,6 @@
 #include <cmath>
 
 class CLinearGradient : public CGenGradient {
- private:
-  double x1_, y1_, x2_, y2_;
-  double c_, s_;
-  double dmin_, dmax_;
-
  public:
   CLinearGradient() :
    CGenGradient(), x1_(0), y1_(0), x2_(1), y2_(0), c_(0), s_(0), dmin_(0), dmax_(0) {
@@ -164,6 +159,11 @@ class CLinearGradient : public CGenGradient {
   double distance1(double x, double y) const { return x*c_ + y*s_; }
 
   const CLinearGradient &operator=(const CLinearGradient &lg);
+
+ private:
+  double x1_, y1_, x2_, y2_;
+  double c_, s_;
+  double dmin_, dmax_;
 };
 
 #endif

@@ -215,24 +215,31 @@ class CBBox2DT {
       return CMathGen::Y_AXIS_2D;
   }
 
-  Point getMin() const { return set_ ? pmin_ : Point(0,0); }
-  Point getMax() const { return set_ ? pmax_ : Point(0,0); }
+  Point getMin() const { assert(set_); return pmin_; }
+  Point getMax() const { assert(set_); return pmax_; }
 
   T getLeft  () const { return getXMin(); }
   T getBottom() const { return getYMin(); }
   T getRight () const { return getXMax(); }
   T getTop   () const { return getYMax(); }
 
-  T getXMin() const { return set_ ? pmin_.x : 0.0; }
-  T getYMin() const { return set_ ? pmin_.y : 0.0; }
-  T getXMax() const { return set_ ? pmax_.x : 0.0; }
-  T getYMax() const { return set_ ? pmax_.y : 0.0; }
+  T getXMin() const { return getMin().x; }
+  T getYMin() const { return getMin().y; }
+  T getXMax() const { return getMax().x; }
+  T getYMax() const { return getMax().y; }
 
-  T getXMid() const { return set_ ? (pmin_.x + pmax_.x)/2 : 0.0; }
-  T getYMid() const { return set_ ? (pmin_.y + pmax_.y)/2 : 0.0; }
+  T getXMid() const { return (getXMin() + getXMax())/2; }
+  T getYMid() const { return (getYMin() + getYMax())/2; }
 
   Point getCenter() const {
     return 0.5*(getMin() + getMax());
+  }
+
+  void setCenter(const Point &point) {
+    T dx = point.x - getCenter().x;
+    T dy = point.y - getCenter().y;
+
+    moveBy(Point(dx, dy));
   }
 
   void setLL(const Point &point) {
@@ -253,22 +260,21 @@ class CBBox2DT {
     }
   }
 
-  void setX(T x) {
-    pmin_.x = x;
-    set_    = true;
-  }
-
-  void setY(T y) {
-    pmin_.y = y;
-    set_    = true;
-  }
+  void setX(T x) { setXMin(x); }
+  void setY(T y) { setYMin(y); }
 
   void setWidth(T width) {
+    if (! set_)
+      pmin_.x = 0;
+
     pmax_.x = pmin_.x + width;
     set_    = true;
   }
 
   void setHeight(T height) {
+    if (! set_)
+      pmin_.y = 0;
+
     pmax_.y = pmin_.y + height;
     set_    = true;
   }
@@ -299,15 +305,20 @@ class CBBox2DT {
   }
 
   void setSize(const Size &size) {
+    if (! set_) {
+      pmin_.x = 0;
+      pmin_.y = 0;
+    }
+
     pmax_.x = pmin_.x + size.width;
     pmax_.y = pmin_.y + size.height;
     set_    = true;
   }
 
-  Point getLL() const { return pmin_; }
-  Point getLR() const { return Point(pmax_.x, pmin_.y); }
-  Point getUL() const { return Point(pmin_.x, pmax_.y); }
-  Point getUR() const { return pmax_; }
+  Point getLL() const { return getMin(); }
+  Point getLR() const { assert(set_); return Point(pmax_.x, pmin_.y); }
+  Point getUL() const { assert(set_); return Point(pmin_.x, pmax_.y); }
+  Point getUR() const { return getMax(); }
 
   Size getSize() const {
     return Size(getWidth(), getHeight());
@@ -327,7 +338,48 @@ class CBBox2DT {
     return fabs(getYMax() - getYMin());
   }
 
+  BBox &moveXTo(double x) {
+    assert(set_);
+
+    double dx = x - pmin_.x;
+
+    pmin_.x += dx;
+    pmax_.x += dx;
+
+    update();
+
+    return *this;
+  }
+
+  BBox &moveYTo(double y) {
+    assert(set_);
+
+    double dy = y - pmin_.y;
+
+    pmin_.y += dy;
+    pmax_.y += dy;
+
+    update();
+
+    return *this;
+  }
+
+  BBox &moveTo(const Point &p) {
+    assert(set_);
+
+    Point delta = p - pmin_;
+
+    pmin_ += delta;
+    pmax_ += delta;
+
+    update();
+
+    return *this;
+  }
+
   BBox &moveBy(const Vector &delta) {
+    assert(set_);
+
     pmin_ += delta;
     pmax_ += delta;
 
@@ -337,6 +389,8 @@ class CBBox2DT {
   }
 
   BBox &moveBy(const Point &delta) {
+    assert(set_);
+
     pmin_ += delta;
     pmax_ += delta;
 
@@ -346,6 +400,8 @@ class CBBox2DT {
   }
 
   BBox &moveBy(const Point &dmin, const Point &dmax) {
+    assert(set_);
+
     pmin_ += dmin;
     pmax_ += dmax;
 
@@ -369,6 +425,8 @@ class CBBox2DT {
 
  private:
   void update() {
+    assert(set_);
+
     if (pmin_.x > pmax_.x) std::swap(pmin_.x, pmax_.x);
     if (pmin_.y > pmax_.y) std::swap(pmin_.y, pmax_.y);
   }

@@ -5,30 +5,14 @@
 
 template<typename T>
 class CTransform2DT {
- private:
-  T xmin1_, ymin1_;
-  T xmax1_, ymax1_;
-  T xmin2_, ymin2_;
-  T xmax2_, ymax2_;
-
-  mutable CMatrix2DT<T> nmatrix_;
-  mutable CMatrix2DT<T> imatrix_;
-  mutable bool          inverse_set_;
-
  public:
-  CTransform2DT() :
-   xmin1_(0.0), ymin1_(0.0), xmax1_(1.0), ymax1_(1.0),
-   xmin2_(0.0), ymin2_(0.0), xmax2_(1.0), ymax2_(1.0),
-   nmatrix_(), imatrix_(), inverse_set_(false)
-  {
+  CTransform2DT() {
     calcMatrix();
   }
 
   CTransform2DT(T xmin1, T ymin1, T xmax1, T ymax1, T xmin2, T ymin2, T xmax2, T ymax2) :
    xmin1_(xmin1), ymin1_(ymin1), xmax1_(xmax1), ymax1_(ymax1),
-   xmin2_(xmin2), ymin2_(ymin2), xmax2_(xmax2), ymax2_(ymax2),
-   nmatrix_(), imatrix_(), inverse_set_(false)
-  {
+   xmin2_(xmin2), ymin2_(ymin2), xmax2_(xmax2), ymax2_(ymax2) {
     calcMatrix();
   }
 
@@ -36,9 +20,7 @@ class CTransform2DT {
    xmin1_(transform.xmin1_), ymin1_(transform.ymin1_),
    xmax1_(transform.xmax1_), ymax1_(transform.ymax1_),
    xmin2_(transform.xmin2_), ymin2_(transform.ymin2_),
-   xmax2_(transform.xmax2_), ymax2_(transform.ymax2_),
-   nmatrix_(), imatrix_(), inverse_set_(false)
-  {
+   xmax2_(transform.xmax2_), ymax2_(transform.ymax2_) {
     calcMatrix();
   }
 
@@ -131,6 +113,16 @@ class CTransform2DT {
 
     inverse_set_ = false;
   }
+
+ private:
+  T xmin1_ { 0 }, ymin1_ { 0 };
+  T xmax1_ { 1 }, ymax1_ { 1 };
+  T xmin2_ { 0 }, ymin2_ { 0 };
+  T xmax2_ { 1 }, ymax2_ { 1 };
+
+  mutable CMatrix2DT<T> nmatrix_;
+  mutable CMatrix2DT<T> imatrix_;
+  mutable bool          inverse_set_ { false };
 };
 
 typedef CTransform2DT<double> CTransform2D;
