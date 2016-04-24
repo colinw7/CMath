@@ -147,7 +147,7 @@ class CCone3DT : public CShape3DT<T> {
   }
 
   T getArea() const {
-    if (! area_.getValid()) {
+    if (! area_.isValid()) {
       T h2 = height_*height_;
       T r2 = radius_*radius_;
 

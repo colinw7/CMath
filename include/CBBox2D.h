@@ -74,6 +74,14 @@ class CBBox2DT {
     return *this;
   }
 
+  friend BBox operator*(const BBox &lhs, T rhs) {
+    return BBox(lhs.pmin_*rhs, lhs.pmax_*rhs);
+  }
+
+  friend BBox operator*(T rhs, const BBox &lhs) {
+    return BBox(lhs.pmin_*rhs, lhs.pmax_*rhs);
+  }
+
   void add(const Point &point) {
     add(point.x, point.y);
   }

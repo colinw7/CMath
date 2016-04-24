@@ -134,7 +134,7 @@ class CPlane3DT {
 
     T det = n11*n22 - n12*n12;
 
-    if (fabs(det) < CMathGen::EPSILON_E6)
+    if (fabs(det) < 1E-6)
       return false;
 
     T idet = 1.0/det;

@@ -2,6 +2,7 @@
 #define CMATRIX_2D_H
 
 #include <CMathGen.h>
+#include <CMathMacros.h>
 #include <CPoint2D.h>
 #include <CVector2D.h>
 #include <CMatrixType.h>
@@ -173,6 +174,22 @@ class CMatrix2DT {
     CMatrix2DT matrix;
 
     matrix.setSkew(sx, sy);
+
+    return matrix;
+  }
+
+  static CMatrix2DT skewX(T a) {
+    CMatrix2DT matrix;
+
+    matrix.setSkewX(a);
+
+    return matrix;
+  }
+
+  static CMatrix2DT skewY(T a) {
+    CMatrix2DT matrix;
+
+    matrix.setSkewY(a);
 
     return matrix;
   }

@@ -733,4 +733,21 @@ namespace CMathGeom2D {
   }
 }
 
+namespace CMathGeom2D {
+  inline bool PointInsideRect(double x, double y, double xmin, double ymin,
+                              double xmax, double ymax) {
+    // ensure rectangle is properly ordered (assert ?)
+    if (xmin > xmax) std::swap(xmin, xmax);
+    if (ymin > ymax) std::swap(ymin, ymax);
+
+    return (x >= xmin && x <= xmax && y >= ymin && y <= ymax);
+  }
+
+  inline bool PointInsideRect(const CPoint2D &point, const CBBox2D &rect) {
+    // TODO: needed - CBBox2D has this code already
+    return PointInsideRect(point.x, point.y, rect.getXMin(), rect.getYMin(),
+                           rect.getXMax(), rect.getYMax());
+  }
+}
+
 #endif

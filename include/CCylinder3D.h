@@ -163,7 +163,7 @@ class CCylinder3DT : public CShape3DT<T> {
   }
 
   T getArea() const {
-    if (! area_.getValid()) {
+    if (! area_.isValid()) {
       T area = (zmax_ - zmin_)*phi_max_*radius_;
 
       CCylinder3DT *th = const_cast<CCylinder3DT *>(this);

@@ -160,7 +160,7 @@ class CHyperboloid3DT : public CShape3DT<T> {
   }
 
   T getArea() const {
-    if (! area_.getValid()) {
+    if (! area_.isValid()) {
       T p1x2 = point1_.x*point1_.x;
       T p1y2 = point1_.y*point1_.y;
       T p1z2 = point1_.z*point1_.z;

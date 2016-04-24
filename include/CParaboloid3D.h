@@ -133,7 +133,7 @@ class CParaboloid3DT : public CShape3DT<T> {
   }
 
   T getArea() const {
-    if (! area_.getValid()) {
+    if (! area_.isValid()) {
       T area = phi_max_/12.0*(pow(1 + 4*zmin_, 1.5) -
                               pow(1 + 4*zmax_, 1.5));
 

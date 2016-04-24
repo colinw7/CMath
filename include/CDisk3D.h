@@ -139,7 +139,7 @@ class CDisk3DT : public CShape3DT<T> {
   }
 
   T getArea() const {
-    if (! area_.getValid()) {
+    if (! area_.isValid()) {
       T area = phi_max_*0.5*(radius_*radius_ - inner_radius_*inner_radius_);
 
       CDisk3DT *th = const_cast<CDisk3DT *>(this);
