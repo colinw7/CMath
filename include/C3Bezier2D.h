@@ -583,6 +583,20 @@ class C3Bezier2DT {
     return Bezier(x1, y1, x11, y11, x21, y21, x2, y2);
   }
 
+  double arcLength(double tol=1E-3) const {
+    double l1 = p1_.distanceTo(p4_);
+    double l2 = p1_.distanceTo(p2_) + p2_.distanceTo(p3_) + p3_.distanceTo(p4_);
+
+    if (fabs(l2 - l1) < tol)
+      return l1;
+
+    Bezier bezier1, bezier2;
+
+    split(bezier1, bezier2);
+
+    return bezier1.arcLength(tol) + bezier2.arcLength(tol);
+  }
+
   void print(std::ostream &os) const {
     os << "[[" << p1_.x << ", " << p1_.y << "] [" <<
                   p2_.x << ", " << p2_.y << "] [" <<

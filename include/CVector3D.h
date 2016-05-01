@@ -15,10 +15,6 @@ class CVector3DT {
   typedef CPoint3DT<T>  Point;
   typedef CVector3DT<T> Vector;
 
- private:
-  T    x_, y_, z_;
-  bool normalized_;
-
  public:
   enum Type {
     ZERO,
@@ -30,12 +26,10 @@ class CVector3DT {
 
  public:
   // constructor/destructor
-  CVector3DT() :
-   x_(0), y_(0), z_(0), normalized_(false) {
-  }
+  CVector3DT() { }
 
   CVector3DT(T x, T y, T z) :
-   x_(x), y_(y), z_(z), normalized_(false) {
+   x_(x), y_(y), z_(z) {
   }
 
  ~CVector3DT() { }
@@ -198,26 +192,23 @@ class CVector3DT {
   //------
 
   explicit CVector3DT(const Point &point) :
-    x_(point.x), y_(point.y), z_(point.z), normalized_(false) {
+    x_(point.x), y_(point.y), z_(point.z) {
   }
 
   // v = point2 - point1
   CVector3DT(const Point &point1, const Point &point2) :
-   x_(point2.x - point1.x), y_(point2.y - point1.y),
-   z_(point2.z - point1.z), normalized_(false) {
+   x_(point2.x - point1.x), y_(point2.y - point1.y), z_(point2.z - point1.z) {
   }
 
   // v = vector2 - vector1
   CVector3DT(const Vector &vector1, const Vector &vector2) :
-   x_(vector2.x_ - vector1.x_), y_(vector2.y_ - vector1.y_),
-   z_(vector2.z_ - vector1.z_), normalized_(false) {
+   x_(vector2.x_ - vector1.x_), y_(vector2.y_ - vector1.y_), z_(vector2.z_ - vector1.z_) {
   }
 
   //------
 
   // parametric creation
-  CVector3DT(Type type, T s=1.0) :
-   normalized_(false) {
+  CVector3DT(Type type, T s=1.0) {
     if      (type == ZERO  ) { x_ = 0.0; y_ = 0.0; z_ = 0.0; }
     else if (type == UNIT  ) { x_ =   s; y_ =   s; z_ =   s; }
     else if (type == UNIT_X) { x_ =   s; y_ = 0.0; z_ = 0.0; }
@@ -877,6 +868,10 @@ class CVector3DT {
   CVector3DT(T x, T y, T z, bool normalized) :
    x_(x), y_(y), z_(z), normalized_(normalized) {
   }
+
+ private:
+  T    x_ { 0 }, y_ { 0 }, z_ { 0 };
+  bool normalized_ { false };
 };
 
 typedef CVector3DT<double> CVector3D;

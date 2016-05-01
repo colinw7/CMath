@@ -2,6 +2,7 @@
 #define CARC_TO_BEZIER_H
 
 #include <C3Bezier2D.h>
+#include <vector>
 
 class CArcToBezier {
  public:
@@ -9,7 +10,7 @@ class CArcToBezier {
 
  public:
   static void ArcToBeziers(double x, double y, double rx, double ry,
-                           double angle1, double angle2, std::vector<C3Bezier2D> &beziers) {
+                           double angle1, double angle2, BezierList &beziers) {
     CArcToBezier a_to_b;
 
     a_to_b.calc(x, y, rx, ry, angle1, angle2);
@@ -110,9 +111,13 @@ class CArcToBezier {
   const C3Bezier2D &getBezier(uint i) const { return arc_beziers_[i]; }
 
  protected:
-  double     x_, y_, xr_, yr_;
-  double     angle1_, angle2_;
-  double     angle_diff_;
+  double     x_          { 0 };
+  double     y_          { 0 };
+  double     xr_         { 1 };
+  double     yr_         { 1 };
+  double     angle1_     { 0 };
+  double     angle2_     { 0 };
+  double     angle_diff_ { 0 };
   BezierList arc_beziers_;
 };
 
