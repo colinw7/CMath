@@ -2,7 +2,7 @@
 #define C3BEZIER_2D_H
 
 #include <CPoint2D.h>
-#include <CMathGen.h>
+//#include <CMathGen.h>
 #include <C2Bezier2D.h>
 
 template<typename T>
@@ -174,10 +174,12 @@ class C3Bezier2DT {
   }
 
   T gradientStart() const {
+    //return CMathGen::atan2(p2_.x - p1_.x, p2_.y - p1_.y);
     return atan2(p2_.y - p1_.y, p2_.x - p1_.x);
   }
 
   T gradientEnd() const {
+    //return CMathGen::atan2(p4_.x - p3_.x, p4_.y - p3_.y);
     return atan2(p4_.y - p3_.y, p4_.x - p3_.x);
   }
 
@@ -190,6 +192,7 @@ class C3Bezier2DT {
 
     Point p = (p2_ - p1_)*uu + 2.0*(p3_ - p2_)*tu + (p4_ - p3_)*tt;
 
+    //T g = CMathGen::atan2(p.x, p.y);
     T g = atan2(p.y, p.x);
 
     return g;

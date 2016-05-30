@@ -54,7 +54,7 @@ class CMatrixStack2DT {
       v_[2] = p.y;
     }
 
-    Transform(const CMatrix2D &m) :
+    Transform(const Matrix &m) :
      type_(CMatrixTransformType::MATRIX) {
       m.getValues(v_, 6);
     }
@@ -200,6 +200,13 @@ class CMatrixStack2DT {
    transformStack_(m.transformStack_), mValid_(m.mValid_), m_(m.m_) {
   }
 
+  CMatrixStack2DT(const Matrix &m) :
+   transformStack_() {
+    transformStack_.push_back(Transform(m));
+
+    mValid_ = false;
+  }
+
   const CMatrixStack2DT &operator=(const CMatrixStack2DT &m) {
     transformStack_ = m.transformStack_;
     mValid_         = m.mValid_;
@@ -259,7 +266,7 @@ class CMatrixStack2DT {
   }
 
   void matrix(double m00, double m01, double m10, double m11, double tx, double ty) {
-    CMatrix2D m;
+    Matrix m;
 
     m.setValues(m00, m01, m10, m11, tx, ty);
 
@@ -268,7 +275,7 @@ class CMatrixStack2DT {
     mValid_ = false;
   }
 
-  void matrix(const CMatrix2D &m) {
+  void matrix(const Matrix &m) {
     transformStack_.push_back(Transform(m));
 
     mValid_ = false;
@@ -319,6 +326,14 @@ class CMatrixStack2DT {
     getMatrix().multiplyPoint(xi, yi, xo, yo);
   }
 
+  void preMultiplyPoint(const Point &point1, Point &point2) const {
+    getMatrix().preMultiplyPoint(point1, point2);
+  }
+
+  void preMultiplyPoint(T xi, T yi, T *xo, T *yo) const {
+    getMatrix().preMultiplyPoint(xi, yi, xo, yo);
+  }
+
   friend std::ostream &operator<<(std::ostream &os, const CMatrixStack2DT &ms) {
     ms.print(os);
 
@@ -344,7 +359,7 @@ class CMatrixStack2DT {
  private:
   TransformStack transformStack_;
   bool           mValid_ { false };
-  CMatrix2D      m_;
+  Matrix         m_;
 };
 
 typedef CMatrixStack2DT<double> CMatrixStack2D;

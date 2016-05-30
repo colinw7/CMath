@@ -35,25 +35,20 @@ class CDisplayRange2D {
    void incY(T dy) { ymin += dy; ymax += dy; }
   };
 
-  typedef RangeT<int>    IRange;
+//typedef RangeT<int>    IRange;
   typedef RangeT<double> RRange;
 
  public:
-  CDisplayRange2D(int    pixel_xmin  =   0, int    pixel_ymin  =   0,
-                  int    pixel_xmax  = 100, int    pixel_ymax  = 100,
+  CDisplayRange2D(double pixel_xmin  =   0, double pixel_ymin  =   0,
+                  double pixel_xmax  = 100, double pixel_ymax  = 100,
                   double window_xmin = 0.0, double window_ymin = 0.0,
                   double window_xmax = 1.0, double window_ymax = 1.0) :
    pixel_ (pixel_xmin , pixel_ymin , pixel_xmax , pixel_ymax ),
-   window_(window_xmin, window_ymin, window_xmax, window_ymax),
-   window1_(window_), window_xc1_(0.0), window_yc1_(0.0), window_width1_(1.0), window_height1_(1.0),
-   factor_x_(1.0), factor_y_(1.0), factor_x1_(1.0), factor_y1_(1.0), pdx_(0.0), pdy_(0.0),
-   equal_scale_(false), scale_min_(true),
-   halign_(CHALIGN_TYPE_CENTER), valign_(CVALIGN_TYPE_CENTER),
-   flip_x_(false), flip_y_(false), matrix_(), imatrix_() {
+   window_(window_xmin, window_ymin, window_xmax, window_ymax), window1_(window_) {
     reset();
   }
 
-  void setPixelRange(int pixel_xmin, int pixel_ymin, int pixel_xmax, int pixel_ymax) {
+  void setPixelRange(double pixel_xmin, double pixel_ymin, double pixel_xmax, double pixel_ymax) {
     pixel_.set(pixel_xmin, pixel_ymin, pixel_xmax, pixel_ymax);
 
     reset();
@@ -66,12 +61,24 @@ class CDisplayRange2D {
     reset();
   }
 
-  void getPixelRange(int *pixel_xmin, int *pixel_ymin, int *pixel_xmax, int *pixel_ymax) const {
+  void getPixelRange(double *pixel_xmin, double *pixel_ymin,
+                     double *pixel_xmax, double *pixel_ymax) const {
     pixel_.get(pixel_xmin, pixel_ymin, pixel_xmax, pixel_ymax);
   }
 
-  int getPixelWidth () const { return pixel_.dx(); }
-  int getPixelHeight() const { return pixel_.dy(); }
+  void getPixelRange(int *pixel_xmin, int *pixel_ymin, int *pixel_xmax, int *pixel_ymax) const {
+    double pixel_xmin1, pixel_ymin1, pixel_xmax1, pixel_ymax1;
+
+    pixel_.get(&pixel_xmin1, &pixel_ymin1, &pixel_xmax1, &pixel_ymax1);
+
+    *pixel_xmin = pixel_xmin1;
+    *pixel_ymin = pixel_ymin1;
+    *pixel_xmax = pixel_xmax1;
+    *pixel_ymax = pixel_ymax1;
+  }
+
+  double getPixelWidth () const { return (pixel_.dx() >= 0 ? pixel_.dx() + 1 : pixel_.dx() - 1); }
+  double getPixelHeight() const { return (pixel_.dy() >= 0 ? pixel_.dy() + 1 : pixel_.dy() - 1); }
 
   void getWindowRange(double *window_xmin, double *window_ymin,
                       double *window_xmax, double *window_ymax) const {
@@ -145,8 +152,8 @@ class CDisplayRange2D {
     window_width1_  = window1_.dx();
     window_height1_ = window1_.dy();
 
-    factor_x_ =  pixel_.dx()/window_width1_ ;
-    factor_y_ = -pixel_.dy()/window_height1_;
+    factor_x_ =  getPixelWidth ()/window_width1_ ;
+    factor_y_ = -getPixelHeight()/window_height1_;
 
     if (equal_scale_) {
       factor_x1_ = factor_x_;
@@ -308,34 +315,40 @@ class CDisplayRange2D {
     *window = fabs(window_y2 - window_y1);
   }
 
-  bool checkPixel(int x, int y) {
-    return (x >= pixel_.xmin && x <= pixel_.xmin &&
-            y >= pixel_.ymin && y <= pixel_.ymin);
+  bool checkPixel(double x, double y) {
+    return (x >= pixel_.xmin && x <= pixel_.xmin && y >= pixel_.ymin && y <= pixel_.ymin);
   }
 
   const CMatrix2D &getMatrix () const { return matrix_ ; }
   const CMatrix2D &getIMatrix() const { return imatrix_; }
 
  private:
-  IRange pixel_;
+  RRange pixel_;
   RRange window_;
 
   RRange window1_;
 
-  double window_xc1_   , window_yc1_    ;
-  double window_width1_, window_height1_;
+  double window_xc1_     { 0.0 };
+  double window_yc1_     { 0.0 };
+  double window_width1_  { 1.0 };
+  double window_height1_ { 1.0 };
 
-  double factor_x_ , factor_y_ ;
-  double factor_x1_, factor_y1_;
+  double factor_x_  { 1.0 };
+  double factor_y_  { 1.0 };
+  double factor_x1_ { 1.0 };
+  double factor_y1_ { 1.0 };
 
-  double pdx_, pdy_;
+  double pdx_ { 0.0 };
+  double pdy_ { 0.0 };
 
-  bool        equal_scale_;
-  bool        scale_min_;
-  CHAlignType halign_;
-  CVAlignType valign_;
+  bool equal_scale_ { false };
+  bool scale_min_   { true };
 
-  bool flip_x_, flip_y_;
+  CHAlignType halign_ { CHALIGN_TYPE_CENTER };
+  CVAlignType valign_ { CVALIGN_TYPE_CENTER };
+
+  bool flip_x_ { false };
+  bool flip_y_ { false };
 
   CMatrix2D matrix_;
   CMatrix2D imatrix_;

@@ -12,7 +12,7 @@ class CBezierToLine {
   enum { MAX_BEZIER_DEPTH = 9 };
 
  public:
-  CBezierToLine() : tol_(-1) { }
+  CBezierToLine() { }
 
   virtual ~CBezierToLine() { }
 
@@ -231,7 +231,7 @@ class CBezierToLine {
   }
 
  protected:
-  double    tol_;
+  double    tol_ { -1 };
   PointList bezierPoints_;
 };
 

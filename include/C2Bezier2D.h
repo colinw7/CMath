@@ -2,7 +2,7 @@
 #define C2BEZIER_2D_H
 
 #include <CPoint2D.h>
-#include <CMathGen.h>
+//#include <CMathGen.h>
 #include <CBBox2D.h>
 #include <vector>
 
@@ -23,6 +23,18 @@ class C2Bezier2DT {
 
   C2Bezier2DT(const Point &p1, const Point &p2, const Point &p3) :
    p1_(p1), p2_(p2), p3_(p3) {
+  }
+
+  C2Bezier2DT(const C2Bezier2DT<T> &bezier) :
+    p1_(bezier.p1_), p2_(bezier.p2_), p3_(bezier.p3_) {
+  }
+
+  C2Bezier2DT &operator=(const C2Bezier2DT<T> &bezier) {
+    p1_ = bezier.p1_;
+    p2_ = bezier.p2_;
+    p3_ = bezier.p3_;
+
+    return *this;
   }
 
   const Point &getFirstPoint  () const { return p1_; }
@@ -59,12 +71,16 @@ class C2Bezier2DT {
   }
 
   void calc(T t, Point &p) const {
+    p = calc(t);
+  }
+
+  Point calc(T t) const {
     T u = (1.0 - t);
 
     T tt = t*t;
     T uu = u*u;
 
-    p = p1_*uu + 2.0*p2_*t*u + p3_*tt;
+    return p1_*uu + 2.0*p2_*t*u + p3_*tt;
   }
 
   bool interp(T x, T y, T *t) const {
@@ -136,10 +152,12 @@ class C2Bezier2DT {
   }
 
   T gradientStart() const {
+    //return CMathGen::atan2(p2_.x - p1_.x, p2_.y - p1_.y);
     return atan2(p2_.y - p1_.y, p2_.x - p1_.x);
   }
 
   T gradientEnd() const {
+    //return CMathGen::atan2(p3_.x - p2_.x, p3_.y - p2_.y);
     return atan2(p3_.y - p2_.y, p3_.x - p2_.x);
   }
 
@@ -148,6 +166,7 @@ class C2Bezier2DT {
 
     Point p = (p2_ - p1_)*u + (p3_ - p2_)*t;
 
+    //T g = CMathGen::atan2(p.x, p.y);
     T g = atan2(p.y, p.x);
 
     return g;
@@ -176,6 +195,20 @@ class C2Bezier2DT {
 
     bezier1 = Bezier(p1_, p12, pm );
     bezier2 = Bezier(pm , p23, p3_);
+  }
+
+  double arcLength(double tol=1E-3) const {
+    double l1 = p1_.distanceTo(p3_);
+    double l2 = p1_.distanceTo(p2_) + p2_.distanceTo(p3_);
+
+    if (fabs(l2 - l1) < tol)
+      return l1;
+
+    Bezier bezier1, bezier2;
+
+    split(bezier1, bezier2);
+
+    return bezier1.arcLength(tol) + bezier2.arcLength(tol);
   }
 
   void print(std::ostream &os) const {
