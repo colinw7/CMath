@@ -204,6 +204,14 @@ class CBBox2DT {
     update();
   }
 
+  BBox expanded(T x1, T y1, T x2, T y2) const {
+    BBox bbox(*this);
+
+    bbox.expand(x1, y1, x2, y2);
+
+    return bbox;
+  }
+
   T area() const {
     if (! set_) return 0.0;
 
