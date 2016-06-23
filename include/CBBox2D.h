@@ -426,6 +426,14 @@ class CBBox2DT {
     return *this;
   }
 
+  BBox movedBy(const Point &delta) const {
+    BBox bbox(*this);
+
+    bbox.moveBy(delta);
+
+    return bbox;
+  }
+
   void print(std::ostream &os) const {
     if (! set_)
       os << "( not set )";
