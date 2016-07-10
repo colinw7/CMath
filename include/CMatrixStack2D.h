@@ -99,13 +99,13 @@ class CMatrixStack2DT {
     double xo() const {
       assert(type_ == CMatrixTransformType::ROTATE_ORIGIN);
 
-      return value(0);
+      return value(1);
     }
 
     double yo() const {
       assert(type_ == CMatrixTransformType::ROTATE_ORIGIN);
 
-      return value(1);
+      return value(2);
     }
 
     double value(int i) const { return v_[i]; }
@@ -289,6 +289,14 @@ class CMatrixStack2DT {
 
   bool isEmpty() const {
     return transformStack_.empty();
+  }
+
+  int length() const {
+    return transformStack_.size();
+  }
+
+  const Transform &transform(int i) const {
+    return transformStack_[i];
   }
 
   void append(const CMatrixStack2DT &m) {
