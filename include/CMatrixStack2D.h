@@ -182,6 +182,12 @@ class CMatrixStack2DT {
       os << calcMatrix();
     }
 
+    friend std::ostream &operator<<(std::ostream &os, const Transform &rhs) {
+      os << rhs.name() << "("; rhs.printParts(os); os << ")";
+
+      return os;
+    }
+
    private:
     CMatrixTransformType type_;
     double               v_[NUM_VALUES];
@@ -217,38 +223,62 @@ class CMatrixStack2DT {
 
   const TransformStack &transformStack() const { return transformStack_; }
 
+  static Transform translateTransform(const CPoint2D &d) {
+    return Transform(CMatrixTransformType::TRANSLATE, d.x, d.y);
+  }
+
+  static Transform translateTransform(double dx, double dy) {
+    return Transform(CMatrixTransformType::TRANSLATE, dx, dy);
+  }
+
   void translate(const Point &d) {
-    transformStack_.push_back(Transform(CMatrixTransformType::TRANSLATE, d.x, d.y));
+    transformStack_.push_back(translateTransform(d));
 
     mValid_ = false;
   }
 
   void translate(double dx, double dy) {
-    transformStack_.push_back(Transform(CMatrixTransformType::TRANSLATE, dx, dy));
+    transformStack_.push_back(translateTransform(dx, dy));
 
     mValid_ = false;
   }
 
+  static Transform scaleTransform(double s) {
+    return Transform(CMatrixTransformType::SCALE1, s);
+  }
+
+  static Transform scaleTransform(double sx, double sy) {
+    return Transform(CMatrixTransformType::SCALE2, sx, sy);
+  }
+
   void scale(double s) {
-    transformStack_.push_back(Transform(CMatrixTransformType::SCALE1, s));
+    transformStack_.push_back(scaleTransform(s));
 
     mValid_ = false;
   }
 
   void scale(double sx, double sy) {
-    transformStack_.push_back(Transform(CMatrixTransformType::SCALE2, sx, sy));
+    transformStack_.push_back(scaleTransform(sx, sy));
 
     mValid_ = false;
   }
 
+  static Transform rotateTransform(double a, const CPoint2D &o) {
+    return Transform(a, o);
+  }
+
+  static Transform rotateTransform(double a) {
+    return Transform(CMatrixTransformType::ROTATE, a);
+  }
+
   void rotate(double a) {
-    transformStack_.push_back(Transform(CMatrixTransformType::ROTATE, a));
+    transformStack_.push_back(rotateTransform(a));
 
     mValid_ = false;
   }
 
   void rotate(double a, const Point &o) {
-    transformStack_.push_back(Transform(a, o));
+    transformStack_.push_back(rotateTransform(a, o));
 
     mValid_ = false;
   }
@@ -299,6 +329,12 @@ class CMatrixStack2DT {
     return transformStack_[i];
   }
 
+  void setTransform(int i, const Transform &t) {
+    assert(i >= 0 && i < int(transformStack_.size()));
+
+    transformStack_[i] = t;
+  }
+
   void append(const CMatrixStack2DT &m) {
     for (const auto &t : m.transformStack_)
       transformStack_.push_back(t);
@@ -342,8 +378,8 @@ class CMatrixStack2DT {
     getMatrix().preMultiplyPoint(xi, yi, xo, yo);
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const CMatrixStack2DT &ms) {
-    ms.print(os);
+  friend std::ostream &operator<<(std::ostream &os, const CMatrixStack2DT &rhs) {
+    rhs.print(os);
 
     return os;
   }
