@@ -115,7 +115,7 @@ typedef union {
 //#include <bits/nan.h>
 #include <cmath>
 
-#define IsNaN(X) isnan(X)
+#define IsNaN(X) std::isnan(X)
 #define IsNaNF(X) isnan((double) (X))
 #define IsInf(X) (isinf(X)!=0)
 #define IsPosInf(X) (isinf(X)==1)

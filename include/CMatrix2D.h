@@ -309,6 +309,23 @@ class CMatrix2DT {
     setBottomIdentity();
   }
 
+  void setValues(T a, T b, T c, T d, T e, T f, T g, T h, T i) {
+    m00_ = a, m01_ = b, m02_ = c;
+    m10_ = d, m11_ = e, m12_ = f;
+    m20_ = g, m21_ = h, m22_ = i;
+  }
+
+  void setValues(const T *v, int n) {
+    if      (n == 4)
+      setValues(v[0], v[1], v[2], v[3]);
+    else if (n == 6)
+      setValues(v[0], v[1], v[2], v[3], v[4], v[5]);
+    else if (n == 9)
+      setValues(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8]);
+    else
+      CTHROW("Invalid Size");
+  }
+
   void getValues(T *a, T *b, T *c, T *d) const {
     if (a) *a = m00_;
     if (b) *b = m01_;
@@ -854,6 +871,29 @@ class CMatrix2DT {
   void setBottomIdentity() {
     m20_ = 0.0, m21_ = 0.0, m22_ = 1.0;
   }
+
+  //---
+
+  int cmp(const CMatrix2DT &m) const {
+    if (m00_ < m.m00_) return -1; if (m00_ > m.m00_) return  1;
+    if (m10_ < m.m10_) return -1; if (m10_ > m.m10_) return  1;
+    if (m01_ < m.m01_) return -1; if (m01_ > m.m01_) return  1;
+    if (m11_ < m.m11_) return -1; if (m11_ > m.m11_) return  1;
+    if (m02_ < m.m02_) return -1; if (m02_ > m.m02_) return  1;
+    if (m12_ < m.m12_) return -1; if (m12_ > m.m12_) return  1;
+    if (m20_ < m.m20_) return -1; if (m20_ > m.m20_) return  1;
+    if (m21_ < m.m21_) return -1; if (m21_ > m.m21_) return  1;
+    if (m22_ < m.m22_) return -1; if (m22_ > m.m22_) return  1;
+
+    return 0;
+  }
+
+  friend bool operator< (const CMatrix2DT &lhs, const CMatrix2DT &rhs) { return lhs.cmp(rhs) <  0; }
+  friend bool operator<=(const CMatrix2DT &lhs, const CMatrix2DT &rhs) { return lhs.cmp(rhs) <= 0; }
+  friend bool operator> (const CMatrix2DT &lhs, const CMatrix2DT &rhs) { return lhs.cmp(rhs) >  0; }
+  friend bool operator>=(const CMatrix2DT &lhs, const CMatrix2DT &rhs) { return lhs.cmp(rhs) >= 0; }
+  friend bool operator==(const CMatrix2DT &lhs, const CMatrix2DT &rhs) { return lhs.cmp(rhs) == 0; }
+  friend bool operator!=(const CMatrix2DT &lhs, const CMatrix2DT &rhs) { return lhs.cmp(rhs) != 0; }
 
  private:
   static T calcDeterminant(T m00, T m01, T m10, T m11) {
