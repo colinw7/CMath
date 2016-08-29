@@ -434,6 +434,10 @@ class CBBox2DT {
     return bbox;
   }
 
+  friend bool operator==(const BBox &lhs, const BBox &rhs) {
+    return (lhs.pmin_ == rhs.pmin_ && lhs.pmax_ == rhs.pmax_);
+  }
+
   void print(std::ostream &os) const {
     if (! set_)
       os << "( not set )";
