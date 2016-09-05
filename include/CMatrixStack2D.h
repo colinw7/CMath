@@ -384,6 +384,14 @@ class CMatrixStack2DT {
     return os;
   }
 
+  std::string toString() const {
+    std::stringstream str;
+
+    str << *this;
+
+    return str.str();
+  }
+
   void print(std::ostream &os) const {
     uint num = transformStack_.size();
 

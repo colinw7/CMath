@@ -184,6 +184,54 @@ class CBBox2DT {
             (bbox.pmin_.y >= pmin_.y && bbox.pmax_.y <= pmax_.y));
   }
 
+  double distanceTo(const BBox &bbox) const {
+    if (! set_) return 1E50; // assert
+
+    // intersect
+    if ((pmax_.x >= bbox.pmin_.x && pmin_.x <= bbox.pmax_.x) ||
+        (pmax_.y >= bbox.pmin_.y && pmin_.y <= bbox.pmax_.y))
+      return 0;
+
+    // above or below
+    if      ((pmin_.x >= bbox.pmin_.x && pmin_.x <= bbox.pmax_.x) ||
+             (pmax_.x >= bbox.pmin_.x && pmax_.x <= bbox.pmax_.x)) {
+      if (pmin_.y >= bbox.pmax_.y) // above
+        return pmin_.y - bbox.pmax_.y;
+      else                         // below
+        return pmax_.y - bbox.pmin_.y;
+    }
+    // left or right
+    else if ((pmin_.y >= bbox.pmin_.y && pmin_.y <= bbox.pmax_.y) ||
+             (pmax_.y >= bbox.pmin_.y && pmax_.y <= bbox.pmax_.y)) {
+      if (pmin_.x >= bbox.pmax_.x) // right
+        return pmin_.x - bbox.pmax_.x;
+      else                         // left
+        return pmax_.x - bbox.pmin_.x;
+    }
+    // bottom left/top left
+    else if (pmax_.x <= bbox.pmin_.x) {
+      // bottom left
+      if (pmax_.y <= bbox.pmin_.x) {
+        return hypot(bbox.pmin_.x - pmax_.x, bbox.pmin_.y - pmax_.y);
+      }
+      // top left
+      else {
+        return hypot(bbox.pmin_.x - pmax_.x, bbox.pmin_.y - pmin_.y);
+      }
+    }
+    // bottom right/top right
+    else {
+      // bottom right
+      if (pmax_.y <= bbox.pmin_.x) {
+        return hypot(bbox.pmax_.x - pmin_.x, bbox.pmin_.y - pmax_.y);
+      }
+      // top right
+      else {
+        return hypot(bbox.pmax_.x - pmin_.x, bbox.pmax_.y - pmin_.y);
+      }
+    }
+  }
+
   void expand(T delta) {
     if (! set_) return;
 
