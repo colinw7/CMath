@@ -4,8 +4,6 @@
 #include <CMathGen.h>
 #include <vector>
 
-#define EPSILON_E6 1E-6
-
 struct CPoint2DParam {
   CPoint2D p;
   double   t;
@@ -80,6 +78,8 @@ namespace CMathGeom2D {
   inline bool clipBySector(double xmin, double ymin, double xmax, double ymax,
                            double *x1, double *y1, double *x2, double *y2,
                            ClipZone *zone1, ClipZone *zone2, bool *intersect) {
+    static const double EPSILON_E6 = 1E-6;
+
     if (xmin >= xmax || ymin >= ymax) {
       *intersect = false;
 
@@ -157,6 +157,8 @@ namespace CMathGeom2D {
   //! Clip line (x1,y1) -> (x2,y2) in region (xmin,xmax,ymin,ymax)
   inline bool clipLine(double xmin, double ymin, double xmax, double ymax,
                        double *x1, double *y1, double *x2, double *y2) {
+    static const double EPSILON_E6 = 1E-6;
+
     bool     intersect;
     ClipZone zone1, zone2;
 
@@ -324,22 +326,255 @@ namespace CMathGeom2D {
   }
 }
 
+#include <CPolygonOrientation.h>
+#include <CVector2D.h>
+
 namespace CMathGeom2D {
-  bool IntersectPolygons(const double *x1, const double *y1, uint n1,
-                         const double *x2, const double *y2, uint n2,
-                         double **xi, double **yi, uint *ni);
+  inline CPolygonOrientation PolygonOrientation(double x1, double y1, double x2, double y2,
+                                                double x3, double y3) {
+    double dx1 = x2 - x1;
+    double dy1 = y2 - y1;
+
+    double dx2 = x3 - x2;
+    double dy2 = y3 - y2;
+
+    return (CPolygonOrientation) CMathGen::sign(dx1*dy2 - dy1*dx2);
+  }
+
+  inline CPolygonOrientation PolygonOrientation(const CPoint2D &point1, const CPoint2D &point2,
+                                                const CPoint2D &point3) {
+    CVector2D d1(point1, point2);
+    CVector2D d2(point2, point3);
+
+    return (CPolygonOrientation) CMathGen::sign(d1.getX()*d2.getY() - d1.getY()*d2.getX());
+  }
+
+  inline CPolygonOrientation PolygonOrientation(const double *x, const double *y, uint num_xy) {
+    int i = 2;
+
+    while (i < (int) num_xy) {
+      CPolygonOrientation orient =
+        PolygonOrientation(x[i - 2], y[i - 2], x[i - 1], y[i - 1], x[i], y[i]);
+
+      if (orient != CPOLYGON_ORIENTATION_UNKNOWN)
+        return orient;
+
+      ++i;
+    }
+
+    return CPOLYGON_ORIENTATION_UNKNOWN;
+  }
+
+  inline CPolygonOrientation PolygonOrientation(const std::vector<CPoint2D> &points) {
+    int i = 2;
+
+    uint num_points = points.size();
+
+    while (i < (int) num_points) {
+      CPolygonOrientation orient = PolygonOrientation(points[i - 2], points[i - 1], points[i]);
+
+      if (orient != CPOLYGON_ORIENTATION_UNKNOWN)
+        return orient;
+
+      ++i;
+    }
+
+    return CPOLYGON_ORIENTATION_UNKNOWN;
+  }
+
+  inline bool IntersectPolygons(const std::vector<CPoint2D> &points1,
+                                const std::vector<CPoint2D> &points2,
+                                std::vector<CPoint2D> &ipoints) {
+    static const double EPSILON_E6 = 1E-6;
+
+    static CPoint2D *f[2];
+    static uint      num_f;
+
+    ipoints.clear();
+
+    uint num_points1 = points1.size();
+    uint num_points2 = points2.size();
+
+    // fail if polygons are degenerate
+    if (num_points1 < 3 || num_points2 < 3)
+      return false;
+
+    CPolygonOrientation orient1 = PolygonOrientation(points1);
+    CPolygonOrientation orient2 = PolygonOrientation(points2);
+
+    // max number of intersection
+    uint ni = num_points1*num_points2;
+
+    // make sure intersection buffer is large enough
+    if (num_f < ni) {
+      num_f = ni;
+
+      delete [] f[0];
+      delete [] f[1];
+
+      f[0] = new CPoint2D [num_f];
+      f[1] = new CPoint2D [num_f];
+    }
+
+    // store polygon one in start point array
+    // Note: if orients don't match we invert the first polygon's point order
+    int l1 = 0;
+
+    ni = num_points1;
+
+    if (orient1 == orient2) {
+      for (uint i = 0; i < ni; ++i)
+        f[l1][i] = points1[i];
+    }
+    else {
+      for (uint i = 0, j = ni - 1; i < ni; ++i, --j)
+        f[l1][i] = points1[j];
+    }
+
+    // intersect current set of points with each line (end1, end2)
+    // of the second polygon (points2)
+    CPoint2D end1 = points2[num_points2 - 1];
+
+    for (uint i = 0; i < num_points2; ++i) {
+      CPoint2D end2 = points2[i];
+
+      // l2 is destination point index (inverse of current l1)
+      int l2 = 1 - l1;
+
+      // calc line coefficients
+      double ca = end2.x - end1.x; // (x2 - x1), (y2 - y1)
+      double cb = end1.y - end2.y; // (x2 - x1), (y2 - y1)
+      double cc = -end1.x*cb - end1.y*ca; // -x1*(y2 - y1) - y1*(x2 - x1)
+
+      // calc side of line for first point
+      CPoint2D v1     = f[l1][ni - 1];
+      double   fv1    = ca*v1.y + cb*v1.x + cc;
+      double   absfv1 = fabs(fv1);
+
+      int index1 = 0;
+
+      if (absfv1 >= EPSILON_E6)
+        index1 = CMathGen::sign(fv1)*orient2;
+
+      int ni1 = 0;
+
+      for (uint j = 0; j < ni; ++j) {
+        // calc side of line for second point
+        CPoint2D v2     = f[l1][j];
+        double   fv2    = ca*v2.y + cb*v2.x + cc;
+        double   absfv2 = fabs(fv2);
+
+        int index2 = 0;
+
+        if (absfv2 >= EPSILON_E6)
+          index2 = CMathGen::sign(fv2)*orient2;
+
+        // add start point
+        if (index1 >= 0)
+          f[l2][ni1++] = v1;
+
+        // add intersection point (if changed sides)
+        if (index1 != 0 && index1 != index2 && index2 != 0) {
+          double delta = absfv1 + absfv2;
+
+          double xi = (absfv2*v1.x + absfv1*v2.x)/delta;
+          double yi = (absfv2*v1.y + absfv1*v2.y)/delta;
+
+          f[l2][ni1++] = CPoint2D(xi, yi);
+        }
+
+        // move to next line
+        v1     = v2;
+        absfv1 = absfv2;
+        index1 = index2;
+      }
+
+      // degenerate result so fail
+      if (ni1 < 3)
+        return false;
+
+      l1   = l2;
+      end1 = end2;
+      ni   = ni1;
+    }
+
+    ipoints.resize(ni);
+
+    for (uint i = 0; i < ni; ++i)
+      ipoints[i] = f[l1][i];
+
+    return true;
+  }
+
+  inline bool IntersectPolygons(const double *x1, const double *y1, uint n1,
+                                const double *x2, const double *y2, uint n2,
+                                double **xi, double **yi, uint *ni) {
+    *xi = NULL;
+    *yi = NULL;
+    *ni = 0;
+
+    // convert input polygons to vector of points
+    std::vector<CPoint2D> vpoints1, vpoints2;
+
+    vpoints1.resize(n1);
+    vpoints2.resize(n2);
+
+    for (uint i = 0; i < n1; ++i) vpoints1[i] = CPoint2D(x1[i], y1[i]);
+    for (uint i = 0; i < n2; ++i) vpoints2[i] = CPoint2D(x2[i], y2[i]);
+
+    // call actual implementation
+    std::vector<CPoint2D> vipoints;
+
+    if (! IntersectPolygons(vpoints1, vpoints2, vipoints))
+      return false;
+
+    // convert result point vector to return array
+    *ni = vipoints.size();
+    *xi = new double [*ni + 1];
+    *yi = new double [*ni + 1];
+
+    for (uint i = 0; i < *ni; ++i) {
+      (*xi)[i] = vipoints[i].x;
+      (*yi)[i] = vipoints[i].y;
+    }
+
+    return true;
+  }
 
   bool PolygonLineIntersect(const double *x, const double *y, uint nxy,
                             double x1, double y1, double x2, double y2,
                             double *xi, double *yi, uint *num_i);
 
-  bool PointLineLeft   (const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
-  bool PointLineRight  (const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
-  bool PointLineOn     (const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
-  bool PointLineLeftOn (const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
-  bool PointLineRightOn(const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
+  inline double TriangleArea2(const CPoint2D &point1, const CPoint2D &point2,
+                              const CPoint2D &point3) {
+    return (point2.x - point1.x)*(point3.y - point1.y) -
+           (point3.x - point1.x)*(point2.y - point1.y);
+  }
 
-  double TriangleArea2(const CPoint2D &point1, const CPoint2D &point2, const CPoint2D &point3);
+  inline bool PointLineLeft(const CPoint2D &lpoint1, const CPoint2D &lpoint2,
+                            const CPoint2D &point) {
+    return TriangleArea2(lpoint1, lpoint2, point) > 0.0;
+  }
+
+  inline bool PointLineRight(const CPoint2D &lpoint1, const CPoint2D &lpoint2,
+                             const CPoint2D &point) {
+    return TriangleArea2(lpoint1, lpoint2, point) < 0.0;
+  }
+
+  inline bool PointLineOn(const CPoint2D &lpoint1, const CPoint2D &lpoint2,
+                          const CPoint2D &point) {
+    return TriangleArea2(lpoint1, lpoint2, point) == 0.0;
+  }
+
+  inline bool PointLineLeftOn(const CPoint2D &lpoint1, const CPoint2D &lpoint2,
+                              const CPoint2D &point) {
+    return TriangleArea2(lpoint1, lpoint2, point) >= 0.0;
+  }
+
+  inline bool PointLineRightOn(const CPoint2D &lpoint1, const CPoint2D &lpoint2,
+                               const CPoint2D &point) {
+    return TriangleArea2(lpoint1, lpoint2, point) >= 0.0;
+  }
 
   void PolygonCentroid(const double *x, const double *y, int num_xy, double *xc, double *yc);
   void PolygonCentroid(const std::vector<CPoint2D> &points, CPoint2D &c);
@@ -554,36 +789,8 @@ namespace CMathGeom2D {
 }
 
 #include <CBBox2D.h>
-#include <CPolygonOrientation.h>
 
 namespace CMathGeom2D {
-  inline CPolygonOrientation PolygonOrientation(double x1, double y1, double x2, double y2,
-                                                double x3, double y3) {
-    double dx1 = x2 - x1;
-    double dy1 = y2 - y1;
-
-    double dx2 = x3 - x2;
-    double dy2 = y3 - y2;
-
-    return (CPolygonOrientation) CMathGen::sign(dx1*dy2 - dy1*dx2);
-  }
-
-  inline CPolygonOrientation PolygonOrientation(const double *x, const double *y, uint num_xy) {
-    int i = 2;
-
-    while (i < (int) num_xy) {
-      CPolygonOrientation orient =
-        PolygonOrientation(x[i - 2], y[i - 2], x[i - 1], y[i - 1], x[i], y[i]);
-
-      if (orient != CPOLYGON_ORIENTATION_UNKNOWN)
-        return orient;
-
-      ++i;
-    }
-
-    return CPOLYGON_ORIENTATION_UNKNOWN;
-  }
-
   inline bool PointInsideConvex(double x, double y, const double *px, const double *py, uint np) {
     CPolygonOrientation orient = PolygonOrientation(px, py, np);
 
@@ -622,13 +829,97 @@ namespace CMathGeom2D {
   void EllipsePointAtAngle(double cx, double cy, double xr, double yr, double a,
                            double *x, double *y);
 
-  bool PointInsideEvenOdd(const CPoint2D &point, const std::vector<CPoint2D> &points);
-  bool PointInsideEvenOdd(const CPoint2D &point, const CPoint2D *points, uint num_points);
+  inline bool PointInsideEvenOdd(const CPoint2D &point, const CPoint2D *points, uint num_points) {
+    double xinters;
 
-  double PolygonArea(const double *x, const double *y, uint num_xy);
+    int counter = 0;
 
-  bool Intersects(const CPoint2D &l1point1, const CPoint2D &l1point2,
-                  const CPoint2D &l2point1, const CPoint2D &l2point2);
+    int             i2     = num_points - 1;
+    const CPoint2D *point2 = &points[i2];
+
+    // iterate through all lines of the polygon
+    for (int i1 = 0; i1 < (int) num_points; ++i1) {
+      const CPoint2D *point1 = &points[i1];
+
+      // intersect current line with horizontal line at inside point
+      if (point.y > std::min(point1->y, point2->y)) {
+        if (point.y <= std::max(point1->y, point2->y)) {
+          if (point.x <= std::max(point1->x, point2->x)) {
+            if (point1->y != point2->y) {
+              // if we have an intersection, increase count
+              xinters = (point.y   - point1->y)*(point2->x - point1->x)/
+                        (point2->y - point1->y) + point1->x;
+
+              if (point1->x == point2->x || point.x <= xinters)
+                ++counter;
+            }
+          }
+        }
+      }
+
+      // next line
+      i2     = i1;
+      point2 = point1;
+    }
+
+    // if odd then success
+    return ((counter % 2) != 0);
+  }
+
+  inline bool PointInsideEvenOdd(const CPoint2D &point, const std::vector<CPoint2D> &points) {
+    return PointInsideEvenOdd(point, &points[0], points.size());
+  }
+
+  inline double PolygonArea2(const double *x, const double *y, uint num_xy) {
+    double area = 0.0;
+
+    int i1 = num_xy - 1;
+    int i2 = 0;
+
+    for ( ; i2 < (int) num_xy; i1 = i2++)
+      area += x[i1]*y[i2] - y[i1]*x[i2];
+
+    return area;
+  }
+
+  inline double PolygonArea(const double *x, const double *y, uint num_xy) {
+    return fabs(0.5*PolygonArea2(x, y, num_xy));
+  }
+
+  inline bool PointBetween(const CPoint2D &lpoint1, const CPoint2D &lpoint2,
+                           const CPoint2D &point) {
+    if (lpoint1.x != lpoint2.x)
+      return (lpoint1.x <= point.x && point.x <= lpoint2.x) ||
+             (lpoint1.x >= point.x && point.x >= lpoint2.x);
+    else
+      return (lpoint1.x <= point.y && point.x <= lpoint2.y) ||
+             (lpoint1.x >= point.y && point.x >= lpoint2.y);
+  }
+
+  inline bool Intersects(const CPoint2D &l1point1, const CPoint2D &l1point2,
+                         const CPoint2D &l2point1, const CPoint2D &l2point2) {
+     double area11 = TriangleArea2(l1point1, l1point2, l2point1);
+
+    if (area11 == 0.0 && PointBetween(l1point1, l1point2, l2point1))
+      return true;
+
+    double area12 = TriangleArea2(l1point1, l1point2, l2point2);
+
+    if (area12 == 0.0 && PointBetween(l1point1, l1point2, l2point2))
+      return true;
+
+    double area21 = TriangleArea2(l2point1, l2point2, l1point1);
+
+    if (area21 == 0.0 && PointBetween(l2point1, l2point2, l1point1))
+      return true;
+
+    double area22 = TriangleArea2(l2point1, l2point2, l1point2);
+
+    if (area22 == 0.0 && PointBetween(l2point1, l2point2, l1point1))
+      return true;
+
+    return ((area11*area12 < 0.0) && (area21*area22 < 0.0));
+  }
 }
 
 #include <CLine2D.h>

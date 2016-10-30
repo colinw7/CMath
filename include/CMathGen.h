@@ -29,6 +29,8 @@
 
 #define REAL_EQ(r1,r2) (fabs((r1)-(r2))<1E-6)
 
+typedef unsigned char uchar;
+
 namespace CMathGen {
   enum Handedness {
     LEFT_HANDEDNESS,
@@ -422,6 +424,129 @@ namespace CMathGen {
     if (*r1 > *r2) std::swap(*r1, *r2);
 
     return true;
+  }
+
+  //-----
+
+  inline ulong binomialCoeff(uint n, uint k) {
+    enum { MAX_COEFF = 28 };
+
+    assert(n <= MAX_COEFF && k <= n);
+
+    if (! n) return 0;
+
+    static ushort computed_value;
+    static ulong  values[MAX_COEFF + 1][MAX_COEFF + 1];
+
+    if (n > computed_value) {
+      if (computed_value == 0) {
+        values[1][0] = 1;
+        values[1][1] = 1;
+
+        computed_value = 1;
+      }
+
+      uint n2 = n/2;
+
+      for (uint k1 = 0; k1 <= n2; ++k1) {
+        ulong t = 1;
+        ulong b = 1;
+
+        for (uint i = 0; i < k1; ++i) {
+          t *= n - i;
+          b *= i + 1;
+        }
+
+        ulong tb = t/b;
+
+        values[n][    k1] = tb;
+        values[n][n - k1] = tb;
+      }
+
+      if (n & 1) {
+        ulong t = 1;
+        ulong b = 1;
+
+        uint k1 = n2 + 1;
+
+        for (uint i = 0; i < k1; ++i) {
+          t *= n - i;
+          b *= i + 1;
+        }
+
+        ulong tb = t/b;
+
+        values[n][k1] = tb;
+      }
+    }
+
+    return values[n][k];
+  }
+
+  //-----
+
+  inline double mapToReal(char i) {
+    static double factor1 = -1.0/CHAR_MIN;
+    static double factor2 =  1.0/CHAR_MAX;
+
+    if (i < 0)
+      return 0.5*(i*factor1 + 1.0);
+    else
+      return 0.5*(i*factor2 + 1.0);
+  }
+
+  inline double mapToReal(uchar i) {
+    static double factor = 1.0/UCHAR_MAX;
+
+    return i*factor;
+  }
+
+  inline double mapToReal(short i) {
+    static double factor1 = -1.0/SHRT_MIN;
+    static double factor2 =  1.0/SHRT_MAX;
+
+    if (i < 0)
+      return 0.5*(i*factor1 + 1.0);
+    else
+      return 0.5*(i*factor2 + 1.0);
+  }
+
+  inline double mapToReal(ushort i) {
+    static double factor = 1.0/USHRT_MAX;
+
+    return i*factor;
+  }
+
+  inline double mapToReal(int i) {
+    static double factor1 = -1.0/INT_MIN;
+    static double factor2 =  1.0/INT_MAX;
+
+    if (i < 0)
+      return 0.5*(i*factor1 + 1.0);
+    else
+      return 0.5*(i*factor2 + 1.0);
+  }
+
+  inline double mapToReal(uint i) {
+    static double factor = 1.0/UINT_MAX;
+
+    return i*factor;
+  }
+
+  inline double mapToReal(long i) {
+    static double factor1 = -1.0/LONG_MIN;
+    static double factor2 =  1.0/LONG_MAX;
+
+    if (i < 0)
+      return 0.5*(i*factor1 + 1.0);
+    else
+      return 0.5*(i*factor2 + 1.0);
+  }
+
+  inline double mapToReal(ulong i) {
+    static double factor = 1.0/ULONG_MAX;
+
+    return i*factor;
   }
 
   //-----
