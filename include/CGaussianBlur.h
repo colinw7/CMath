@@ -11,7 +11,7 @@ class CGaussianBlur {
  ~CGaussianBlur() { }
 
   bool blur(const IMAGE &src, IMAGE &dst, double bx, double by, int nx, int ny) {
-    if (std::min(bx, by) <= 0)
+    if (bx <= 0 && by <= 0)
       return false;
 
     // init matrix (if needed)
@@ -39,7 +39,7 @@ class CGaussianBlur {
     int dx = nx2 - nx1 + 1;
     int dy = ny2 - ny1 + 1;
 
-    assert(m_.size() == dx && m_[0].size() == dy);
+    assert(int(m_.size()) == dx && int(m_[0].size()) == dy);
 
     //---
 
@@ -77,9 +77,10 @@ class CGaussianBlur {
 
             double f = m_[i][j]/sm_;
 
-            r += r1*f;
-            g += g1*f;
-            b += b1*f;
+            r += r1*a1*f;
+            g += g1*a1*f;
+            b += b1*a1*f;
+
             a += a1;
 
             ++n;
@@ -88,12 +89,15 @@ class CGaussianBlur {
 
         a /= n;
 
-        r = std::min(r, 1.0);
-        g = std::min(g, 1.0);
-        b = std::min(b, 1.0);
-        a = std::min(a, 1.0);
+        if (a < 1E-3)
+          continue;
 
-        dst.setRGBA(x2, y2, r, g, b, a);
+        CRGBA rgba1(r/a, g/a, b/a, a);
+        CRGBA rgba2(0, 0, 0, 0);
+
+        rgba2.combine(rgba1);
+
+        dst.setRGBA(x2, y2, rgba2.getRed(), rgba2.getGreen(), rgba2.getBlue(), rgba2.getAlpha());
       }
     }
 
@@ -117,21 +121,56 @@ class CGaussianBlur {
     for (int i = 0; i < dx; ++i)
       m_[i].resize(dy);
 
-    double bxy  = bx*by;
-    double bxy1 = 2*bxy;
-    double bxy2 = 1.0/sqrt(M_PI*bxy1);
-
     double sm = 0.0;
 
-    for (int i = 0, i1 = nx1; i < dx; ++i, ++i1) {
-      int i2 = i1*i1;
+    // x,y blur
+    if      (bx > 0 && by > 0) {
+      double bxy   = bx*by;
+      double bxy2  = 2*bxy;
+      double ibxy2 = 1.0/(M_PI*bxy2);
 
-      for (int j = 0, j1 = ny1; j < dy; ++j, ++j1) {
-        int j2 = j1*j1;
+      for (int i = 0, i1 = nx1; i < dx; ++i, ++i1) {
+        int x2 = i1*i1;
 
-        m_[i][j] = bxy2*exp(-(i2 + j2)/bxy1);
+        for (int j = 0, j1 = ny1; j < dy; ++j, ++j1) {
+          int y2 = j1*j1;
 
-        sm += m_[i][j];
+          m_[i][j] = ibxy2*exp(-(x2 + y2)/bxy2);
+
+          sm += m_[i][j];
+        }
+      }
+    }
+    // x blur
+    else if (bx > 0) {
+      double bx2  = bx*bx;
+      double bx22 = 2*bx*bx;
+      double ibx2 = 1.0/sqrt(M_PI*bx2);
+
+      for (int i = 0, i1 = nx1; i < dx; ++i, ++i1) {
+        int x2 = i1*i1;
+
+        for (int j = 0, j1 = ny1; j < dy; ++j, ++j1) {
+          m_[i][j] = ibx2*exp(-x2/bx22);
+
+          sm += m_[i][j];
+        }
+      }
+    }
+    // y blur
+    else {
+      double by2  = by*by;
+      double by22 = 2*by*by;
+      double iby2 = 1.0/sqrt(M_PI*by2);
+
+      for (int i = 0, i1 = nx1; i < dx; ++i, ++i1) {
+        for (int j = 0, j1 = ny1; j < dy; ++j, ++j1) {
+          int y2 = j1*j1;
+
+          m_[i][j] = iby2*exp(-y2/by22);
+
+          sm += m_[i][j];
+        }
       }
     }
 
