@@ -15,11 +15,6 @@ class CIBBox2DT {
   typedef CISize2DT<T>   Size;
   typedef CIVector2DT<T> Vector;
 
- private:
-  Point pmin_;
-  Point pmax_;
-  bool  set_;
-
  public:
   CIBBox2DT() : pmin_(), pmax_(), set_(false) { }
 
@@ -208,6 +203,13 @@ class CIBBox2DT {
   }
 
   void setSize(const Size &size) {
+    if (! set_) {
+      pmin_.x = 0;
+      pmin_.y = 0;
+
+      set_ = true;
+    }
+
     pmax_.x = pmin_.x + size.width;
     pmax_.y = pmin_.y + size.height;
   }
@@ -377,6 +379,10 @@ class CIBBox2DT {
     return pmax_;
   }
 
+  double area() const {
+    return getWidth()*getHeight();
+  }
+
   void print(std::ostream &os) const {
     if (! set_)
       os << "( not set )";
@@ -397,6 +403,11 @@ class CIBBox2DT {
   friend bool operator!=(const CIBBox2DT &lhs, const CIBBox2DT &rhs) {
     return ! (lhs == rhs);
   }
+
+ private:
+  Point pmin_;
+  Point pmax_;
+  bool  set_ { false };
 };
 
 typedef CIBBox2DT<int> CIBBox2D;
