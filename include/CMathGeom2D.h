@@ -1,8 +1,14 @@
 #ifndef CMathGeom2D_H
 #define CMathGeom2D_H
 
-#include <CMathGen.h>
+#include <list>
+#include <map>
 #include <vector>
+
+#include <CPoint2D.h>
+#include <CBBox2D.h>
+#include <CPolygonOrientation.h>
+#include <CLineJoinType.h>
 
 struct CPoint2DParam {
   CPoint2D p;
@@ -40,6 +46,15 @@ namespace CMathGeom2D {
     CLIP_ZONE_9  = (CLIP_ZONE_LEFT  | CLIP_ZONE_BOT),
     CLIP_ZONE_10 = (CLIP_ZONE_RIGHT | CLIP_ZONE_BOT)
   };
+
+  enum PointPosition {
+    POINT_POSITION_NONE  = -999,
+    POINT_POSITION_LEFT  = -1,
+    POINT_POSITION_RIGHT = 1,
+    POINT_POSITION_ON    = 0
+  };
+
+  //------
 
   //! get clip zone for point
   inline ClipZone getClipZone(double x, double y, double xmin, double ymin,
@@ -382,6 +397,8 @@ namespace CMathGeom2D {
     return CPOLYGON_ORIENTATION_UNKNOWN;
   }
 
+  //------
+
   inline bool IntersectPolygons(const std::vector<CPoint2D> &points1,
                                 const std::vector<CPoint2D> &points2,
                                 std::vector<CPoint2D> &ipoints) {
@@ -577,7 +594,7 @@ namespace CMathGeom2D {
   }
 
   void PolygonCentroid(const double *x, const double *y, int num_xy, double *xc, double *yc);
-  void PolygonCentroid(const std::vector<CPoint2D> &points, CPoint2D &c);
+  void PolygonCentroid(const std::vector<CPoint2D> &points, CPoint2D &p);
 
   inline double IncludedAngle(const CPoint2D &point1, const CPoint2D &point2,
                               const CPoint2D &point3) {
@@ -925,7 +942,7 @@ namespace CMathGeom2D {
 #include <CLine2D.h>
 
 namespace CMathGeom2D {
-  bool PolygonIsConvex(const std::vector<CLine2D> &lines);
+  bool PolygonIsConvex(const double *x, const double *y, int num_xy);
 
   bool PointLineDistance(const CPoint2D &point, const CLine2D &line, double *dist);
 
@@ -1039,6 +1056,197 @@ namespace CMathGeom2D {
     return PointInsideRect(point.x, point.y, rect.getXMin(), rect.getYMin(),
                            rect.getXMax(), rect.getYMax());
   }
+}
+
+namespace CMathGeom2D {
+  bool CutPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &points2,
+                   std::vector<CPoint2D> &opoints);
+  bool CutPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &points2,
+                   std::vector< std::vector<CPoint2D> > &opoints);
+
+  bool AddPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &points2,
+                   std::vector<CPoint2D> &opoints);
+
+  //------
+
+  bool PointInsideConvex(const CPoint2D &point, const std::vector<CPoint2D> &points);
+  bool PointInsideConvex(const CPoint2D &point, const CPoint2D *points, uint num_points);
+  bool PointInsideConvex(double x, double y, const CPoint2D *points, uint num_points);
+
+  bool PointInsideEvenOdd(double x, double y, const CPoint2D *points, uint num_points);
+  bool PointInsideEvenOdd(double x, double y, const double *xp, const double *yp, uint np);
+
+  bool PointInsideByAngle(const CPoint2D &point, const std::vector<CPoint2D> &points);
+  bool PointInsideByAngle(const CPoint2D &point, const CPoint2D *points, uint num_points);
+  bool PointInsideByAngle(double x, double y, const CPoint2D *points, uint num_points);
+  bool PointInsideByAngle(double x, double y, const double *xp, const double *yp, uint np);
+
+  bool PointInsideConvex1(double x, double y, const double *xp, const double *yp, uint np);
+
+  //------
+
+  bool ArcThrough(const CPoint2D &point1, const CPoint2D &point2, const CPoint2D &point3,
+                  double r, CPoint2D &center, CPoint2D &t1, CPoint2D &t2);
+  bool ArcThrough(double x1, double y1, double x2, double y2, double x3, double y3,
+                  double xr, double yr, double *xc, double *yc, double *xt1,
+                  double *yt1, double *xt2, double *yt2);
+
+  bool LinesAreCoincident(double x11, double y11, double x21, double y21,
+                          double x12, double y12, double x22, double y22);
+  bool LinesAreCoincident(const CPoint2D &p11, const CPoint2D &p12,
+                          const CPoint2D &p21, const CPoint2D &p22);
+
+  double PolygonArea(double x1, double y1, double x2, double y2, double x3, double y3);
+  double PolygonArea(double x1, double y1, double x2, double y2,
+                     double x3, double y3, double x4, double y4);
+  double PolygonArea(const CPoint2D *points, uint num_points);
+  double PolygonArea(const std::vector<CPoint2D> &points);
+
+  double PolygonArea2(double x1, double y1, double x2, double y2,
+                      double x3, double y3, double x4, double y4);
+  double PolygonArea2(const CPoint2D *points, uint num_points);
+  double PolygonArea2(const std::vector<CPoint2D> &points);
+  double PolygonArea2(const std::list<CPoint2D> &points);
+
+  double TriangleArea(const CPoint2D &point1, const CPoint2D &point2, const CPoint2D &point3);
+  double TriangleArea(double x1, double y1, double x2, double y2, double x3, double y3);
+  double TriangleArea2(double x1, double y1, double x2, double y2, double x3, double y3);
+
+  double IncludedAngle(double x1, double y1, double x2, double y2, double x3, double y3);
+  double IncludedAngle(double x1, double y1, double x2, double y2);
+
+  bool clipLine(double xmin, double ymin, double xmax, double ymax,
+                double *x1, double *y1, double *x2, double *y2);
+  bool clipLine1(double xmin, double ymin, double xmax, double ymax,
+                 double *x1, double *y1, double *x2, double *y2);
+
+  double PointPointDistance(const CPoint2D &point1, const CPoint2D &point2);
+
+  double Hypot(double a, double b);
+
+  bool ThreePointCircle(const CPoint2D &point1, const CPoint2D &point2,
+                        const CPoint2D &point3, CPoint2D &center, double &radius);
+  bool ThreePointCircle(double x1, double y1, double x2, double y2,
+                        double x3, double y3, double *xc, double *yc, double *r);
+
+  PointPosition PointLinePosition(const CPoint2D &lpoint1, const CPoint2D &lpoint2,
+                                  const CPoint2D &point);
+
+  bool Collinear(const CPoint2D &point1, const CPoint2D &point2, const CPoint2D &point3);
+
+  bool IntersectsProperly(const CPoint2D &l1point1, const CPoint2D &l1point2,
+                          const CPoint2D &l2point1, const CPoint2D &l2point2);
+
+  CPoint2D RotatePoint(const CPoint2D &point, double angle, const CPoint2D &o);
+
+  bool IsPerpendicular(double x21, double y21, double x32, double y32);
+
+  bool ThreePointCircle1(double x1, double y1, double x2, double y2,
+                         double x3, double y3, double *xc, double *yc, double *r);
+
+  bool CircleCircleIntersect(double x1, double y1, double r1, double x2, double y2, double r2,
+                             double *xi1, double *yi1, double *xi2, double *yi2);
+}
+
+#include <CLine2D.h>
+
+namespace CMathGeom2D {
+  bool PolygonIsConvex(const std::vector<CLine2D> &lines);
+  bool PolygonIsConvex(const std::list<CLine2D> &lines);
+
+  bool clipLine(const CLine2D &line, const CBBox2D &bbox, CLine2D &cline);
+
+  bool PointLineDistance(const CPoint2D &point, const CLine2D &line, double *dist);
+
+  bool PolygonLineIntersect(const std::vector<CPoint2D> &points, const CLine2D &line,
+                            std::vector<CPoint2D> &ipoints);
+
+  bool PolygonLineIntersect(const std::vector<CPoint2D> &points, const CLine2D &line,
+                            std::map<uint,CPoint2D> &ipoints);
+
+  bool LinesAreCoincident(const CLine2D &line1, const CLine2D &line2);
+
+  PointPosition PointLinePosition(const CLine2D &line, const CPoint2D &point);
+
+  bool PointLineLeft   (const CLine2D &line, const CPoint2D &point);
+  bool PointLineRight  (const CLine2D &line, const CPoint2D &point);
+  bool PointLineOn     (const CLine2D &line, const CPoint2D &point);
+  bool PointLineLeftOn (const CLine2D &line, const CPoint2D &point);
+  bool PointLineRightOn(const CLine2D &line, const CPoint2D &point);
+}
+
+#include <C3Bezier2D.h>
+#include <C2Bezier2D.h>
+
+namespace CMathGeom2D {
+  void ArcToBeziers(double x, double y, double xr, double yr, double angle1, double angle2,
+                    std::vector<C3Bezier2D> &beziers);
+  void ArcNToBeziers(double x, double y, double xr, double yr, double angle1, double angle2,
+                     std::vector<C3Bezier2D> &beziers);
+
+  void BezierToLines(const C3Bezier2D &bezier, std::vector<CPoint2D> &points, double tol=-1.0);
+  void BezierToLines(const C2Bezier2D &bezier, std::vector<CPoint2D> &points, double tol=-1.0);
+
+  bool BezierLineIntersect(const C2Bezier2D &bezier, const CLine2D &line,
+                           std::vector<CPoint2D> &ipoints, double tol);
+  bool BezierLineIntersect(const C2Bezier2D &bezier, const CLine2D &line,
+                           std::vector<CPoint2DParam2> &ibpoints, double tol);
+  bool BezierLineIntersect(const C2Bezier2D &bezier, const CLine2D &line, double t1, double t2,
+                           std::vector<CPoint2DParam2> &ibpoints, double tol);
+
+  bool BezierBezierIntersect(const C2Bezier2D &bezier1, const C2Bezier2D &bezier2,
+                             std::vector<CPoint2D> &ipoints, double tol);
+  bool BezierBezierIntersect(const C2Bezier2D &bezier1, const C2Bezier2D &bezier2,
+                             std::vector<CPoint2DParam2> &ipoints, double tol);
+  bool BezierBezierIntersect(const C2Bezier2D &bezier1, double t11, double t12,
+                             const C2Bezier2D &bezier2, double t21, double t22,
+                             std::vector<CPoint2DParam2> &ipoints, double tol);
+
+  bool BezierLineIntersect(const C3Bezier2D &bezier, const CLine2D &line,
+                           std::vector<CPoint2D> &ipoints, double tol);
+  bool BezierLineIntersect(const C3Bezier2D &bezier, const CLine2D &line,
+                           std::vector<CPoint2DParam2> &ibpoints, double tol);
+  bool BezierLineIntersect(const C3Bezier2D &bezier, const CLine2D &line, double t1, double t2,
+                           std::vector<CPoint2DParam2> &ibpoints, double tol);
+
+  bool BezierBezierIntersect(const C3Bezier2D &bezier1, const C3Bezier2D &bezier2,
+                             std::vector<CPoint2D> &ipoints, double tol);
+  bool BezierBezierIntersect(const C3Bezier2D &bezier1, const C3Bezier2D &bezier2,
+                             std::vector<CPoint2DParam2> &ipoints, double tol);
+  bool BezierBezierIntersect(const C3Bezier2D &bezier1, double t11, double t12,
+                             const C3Bezier2D &bezier2, double t21, double t22,
+                             std::vector<CPoint2DParam2> &ipoints, double tol);
+
+  void AddUniquePoint(std::vector<CPoint2DParam2> &points, const CPoint2DParam2 &p);
+
+  bool LineToPolygon(const CPoint2D &p1, const CPoint2D &p2,
+                     std::vector<CPoint2D> &points, double line_width=1.0);
+
+  bool LineJoinToPolygon(const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p3,
+                         CLineJoinType lineJoin, std::vector<CPoint2D> &points,
+                         double line_width=1.0);
+
+  bool MitreLineJoinToPolygon(const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p3,
+                              std::vector<CPoint2D> &points, double line_width=1.0,
+                              double mitre_limit=1.0);
+  bool RoundLineJoinToPolygon(const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p3,
+                              std::vector<CPoint2D> &points);
+  bool BevelLineJoinToPolygon(const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p3,
+                              std::vector<CPoint2D> &points, double line_width=1.0);
+
+  void AddWidthToPoint(const CPoint2D &p, double g, double line_width, CPoint2D &p1, CPoint2D &p2);
+}
+
+struct COffsetBezierData {
+  std::vector<C3Bezier2D> beziers;
+  std::vector<CPoint2D>   points;
+};
+
+namespace CMathGeom2D {
+  C3Bezier2D offsetBezier(const C3Bezier2D &b, double offset, uint num_samples=32);
+
+  void offsetBezier(const C3Bezier2D &b, double offset, COffsetBezierData &data,
+                    uint num_samples=32, int num_curves=1);
 }
 
 #endif

@@ -142,9 +142,7 @@ class CLineList2DT {
 
     assert(np >= 3);
 
-    return CMathGeom2D::IncludedAngle(points_[0].x, points_[0].y,
-                                      points_[1].x, points_[1].y,
-                                      points_[2].x, points_[2].y);
+    return CMathGeom2D::IncludedAngle(points_[0], points_[1], points_[2]);
   }
 
   bool arcThrough(T xr, T yr, T *xc, T *yc, T *xt1, T *yt1, T *xt2, T *yt2) {
