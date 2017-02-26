@@ -1,6 +1,7 @@
 #ifndef CGAUSSIAN_BLUR_H
 #define CGAUSSIAN_BLUR_H
 
+#include <CRGBA.h>
 #include <vector>
 
 template<typename IMAGE>
