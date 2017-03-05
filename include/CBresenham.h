@@ -1,23 +1,33 @@
 #ifndef CBRESENHAM_H
 #define CBRESENHAM_H
 
-#include <cmath>
+#include <CLineDash.h>
 
 class CBresenham {
  public:
   virtual ~CBresenham() { }
 
   void drawLine(int x1, int y1, int x2, int y2) {
+    CILineDash line_dash = getLineDash();
+
     int dx = x2 - x1;
 
     if (dx == 0) {
       if (y2 > y1) {
-        for (int y = y1; y <= y2; ++y)
-          drawPoint(x1, y);
+        for (int y = y1; y <= y2; ++y) {
+          if (line_dash.isDraw())
+            drawPoint(x1, y);
+
+          line_dash.step();
+        }
       }
       else {
-        for (int y = y2; y <= y1; ++y)
-          drawPoint(x1, y);
+        for (int y = y2; y <= y1; ++y) {
+          if (line_dash.isDraw())
+            drawPoint(x1, y);
+
+          line_dash.step();
+        }
       }
 
       return;
@@ -27,19 +37,27 @@ class CBresenham {
 
     if (dy == 0) {
       if (x2 > x1) {
-        for (int x = x1; x <= x2; ++x)
-          drawPoint(x, y1);
+        for (int x = x1; x <= x2; ++x) {
+          if (line_dash.isDraw())
+            drawPoint(x, y1);
+
+          line_dash.step();
+        }
       }
       else {
-        for (int x = x2; x <= x1; ++x)
-          drawPoint(x, y1);
+        for (int x = x2; x <= x1; ++x) {
+          if (line_dash.isDraw())
+            drawPoint(x, y1);
+
+          line_dash.step();
+        }
       }
 
       return;
     }
 
-    int adx = std::abs(dx);
-    int ady = std::abs(dy);
+    int adx = abs(dx);
+    int ady = abs(dy);
 
     int eps = 0;
 
@@ -49,7 +67,10 @@ class CBresenham {
       if (dx > 0) {
         if (dy > 0) {
           for (int x = x1; x <= x2; ++x) {
-            drawPoint(x, y);
+            if (line_dash.isDraw())
+              drawPoint(x, y);
+
+            line_dash.step();
 
             eps += ady;
 
@@ -62,7 +83,10 @@ class CBresenham {
         }
         else {
           for (int x = x1; x <= x2; ++x) {
-            drawPoint(x, y);
+            if (line_dash.isDraw())
+              drawPoint(x, y);
+
+            line_dash.step();
 
             eps += ady;
 
@@ -77,7 +101,10 @@ class CBresenham {
       else {
         if (dy > 0) {
           for (int x = x1; x >= x2; --x) {
-            drawPoint(x, y);
+            if (line_dash.isDraw())
+              drawPoint(x, y);
+
+            line_dash.step();
 
             eps += ady;
 
@@ -90,7 +117,10 @@ class CBresenham {
         }
         else {
           for (int x = x1; x >= x2; --x) {
-            drawPoint(x, y);
+            if (line_dash.isDraw())
+              drawPoint(x, y);
+
+            line_dash.step();
 
             eps += ady;
 
@@ -109,7 +139,10 @@ class CBresenham {
       if (dy > 0) {
         if (dx > 0) {
           for (int y = y1; y <= y2; ++y) {
-            drawPoint(x, y);
+            if (line_dash.isDraw())
+              drawPoint(x, y);
+
+            line_dash.step();
 
             eps += adx;
 
@@ -122,7 +155,10 @@ class CBresenham {
         }
         else {
           for (int y = y1; y <= y2; ++y) {
-            drawPoint(x, y);
+            if (line_dash.isDraw())
+              drawPoint(x, y);
+
+            line_dash.step();
 
             eps += adx;
 
@@ -137,7 +173,10 @@ class CBresenham {
       else {
         if (dx > 0) {
           for (int y = y1; y >= y2; --y) {
-            drawPoint(x, y);
+            if (line_dash.isDraw())
+              drawPoint(x, y);
+
+            line_dash.step();
 
             eps += adx;
 
@@ -150,7 +189,10 @@ class CBresenham {
         }
         else {
           for (int y = y1; y >= y2; --y) {
-            drawPoint(x, y);
+            if (line_dash.isDraw())
+              drawPoint(x, y);
+
+            line_dash.step();
 
             eps += adx;
 
@@ -282,6 +324,12 @@ class CBresenham {
   }
 
   virtual void drawPoint(int x, int y) = 0;
+
+  virtual const CILineDash &getLineDash() const {
+    static CILineDash dash;
+
+    return dash;
+  }
 
  private:
   void drawHLine(int x1, int x2, int y) {

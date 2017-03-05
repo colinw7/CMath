@@ -12,24 +12,23 @@
 //
 // where b1 >= 0 and b2 >= 0 and b1 + b2 <= 1
 //
-template<typename T>
-class CBarycentric2DT {
+class CBarycentric2D {
  private:
-  typedef CPoint2DT<T>  Point;
-  typedef CVector2DT<T> Vector;
-  typedef CTripletT<T>  Triplet;
+  typedef CPoint2D  Point;
+  typedef CVector2D Vector;
+  typedef CTriplet  Triplet;
 
  public:
-  CBarycentric2DT(const Point &p1, const Point &p2, const Point &p3) :
+  CBarycentric2D(const Point &p1, const Point &p2, const Point &p3) :
    p1_(p1), p2_(p2), p3_(p3) {
   }
 
   Triplet fromPoint(const Point &p) {
-    T area1 = triangleArea(p1_, p2_, p);
-    T area2 = triangleArea(p1_, p3_, p);
-    T area3 = triangleArea(p2_, p3_, p);
+    double area1 = triangleArea(p1_, p2_, p);
+    double area2 = triangleArea(p1_, p3_, p);
+    double area3 = triangleArea(p2_, p3_, p);
 
-    T is = 1.0/(area1 + area2 + area3);
+    double is = 1.0/(area1 + area2 + area3);
 
     return Triplet(area1*is, area2*is, area3*is);
   }
@@ -39,7 +38,7 @@ class CBarycentric2DT {
   }
 
  private:
-  T triangleArea(const Point &p1, const Point &p2, const Point &p3) {
+  double triangleArea(const Point &p1, const Point &p2, const Point &p3) {
     Vector p21 = p2 - p1;
     Vector p31 = p3 - p1;
 
@@ -49,7 +48,5 @@ class CBarycentric2DT {
  private:
   Point p1_, p2_, p3_;
 };
-
-typedef CBarycentric2DT<double> CBarycentric2D;
 
 #endif

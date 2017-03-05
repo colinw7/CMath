@@ -4,6 +4,7 @@
 #include <CThrow.h>
 #include <CArray1D.h>
 
+// 2D Array of specified type, data is optionally owned
 template<typename T, bool OWNER=true>
 class CArray2D {
  public:
@@ -96,7 +97,7 @@ class CArray2D {
     return slice_type(&data_[ind*d2_], d2_);
   }
 
-  void print(ostream &os) const {
+  void print(std::ostream &os) const {
     os << "[";
 
     index_type k = 0;
@@ -114,7 +115,7 @@ class CArray2D {
     os << " ]";
   }
 
-  friend ostream &operator<<(ostream &os, const CArray2D &array) {
+  friend std::ostream &operator<<(std::ostream &os, const CArray2D &array) {
     array.print(os);
 
     return os;

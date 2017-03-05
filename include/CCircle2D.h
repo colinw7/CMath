@@ -6,34 +6,29 @@
 #include <CMathGeom2D.h>
 #include <CShape2D.h>
 
-template<typename T>
-class CCircle2DT : public CShape2DT<T> {
+class CCircle2D : public CShape2D {
  private:
-  typedef CPoint2DT<T>  Point;
-  typedef CLine2DT<T>   Line;
-  typedef CCircle2DT<T> Circle;
-  typedef CBBox2DT<T>   BBox;
-
- private:
-  Point center_;
-  T     radius_;
+  typedef CPoint2D  Point;
+  typedef CLine2D   Line;
+  typedef CCircle2D Circle;
+  typedef CBBox2D   BBox;
 
  public:
-  CCircle2DT() { }
+  CCircle2D() { }
 
-  CCircle2DT(T x, T y, T radius) :
+  CCircle2D(double x, double y, double radius) :
    center_(x, y), radius_(radius) {
   }
 
-  CCircle2DT(const Point &center, T radius) :
+  CCircle2D(const Point &center, double radius) :
    center_(center), radius_(radius) {
   }
 
   void setCenter(const Point &center) { center_ = center; }
   void setRadius(double radius      ) { radius_ = radius; }
 
-  const Point &getCenter() const { return center_; }
-  const T      getRadius() const { return radius_; }
+  const Point& getCenter() const { return center_; }
+  double       getRadius() const { return radius_; }
 
   double area() { return M_PI*radius_*radius_; }
 
@@ -43,7 +38,7 @@ class CCircle2DT : public CShape2DT<T> {
   }
 
   bool inside(const Point &p) const {
-    T d = p.distanceTo(center_);
+    double d = p.distanceTo(center_);
 
     return (d < radius_);
   }
@@ -53,14 +48,14 @@ class CCircle2DT : public CShape2DT<T> {
   }
 
   void resizeBy(const Point &ll, const Point &ur) {
-    radius_ += max(ll.x, max(ll.y, max(ur.x, ur.y)));
+    radius_ += std::max(ll.x, std::max(ll.y, std::max(ur.x, ur.y)));
   }
 
   void rotateBy(double, const Point &) { }
 
   bool lineIntersect(const Line &line, Point &point1, Point &point2) const {
-    uint ni;
-    T    xi1, yi1, xi2, yi2;
+    uint   ni;
+    double xi1, yi1, xi2, yi2;
 
     if (! lineIntersect(line.start().x, line.start().y, line.end().x, line.end().y,
                         &xi1, &yi1, &xi2, &yi2, &ni))
@@ -72,12 +67,15 @@ class CCircle2DT : public CShape2DT<T> {
     return true;
   }
 
-  bool lineIntersect(T lx1, T ly1, T lx2, T ly2, T *xi1, T *yi1, T *xi2, T *yi2, uint *ni) const {
+  bool lineIntersect(double lx1, double ly1, double lx2, double ly2,
+                     double *xi1, double *yi1, double *xi2, double *yi2, uint *ni) const {
     return CMathGeom2D::CircleLineIntersect(center_.x, center_.y, radius_,
                                             lx1,  ly1, lx2, ly2, xi1, yi1, xi2, yi2, ni);
   }
-};
 
-typedef CCircle2DT<double> CCircle2D;
+ private:
+  Point  center_;
+  double radius_ { 1 };
+};
 
 #endif

@@ -6,58 +6,46 @@
 #include <CLine3D.h>
 #include <CVector3D.h>
 
-template<typename T>
-class CPlane3DT {
- private:
-  typedef CPoint3DT<T>  Point;
-  typedef CVector3DT<T> Vector;
-  typedef CPlane3DT<T>  Plane;
-  typedef CLine3DT<T>   Line;
-
- private:
-  Point  point_;
-  Vector normal_;
-  T      c_;
-
+class CPlane3D {
  public:
   // constructor/destructor
-  CPlane3DT() { }
+  CPlane3D() { }
 
-  CPlane3DT(const Point &point, const Vector &normal) :
+  CPlane3D(const CPoint3D &point, const CVector3D &normal) :
    point_(point), normal_(normal) {
     c_ = normal_.dotProduct(CVector3D(point_));
   }
 
-  CPlane3DT(const Vector &normal, T c) :
+  CPlane3D(const CVector3D &normal, double c) :
    normal_(normal), c_(c) {
     point_ = (normal_*c).point();
   }
 
-  CPlane3DT(const Point &point1, const Point &point2, const Point &point3) {
-    Vector v23(point3, point2); // point2 - point3
-    Vector v31(point1, point3); // point3 - point1
-    Vector v12(point2, point1); // point1 - point2
+  CPlane3D(const CPoint3D &point1, const CPoint3D &point2, const CPoint3D &point3) {
+    CVector3D v23(point3, point2); // point2 - point3
+    CVector3D v31(point1, point3); // point3 - point1
+    CVector3D v12(point2, point1); // point1 - point2
 
-    T A = point1.y*v23.getZ() + point2.y*v31.getZ() + point3.y*v12.getZ();
-    T B = point1.z*v23.getX() + point2.z*v31.getX() + point3.z*v12.getX();
-    T C = point1.x*v23.getY() + point2.x*v31.getY() + point3.x*v12.getY();
+    double A = point1.y*v23.getZ() + point2.y*v31.getZ() + point3.y*v12.getZ();
+    double B = point1.z*v23.getX() + point2.z*v31.getX() + point3.z*v12.getX();
+    double C = point1.x*v23.getY() + point2.x*v31.getY() + point3.x*v12.getY();
 
-    normal_ = Vector(A, B, C);
+    normal_ = CVector3D(A, B, C);
     point_  = point1;
 
     c_ = normal_.dotProduct(CVector3D(point_));
   }
 
- ~CPlane3DT() { }
+ ~CPlane3D() { }
 
   //------
 
   // copy operations
-  CPlane3DT(const Plane &rhs) :
+  CPlane3D(const CPlane3D &rhs) :
    point_(rhs.point_), normal_(rhs.normal_), c_(rhs.c_) {
   }
 
-  Plane &operator=(const Plane &rhs) {
+  CPlane3D &operator=(const CPlane3D &rhs) {
     point_  = rhs.point_;
     normal_ = rhs.normal_;
     c_      = rhs.c_;
@@ -72,7 +60,7 @@ class CPlane3DT {
     os << "(" << point_ << ") (" << normal_ << ") (" << c_ << ")";
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const Plane &plane) {
+  friend std::ostream &operator<<(std::ostream &os, const CPlane3D &plane) {
     plane.print(os);
 
     return os;
@@ -81,11 +69,11 @@ class CPlane3DT {
   //------
 
   // accessors
-  const Point  &getPoint   () const { return point_ ; }
-  const Vector &getNormal  () const { return normal_; }
-  T             getConstant() const { return c_     ; }
+  const CPoint3D  &getPoint   () const { return point_ ; }
+  const CVector3D &getNormal  () const { return normal_; }
+  double             getConstant() const { return c_     ; }
 
-  T value(const Point &point) const {
+  double value(const CPoint3D &point) const {
     return (normal_.dotProduct(point - point_));
   }
 
@@ -93,7 +81,7 @@ class CPlane3DT {
 
   // intersect
   CMathGen::IntersectType
-  intersectLine(const CLine3DT<T> &line, T *iparam) const {
+  intersectLine(const CLine3D &line, double *iparam) const {
     if (! intersect(line, iparam)) {
       if (fabs(value(line.start())) <= 1E-6)
         return CMathGen::INTERSECT_ALL;
@@ -108,39 +96,39 @@ class CPlane3DT {
     }
   }
 
-  bool intersect(const CLine3DT<T> &line, T *iparam) const {
+  bool intersect(const CLine3D &line, double *iparam) const {
     const CVector3D &vector = line.vector();
 
-    T dot_product1 = vector.dotProduct(normal_);
+    double dot_product1 = vector.dotProduct(normal_);
 
     if (fabs(dot_product1) < 1E-6)
       return false;
 
-    T dot_product2 = CVector3D::dotProduct(line.start(), normal_);
-    T dot_product3 = CVector3D::dotProduct(point_      , normal_);
+    double dot_product2 = CVector3D::dotProduct(line.start(), normal_);
+    double dot_product3 = CVector3D::dotProduct(point_      , normal_);
 
     *iparam = (dot_product3 - dot_product2)/dot_product1;
 
     return true;
   }
 
-  bool intersect(const Plane &plane, Line &iline) const {
+  bool intersect(const CPlane3D &plane, CLine3D &iline) const {
     const CVector3D &normal1 =       getNormal();
     const CVector3D &normal2 = plane.getNormal();
 
-    T n11 = normal1.dotProduct(normal1);
-    T n12 = normal1.dotProduct(normal2);
-    T n22 = normal2.dotProduct(normal2);
+    double n11 = normal1.dotProduct(normal1);
+    double n12 = normal1.dotProduct(normal2);
+    double n22 = normal2.dotProduct(normal2);
 
-    T det = n11*n22 - n12*n12;
+    double det = n11*n22 - n12*n12;
 
     if (fabs(det) < 1E-6)
       return false;
 
-    T idet = 1.0/det;
+    double idet = 1.0/det;
 
-    T c1 = (      getConstant()*n22 - plane.getConstant())*n12*idet;
-    T c2 = (plane.getConstant()*n11 -       getConstant())*n12*idet;
+    double c1 = (      getConstant()*n22 - plane.getConstant())*n12*idet;
+    double c2 = (plane.getConstant()*n11 -       getConstant())*n12*idet;
 
     CVector3D p = normal1.crossProduct(normal2);
 
@@ -152,20 +140,19 @@ class CPlane3DT {
     return true;
   }
 
-  bool intersect(const Line &line, Point &ipoint, T iparam) const;
-};
+  bool intersect(const CLine3D &line, CPoint3D &ipoint, double iparam) const;
 
-typedef CPlane3DT<double> CPlane3D;
+ private:
+  CPoint3D  point_;
+  CVector3D normal_;
+  double    c_;
+};
 
 //------
 
 #include <CMathGeom3D.h>
 
-template<typename T>
-bool
-CPlane3DT<T>::
-intersect(const Line &line, Point &ipoint, T iparam) const
-{
+inline bool CPlane3D::intersect(const CLine3D &line, CPoint3D &ipoint, double iparam) const {
   return CMathGeom3D::LinePlaneIntersect(line, *this, ipoint, iparam);
 }
 

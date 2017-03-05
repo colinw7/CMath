@@ -5,16 +5,9 @@
 
 #include <CMathGen.h>
 #include <CPoint3D.h>
+#include <CMathMacros.h>
 
-template<typename T>
-class CPoint3DT;
-
-template<typename T>
-class CVector3DT {
- private:
-  typedef CPoint3DT<T>  Point;
-  typedef CVector3DT<T> Vector;
-
+class CVector3D {
  public:
   enum Type {
     ZERO,
@@ -26,22 +19,22 @@ class CVector3DT {
 
  public:
   // constructor/destructor
-  CVector3DT() { }
+  CVector3D() { }
 
-  CVector3DT(T x, T y, T z) :
+  CVector3D(double x, double y, double z) :
    x_(x), y_(y), z_(z) {
   }
 
- ~CVector3DT() { }
+ ~CVector3D() { }
 
   //------
 
   // copy operations
-  CVector3DT(const Vector &vector) :
+  CVector3D(const CVector3D &vector) :
    x_(vector.x_), y_(vector.y_), z_(vector.z_), normalized_(vector.normalized_) {
   }
 
-  Vector &operator=(const Vector &v) {
+  CVector3D &operator=(const CVector3D &v) {
     x_ = v.x_; y_ = v.y_; z_ = v.z_;
 
     normalized_ = v.normalized_;
@@ -56,7 +49,7 @@ class CVector3DT {
     os << "(" << x_ << "," << y_ << "," << z_ << ")";
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const Vector &vector) {
+  friend std::ostream &operator<<(std::ostream &os, const CVector3D &vector) {
     vector.print(os);
 
     return os;
@@ -67,54 +60,58 @@ class CVector3DT {
   // accessors
 
   // get
-  T x() const { return x_; }
-  T y() const { return y_; }
-  T z() const { return z_; }
+  double x() const { return x_; }
+  double y() const { return y_; }
+  double z() const { return z_; }
 
-  T getX() const { return x_; }
-  T getY() const { return y_; }
-  T getZ() const { return z_; }
+  double getX() const { return x_; }
+  double getY() const { return y_; }
+  double getZ() const { return z_; }
 
-  void getXYZ(T *x, T *y, T *z) const {
+  void getXYZ(double *x, double *y, double *z) const {
     *x = x_; *y = y_; *z = z_;
   }
 
-  const T *getValues() const { return &x_; }
+  const double *getValues() const { return &x_; }
 
   // Reference routine would break encapsulation
 
-  T operator[](uint i) const {
-    assert(i < 3);
-
-    return (&x_)[i];
-  }
+  double operator[](uint i) const { assert(i < 3); return (&x_)[i]; }
 
   // set
-  void setX(T x) {
+  CVector3D &setX(double x) {
     x_ = x;
 
     normalized_ = false;
+
+    return *this;
   }
 
-  void setY(T y) {
+  CVector3D &setY(double y) {
     y_ = y;
 
     normalized_ = false;
+
+    return *this;
   }
 
-  void setZ(T z) {
+  CVector3D &setZ(double z) {
     z_ = z;
 
     normalized_ = false;
+
+    return *this;
   }
 
-  void setXYZ(T x, T y, T z) {
+  CVector3D &setXYZ(double x, double y, double z) {
     x_ = x; y_ = y; z_ = z;
 
     normalized_ = false;
+
+    return *this;
   }
 
-  void iset(uint i, T v) {
+  void iset(uint i, double v) {
     assert(i < 3);
 
     (&x_)[i] = v;
@@ -127,18 +124,25 @@ class CVector3DT {
     return normalized_;
   }
 
-  T length() const {
+  double length() const {
     if (normalized_)
       return 1.0;
 
     return ::sqrt(lengthSqr());
   }
 
-  T modulus() const {
+  double fastLength() const {
+    if (normalized_)
+      return 1.0;
+
+    return CMathGen::fastDistance(x_, y_, z_);
+  }
+
+  double modulus() const {
     return length();
   }
 
-  T lengthSqr() const {
+  double lengthSqr() const {
     if (normalized_)
       return 1.0;
 
@@ -149,7 +153,7 @@ class CVector3DT {
 
   // comparison
   // TODO: tolerance ? use eq()
-  int cmp(const Vector &v) const {
+  int cmp(const CVector3D &v) const {
     if      (x_ < v.x_) return -1;
     else if (x_ > v.x_) return  1;
     else if (y_ < v.y_) return -1;
@@ -159,31 +163,31 @@ class CVector3DT {
     else                return  0;
   }
 
-  friend bool operator==(const Vector &lhs, const Vector &rhs) {
+  friend bool operator==(const CVector3D &lhs, const CVector3D &rhs) {
     return lhs.cmp(rhs) == 0;
   }
 
-  friend bool operator!=(const Vector &lhs, const Vector &rhs) {
+  friend bool operator!=(const CVector3D &lhs, const CVector3D &rhs) {
     return lhs.cmp(rhs) != 0;
   }
 
-  friend bool operator< (const Vector &lhs, const Vector &rhs) {
+  friend bool operator< (const CVector3D &lhs, const CVector3D &rhs) {
     return lhs.cmp(rhs) <  0;
   }
 
-  friend bool operator<=(const Vector &lhs, const Vector &rhs) {
+  friend bool operator<=(const CVector3D &lhs, const CVector3D &rhs) {
     return lhs.cmp(rhs) <= 0;
   }
 
-  friend bool operator> (const Vector &lhs, const Vector &rhs) {
+  friend bool operator> (const CVector3D &lhs, const CVector3D &rhs) {
     return lhs.cmp(rhs) >  0;
   }
 
-  friend bool operator>=(const Vector &lhs, const Vector &rhs) {
+  friend bool operator>=(const CVector3D &lhs, const CVector3D &rhs) {
     return lhs.cmp(rhs) >= 0;
   }
 
-  bool eq(const Vector &rhs) const {
+  bool eq(const CVector3D &rhs) const {
     return fabs(x_ - rhs.x_) < 1E-6 &&
            fabs(y_ - rhs.y_) < 1E-6 &&
            fabs(z_ - rhs.z_) < 1E-6;
@@ -191,24 +195,24 @@ class CVector3DT {
 
   //------
 
-  explicit CVector3DT(const Point &point) :
+  explicit CVector3D(const CPoint3D &point) :
     x_(point.x), y_(point.y), z_(point.z) {
   }
 
   // v = point2 - point1
-  CVector3DT(const Point &point1, const Point &point2) :
+  CVector3D(const CPoint3D &point1, const CPoint3D &point2) :
    x_(point2.x - point1.x), y_(point2.y - point1.y), z_(point2.z - point1.z) {
   }
 
   // v = vector2 - vector1
-  CVector3DT(const Vector &vector1, const Vector &vector2) :
+  CVector3D(const CVector3D &vector1, const CVector3D &vector2) :
    x_(vector2.x_ - vector1.x_), y_(vector2.y_ - vector1.y_), z_(vector2.z_ - vector1.z_) {
   }
 
   //------
 
   // parametric creation
-  CVector3DT(Type type, T s=1.0) {
+  CVector3D(Type type, double s=1.0) {
     if      (type == ZERO  ) { x_ = 0.0; y_ = 0.0; z_ = 0.0; }
     else if (type == UNIT  ) { x_ =   s; y_ =   s; z_ =   s; }
     else if (type == UNIT_X) { x_ =   s; y_ = 0.0; z_ = 0.0; }
@@ -219,13 +223,13 @@ class CVector3DT {
   //------
 
   // to point
-  Point point() const {
-    return Point(x_, y_, z_);
+  CPoint3D point() const {
+    return CPoint3D(x_, y_, z_);
   }
 
   //------
 
-  Vector &zero() {
+  CVector3D &zero() {
     x_ = 0.0; y_ = 0.0; z_ = 0.0;
 
     normalized_ = false;
@@ -243,15 +247,15 @@ class CVector3DT {
 
   //------
 
-  Vector &normalize() {
+  CVector3D &normalize() {
     if (normalized_)
       return *this;
 
-    T len = length();
+    double len = length();
 
     // assert on len == 0 ?
 
-    T factor = 0.0;
+    double factor = 0.0;
 
     if (len > 0.0)
       factor = 1.0/len;
@@ -265,35 +269,35 @@ class CVector3DT {
     return *this;
   }
 
-  Vector normalized() const {
+  CVector3D normalized() const {
     if (normalized_)
       return *this;
 
-    T len = length();
+    double len = length();
 
     // assert on len == 0 ?
 
-    T factor = 0.0;
+    double factor = 0.0;
 
     if (len > 0.0)
       factor = 1.0/len;
 
-    return Vector(x_*factor, y_*factor, z_*factor, true);
+    return CVector3D(x_*factor, y_*factor, z_*factor, true);
   }
 
-  Vector unit() const {
+  CVector3D unit() const {
     return normalized();
   }
 
   //------
 
-  Vector &setMagnitude(T magnitude) {
-    T factor = 0.0;
+  CVector3D &setMagnitude(double magnitude) {
+    double factor = 0.0;
 
     if (normalized_)
       factor = magnitude;
     else {
-      T len = length();
+      double len = length();
 
       if (len > 0.0)
         factor = magnitude/len;
@@ -308,53 +312,53 @@ class CVector3DT {
 
   //------
 
-  T getDistance(const Vector &vector) const {
-    Vector diff = *this - vector;
+  double getDistance(const CVector3D &vector) const {
+    CVector3D diff = *this - vector;
 
     return diff.length();
   }
 
-  T getDistanceSqr(const Vector &vector) const {
-    Vector diff = *this - vector;
+  double getDistanceSqr(const CVector3D &vector) const {
+    CVector3D diff = *this - vector;
 
     return diff.lengthSqr();
   }
 
   //------
 
-  void incX(T x = 1.0) { x_ += x; normalized_ = false; }
-  void incY(T y = 1.0) { y_ += y; normalized_ = false; }
-  void incZ(T z = 1.0) { z_ += z; normalized_ = false; }
+  void incX(double x = 1.0) { x_ += x; normalized_ = false; }
+  void incY(double y = 1.0) { y_ += y; normalized_ = false; }
+  void incZ(double z = 1.0) { z_ += z; normalized_ = false; }
 
-  void decX(T x = 1.0) { x_ -= x; normalized_ = false; }
-  void decY(T y = 1.0) { y_ -= y; normalized_ = false; }
-  void decZ(T z = 1.0) { z_ -= z; normalized_ = false; }
+  void decX(double x = 1.0) { x_ -= x; normalized_ = false; }
+  void decY(double y = 1.0) { y_ -= y; normalized_ = false; }
+  void decZ(double z = 1.0) { z_ -= z; normalized_ = false; }
 
-  void scaleX(T x = 1.0) { x_ *= x; normalized_ = false; }
-  void scaleY(T y = 1.0) { y_ *= y; normalized_ = false; }
-  void scaleZ(T z = 1.0) { z_ *= z; normalized_ = false; }
-
-  //------
-
-  T minComponent() { return std::min(std::min(x_, y_), z_); }
-  T maxComponent() { return std::max(std::max(x_, y_), z_); }
-
-  T minAbsComponent() { return std::min(std::min(::fabs(x_), ::fabs(y_)), ::fabs(z_)); }
-  T maxAbsComponent() { return std::max(std::max(::fabs(x_), ::fabs(y_)), ::fabs(z_)); }
+  void scaleX(double x = 1.0) { x_ *= x; normalized_ = false; }
+  void scaleY(double y = 1.0) { y_ *= y; normalized_ = false; }
+  void scaleZ(double z = 1.0) { z_ *= z; normalized_ = false; }
 
   //------
 
-  static Vector min(const Vector &lhs, const Vector &rhs) {
-    return Vector(min(lhs.x_, rhs.x_), min(lhs.y_, rhs.y_), min(lhs.z_, rhs.z_));
+  double minComponent() { return std::min(std::min(x_, y_), z_); }
+  double maxComponent() { return std::max(std::max(x_, y_), z_); }
+
+  double minAbsComponent() { return std::min(std::min(::fabs(x_), ::fabs(y_)), ::fabs(z_)); }
+  double maxAbsComponent() { return std::max(std::max(::fabs(x_), ::fabs(y_)), ::fabs(z_)); }
+
+  //------
+
+  static CVector3D min(const CVector3D &lhs, const CVector3D &rhs) {
+    return CVector3D(std::min(lhs.x_, rhs.x_), std::min(lhs.y_, rhs.y_), std::min(lhs.z_, rhs.z_));
   }
 
-  static Vector max(const Vector &lhs, const Vector &rhs) {
-    return Vector(max(lhs.x_, rhs.x_), max(lhs.y_, rhs.y_), max(lhs.z_, rhs.z_));
+  static CVector3D max(const CVector3D &lhs, const CVector3D &rhs) {
+    return CVector3D(std::max(lhs.x_, rhs.x_), std::max(lhs.y_, rhs.y_), std::max(lhs.z_, rhs.z_));
   }
 
   //------
 
-  Vector &operator=(const Point &point) {
+  CVector3D &operator=(const CPoint3D &point) {
     x_ = point.x; y_ = point.y; z_ = point.z;
 
     normalized_ = false;
@@ -367,16 +371,16 @@ class CVector3DT {
   // operators
 
   // unary +/-
-  Vector operator+() const {
-    return Vector(x_, y_, z_, normalized_);
+  CVector3D operator+() const {
+    return CVector3D(x_, y_, z_, normalized_);
   }
 
-  Vector operator-() const {
-    return Vector(-x_, -y_, -z_, normalized_);
+  CVector3D operator-() const {
+    return CVector3D(-x_, -y_, -z_, normalized_);
   }
 
   // addition
-  Vector &operator+=(const Vector &rhs) {
+  CVector3D &operator+=(const CVector3D &rhs) {
     x_ += rhs.x_; y_ += rhs.y_; z_ += rhs.z_;
 
     normalized_ = false;
@@ -384,12 +388,12 @@ class CVector3DT {
     return *this;
   }
 
-  Vector operator+(const Vector &rhs) const {
-    return Vector(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_);
+  CVector3D operator+(const CVector3D &rhs) const {
+    return CVector3D(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_);
   }
 
   // subtraction
-  Vector &operator-=(const Vector &rhs) {
+  CVector3D &operator-=(const CVector3D &rhs) {
     x_ -= rhs.x_; y_ -= rhs.y_; z_ -= rhs.z_;
 
     normalized_ = false;
@@ -397,12 +401,20 @@ class CVector3DT {
     return *this;
   }
 
-  Vector operator-(const Vector &rhs) const {
-    return Vector(x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_);
+  CVector3D operator-(const CVector3D &rhs) const {
+    return CVector3D(x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_);
   }
 
   // scalar multiplication/division
-  Vector &operator*=(T rhs) {
+  CVector3D &operator*=(const CVector3D &rhs) {
+    x_ *= rhs.x_; y_ *= rhs.y_; z_ *= rhs.z_;
+
+    normalized_ = false;
+
+    return *this;
+  }
+
+  CVector3D &operator*=(double rhs) {
     x_ *= rhs; y_ *= rhs; z_ *= rhs;
 
     normalized_ = false;
@@ -410,24 +422,24 @@ class CVector3DT {
     return *this;
   }
 
-  Vector operator*(const Vector &rhs) {
-    Vector t(*this);
+  CVector3D operator*(const CVector3D &rhs) {
+    CVector3D t(*this);
 
     t *= rhs;
 
     return t;
   }
 
-  friend Vector operator*(const Vector &lhs, T rhs) {
-    return Vector(lhs.x_*rhs, lhs.y_*rhs, lhs.z_*rhs);
+  friend CVector3D operator*(const CVector3D &lhs, double rhs) {
+    return CVector3D(lhs.x_*rhs, lhs.y_*rhs, lhs.z_*rhs);
   }
 
-  friend Vector operator*(T lhs, const Vector &rhs) {
-    return Vector(lhs*rhs.x_, lhs*rhs.y_, lhs*rhs.z_);
+  friend CVector3D operator*(double lhs, const CVector3D &rhs) {
+    return CVector3D(lhs*rhs.x_, lhs*rhs.y_, lhs*rhs.z_);
   }
 
-  Vector &operator/=(T rhs) {
-    T irhs = 1.0/rhs;
+  CVector3D &operator/=(double rhs) {
+    double irhs = 1.0/rhs;
 
     x_ *= irhs; y_ *= irhs; z_ *= irhs;
 
@@ -436,71 +448,71 @@ class CVector3DT {
     return *this;
   }
 
-  Vector operator/(T rhs) const {
-    T irhs = 1.0/rhs;
+  CVector3D operator/(double rhs) const {
+    double irhs = 1.0/rhs;
 
-    return Vector(x_*irhs, y_*irhs, z_*irhs);
+    return CVector3D(x_*irhs, y_*irhs, z_*irhs);
   }
 
   //------
 
   // dot product
-  T dotProduct(const Vector &v) const {
+  double dotProduct(const CVector3D &v) const {
     return (x_*v.x_ + y_*v.y_ + z_*v.z_);
   }
 
-//T dotProduct(const Normal &normal) const {
+//double dotProduct(const Normal &normal) const {
 //  return (x_*normal.getX() + y_*normal.getY() + z_*normal.getZ());
 //}
 
-  static T dotProduct(const Vector &v1, const Vector &v2) {
+  static double dotProduct(const CVector3D &v1, const CVector3D &v2) {
     return v1.dotProduct(v2);
   }
 
-  static T dotProduct(const Point &v1, const Vector &v2) {
-    return Vector(v1.x, v1.y, v1.z).dotProduct(Vector(v2));
+  static double dotProduct(const CPoint3D &v1, const CVector3D &v2) {
+    return CVector3D(v1.x, v1.y, v1.z).dotProduct(CVector3D(v2));
   }
 
-  T dotProduct(const Point &point) const {
-    return dotProduct(Vector(point.x, point.y, point.z));
+  double dotProduct(const CPoint3D &point) const {
+    return dotProduct(CVector3D(point.x, point.y, point.z));
   }
 
-  T dotProduct(T x, T y, T z) const {
-    return dotProduct(Vector(x, y, z));
+  double dotProduct(double x, double y, double z) const {
+    return dotProduct(CVector3D(x, y, z));
   }
 
-  static T dotProduct(const Vector &v1, T x2, T y2, T z2) {
-    return v1.dotProduct(Vector(x2, y2, z2));
+  static double dotProduct(const CVector3D &v1, double x2, double y2, double z2) {
+    return v1.dotProduct(CVector3D(x2, y2, z2));
   }
 
-  T dotProductSelf() const {
+  double dotProductSelf() const {
     return dotProduct(*this);
   }
 
-  static T absDotProduct(const Vector &v1, const Vector &v2) {
+  static double absDotProduct(const CVector3D &v1, const CVector3D &v2) {
     return ::fabs(dotProduct(v1, v2));
   }
 
   //------
 
   // cross product
-  Vector crossProduct(const Vector &v) const {
-    return Vector(y_*v.z_ - z_*v.y_, z_*v.x_ - x_*v.z_, x_*v.y_ - y_*v.x_);
+  CVector3D crossProduct(const CVector3D &v) const {
+    return CVector3D(y_*v.z_ - z_*v.y_, z_*v.x_ - x_*v.z_, x_*v.y_ - y_*v.x_);
   }
 
-  static Vector crossProduct(const Vector &v1, const Vector &v2) {
+  static CVector3D crossProduct(const CVector3D &v1, const CVector3D &v2) {
     return v1.crossProduct(v2);
   }
 
-  Vector crossProduct(const Point &point) const {
-    return crossProduct(Vector(point.x, point.y, point.z));
+  CVector3D crossProduct(const CPoint3D &point) const {
+    return crossProduct(CVector3D(point.x, point.y, point.z));
   }
 
-  Vector crossProduct(T x, T y, T z) const {
-    return crossProduct(Vector(x, y, z));
+  CVector3D crossProduct(double x, double y, double z) const {
+    return crossProduct(CVector3D(x, y, z));
   }
 
-  Vector unitCrossProduct(const Vector &v) const {
+  CVector3D unitCrossProduct(const CVector3D &v) const {
     return crossProduct(v).normalize();
   }
 
@@ -510,46 +522,46 @@ class CVector3DT {
 
   //------
 
-  friend Point operator+(const Point &lhs, const Vector &rhs) {
-    return Point(lhs.x + rhs.x_, lhs.y + rhs.y_, lhs.z + rhs.z_);
+  friend CPoint3D operator+(const CPoint3D &lhs, const CVector3D &rhs) {
+    return CPoint3D(lhs.x + rhs.x_, lhs.y + rhs.y_, lhs.z + rhs.z_);
   }
 
-  friend Point operator+=(Point &lhs, const Vector &rhs) {
+  friend CPoint3D operator+=(CPoint3D &lhs, const CVector3D &rhs) {
     lhs.x += rhs.x_; lhs.y += rhs.y_; lhs.z += rhs.z_;
 
     return lhs;
   }
 
-  friend Point operator-(const Point &lhs, const Vector &rhs) {
-    return Point(lhs.x - rhs.x_, lhs.y - rhs.y_, lhs.z - rhs.z_);
+  friend CPoint3D operator-(const CPoint3D &lhs, const CVector3D &rhs) {
+    return CPoint3D(lhs.x - rhs.x_, lhs.y - rhs.y_, lhs.z - rhs.z_);
   }
 
-  friend Point operator-=(Point &lhs, const Vector &rhs) {
+  friend CPoint3D operator-=(CPoint3D &lhs, const CVector3D &rhs) {
     lhs.x -= rhs.x_; lhs.y -= rhs.y_; lhs.z -= rhs.z_;
 
     return lhs;
   }
 
 #if 0
-  friend Vector operator-(const Point &lhs, const Point &rhs) {
-    return Vector(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
+  friend CVector3D operator-(const CPoint3D &lhs, const CPoint3D &rhs) {
+    return CVector3D(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
   }
 #endif
 
   //------
 
-  Vector normal(const Vector &vector2) {
+  CVector3D normal(const CVector3D &vector2) const {
     return unitCrossProduct(vector2);
   }
 
-  static Vector normal(const Vector &vector1, const Vector &vector2) {
+  static CVector3D normal(const CVector3D &vector1, const CVector3D &vector2) {
     return vector1.normal(vector2);
   }
 
   //------
 
-  T cosIncluded(const Vector &vector1) const {
-    T dot = dotProduct(vector1);
+  double cosIncluded(const CVector3D &vector1) const {
+    double dot = dotProduct(vector1);
 
     if (! normalized_)
       dot /= length();
@@ -560,37 +572,37 @@ class CVector3DT {
     return dot;
   }
 
-  static T cosIncluded(const Vector &vector1, const Vector &vector2) {
-    vector1.cosIncluded(vector2);
+  static double cosIncluded(const CVector3D &vector1, const CVector3D &vector2) {
+    return vector1.cosIncluded(vector2);
   }
 
   //------
 
-  void directionCosines(T *x, T *y, T *z) {
-    Vector vector1 = normalized();
+  void directionCosines(double *x, double *y, double *z) {
+    CVector3D vector1 = normalized();
 
-    *x = vector1.x;
-    *y = vector1.y;
-    *z = vector1.z;
+    *x = vector1.x_;
+    *y = vector1.y_;
+    *z = vector1.z_;
    }
 
   //------
 
-  static void coordinateSystem(const Vector &vector1, Vector *vector2, Vector *vector3) {
+  static void coordinateSystem(const CVector3D &vector1, CVector3D *vector2, CVector3D *vector3) {
     if (! vector1.normalized_) {
       coordinateSystem(vector1.normalized(), vector2, vector3);
       return;
     }
 
     if (::fabs(vector1.x_) > ::fabs(vector1.y_)) {
-      T ilen = 1.0/::sqrt(vector1.x_*vector1.x_ + vector1.z_*vector1.z_);
+      double ilen = 1.0/::sqrt(vector1.x_*vector1.x_ + vector1.z_*vector1.z_);
 
-      *vector2 = Vector(-vector1.z_*ilen, 0.0, vector1.x_*ilen);
+      *vector2 = CVector3D(-vector1.z_*ilen, 0.0, vector1.x_*ilen);
     }
     else {
-      T ilen = 1.0/::sqrt(vector1.y_*vector1.y_ + vector1.z_*vector1.z_);
+      double ilen = 1.0/::sqrt(vector1.y_*vector1.y_ + vector1.z_*vector1.z_);
 
-      *vector2 = Vector(0.0, vector1.z_*ilen, -vector1.y_*ilen);
+      *vector2 = CVector3D(0.0, vector1.z_*ilen, -vector1.y_*ilen);
     }
 
     *vector3 = vector1.crossProduct(*vector2);
@@ -598,27 +610,27 @@ class CVector3DT {
 
   //------
 
-  Vector perp() const {
+  CVector3D perp() const {
     return perp(*this);
   }
 
-  static Vector perp(const Vector &u) {
-    Vector u1 = u.unit();
-    Vector v1 = Vector(0,1,0);
+  static CVector3D perp(const CVector3D &u) {
+    CVector3D u1 = u.unit();
+    CVector3D v1 = CVector3D(0,1,0);
 
-    T vu = v1.dotProduct(u1);
+    double vu = v1.dotProduct(u1);
 
     v1 = (v1 - vu*u1).unit();
 
     if (v1.isZero()) {
-      v1 = Vector(0,0,1);
+      v1 = CVector3D(0,0,1);
 
       vu = v1.dotProduct(u1);
 
       v1 = (v1 - vu*u1).unit();
     }
 
-    Vector w1 = u1.crossProduct(v1);
+    CVector3D w1 = u1.crossProduct(v1);
 
     v1 = w1.crossProduct(u1);
 
@@ -628,17 +640,17 @@ class CVector3DT {
   //------
 
 #if 0
-  void getBarycentrics(const Vector &vector1, const Vector &vector2,
-                       const Vector &vector3, const Vector &vector4,
-                       T barycentric[4]) const {
+  void getBarycentrics(const CVector3D &vector1, const CVector3D &vector2,
+                       const CVector3D &vector3, const CVector3D &vector4,
+                       double barycentric[4]) const {
     // compute the vectors relative to V3 of the tetrahedron
-    Vector diff[4] = { vector1 - vector4, vector2 - vector4, vector3 - vector4, *this - vector4 };
+    CVector3D diff[4] = { vector1 - vector4, vector2 - vector4, vector3 - vector4, *this - vector4 };
 
     // If the vertices have large magnitude, the linear system of equations
     // for computing barycentric coordinates can be ill-conditioned.  To avoid
     // this, uniformly scale the tetrahedron edges to be of order 1.  The
     // scaling of all differences does not change the barycentric coordinates.
-    T maxval = 0.0;
+    double maxval = 0.0;
 
     for (int i = 0; i < 3; ++i)
       for (int j = 0; j < 3; ++j)
@@ -646,20 +658,20 @@ class CVector3DT {
 
     // scale down only large data
     if (maxval > 1.0) {
-      T imaxval = 1.0/maxval;
+      double imaxval = 1.0/maxval;
 
       for (int i = 0; i < 4; i++)
         diff[i] *= imaxval;
     }
 
-    T det = diff[0].dotProduct(diff[1].crossProduct(diff[2]));
+    double det = diff[0].dotProduct(diff[1].crossProduct(diff[2]));
 
-    Vector c12 = diff[1].crossProduct(diff[2]);
-    Vector c20 = diff[2].crossProduct(diff[0]);
-    Vector c01 = diff[0].crossProduct(diff[1]);
+    CVector3D c12 = diff[1].crossProduct(diff[2]);
+    CVector3D c20 = diff[2].crossProduct(diff[0]);
+    CVector3D c01 = diff[0].crossProduct(diff[1]);
 
     if (::fabs(det) > 1E-6 ) {
-      T idet = 1.0/det;
+      double idet = 1.0/det;
 
       barycentric[0] = diff[3].dotProduct(c12)*idet;
       barycentric[1] = diff[3].dotProduct(c20)*idet;
@@ -671,15 +683,15 @@ class CVector3DT {
       // The tetrahedron is potentially flat.  Determine the face of
       // maximum area and compute barycentric coordinates with respect
       // to that face
-      Vector d13     = vector1 - vector3;
-      Vector d23     = vector2 - vector3;
-      Vector d13cd23 = d13.crossProduct(d23);
+      CVector3D d13     = vector1 - vector3;
+      CVector3D d23     = vector2 - vector3;
+      CVector3D d13cd23 = d13.crossProduct(d23);
 
-      T max_length = d13cd23.lengthSqr();
+      double max_length = d13cd23.lengthSqr();
 
       int max_ind = 3;
 
-      T length2 = c01.lengthSqr();
+      double length2 = c01.lengthSqr();
 
       if (length2 > max_length) {
         max_ind    = 0;
@@ -701,9 +713,9 @@ class CVector3DT {
       }
 
       if (max_length > 1E-6) {
-        T imax_length = 1.0/max_length;
+        double imax_length = 1.0/max_length;
 
-        Vector tmp;
+        CVector3D tmp;
 
         if      (max_ind == 0) {
           tmp = diff[3].crossProduct(diff[1]);
@@ -757,11 +769,11 @@ class CVector3DT {
         // The tetrahedron is potentially a sliver.  Determine the edge of
         // maximum length and compute barycentric coordinates with respect
         // to that edge.
-        T max_length2 = diff[0].lengthSqr();
+        double max_length2 = diff[0].lengthSqr();
 
         max_ind = 0;  // <V0,V3>
 
-        T length2 = diff[1].lengthSqr();
+        double length2 = diff[1].lengthSqr();
 
         if (length2 > max_length2) {
           max_ind     = 1;  // <V1,V3>
@@ -789,7 +801,7 @@ class CVector3DT {
           max_length2 = length2;
         }
 
-        Vector v12 = vector1 - vector2;
+        CVector3D v12 = vector1 - vector2;
 
         length2 = v12.lengthSqr();
 
@@ -799,7 +811,7 @@ class CVector3DT {
         }
 
         if ( max_length2 > 1E-6 ) {
-          T imax_length2 = 1.0/max_length2;
+          double imax_length2 = 1.0/max_length2;
 
           if ( max_ind == 0 ) {
             // P-V3 = t*(V0-V3)
@@ -865,16 +877,13 @@ class CVector3DT {
   //------
 
  private:
-  CVector3DT(T x, T y, T z, bool normalized) :
+  CVector3D(double x, double y, double z, bool normalized) :
    x_(x), y_(y), z_(z), normalized_(normalized) {
   }
 
  private:
-  T    x_ { 0 }, y_ { 0 }, z_ { 0 };
-  bool normalized_ { false };
+  double x_ { 0 }, y_ { 0 }, z_ { 0 };
+  bool   normalized_ { false };
 };
-
-typedef CVector3DT<double> CVector3D;
-typedef CVector3DT<float>  CVector3DF;
 
 #endif

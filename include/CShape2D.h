@@ -4,24 +4,19 @@
 #include <CPoint2D.h>
 #include <CBBox2D.h>
 
-template<typename T>
-class CShape2DT {
- private:
-  typedef CPoint2DT<T> Point;
-  typedef CBBox2DT<T>  BBox;
-
+class CShape2D {
  public:
-  CShape2DT() { }
+  CShape2D() { }
 
-  virtual ~CShape2DT() { }
+  virtual ~CShape2D() { }
 
-  virtual BBox getBBox() const = 0;
+  virtual CBBox2D getBBox() const = 0;
 
-  virtual bool inside(const Point &p) const = 0;
+  virtual bool inside(const CPoint2D &p) const = 0;
 
-  virtual void moveBy(const Point &p) = 0;
-  virtual void resizeBy(const Point &ll, const Point &ur) = 0;
-  virtual void rotateBy(double angle, const Point &o) = 0;
+  virtual void moveBy(const CPoint2D &p) = 0;
+  virtual void resizeBy(const CPoint2D &ll, const CPoint2D &ur) = 0;
+  virtual void rotateBy(double angle, const CPoint2D &o) = 0;
 
  protected:
   CPoint2D rotatePoint(const CPoint2D &point, double da, const CPoint2D &o) {
@@ -33,7 +28,5 @@ class CShape2DT {
     return CPoint2D(x2 + o.x, y2 + o.y);
   }
 };
-
-typedef CShape2DT<double> CShape2D;
 
 #endif

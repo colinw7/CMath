@@ -3,12 +3,15 @@
 
 namespace CMath {
 
+// test if type is real
 template<typename T> struct is_real { enum { Value=-1 }; };
 
 template<> struct is_real<double> { enum { Value=1 }; };
 template<> struct is_real<float>  { enum { Value=1 }; };
 
 #define ASSERT_IS_REAL(T) { int a[is_real<T>::Value]; }
+
+//---
 
 template<typename T>
 int sign(T v) {

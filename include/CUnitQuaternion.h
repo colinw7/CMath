@@ -1,39 +1,35 @@
 #ifndef CUNIT_QUATERNION_H
 #define CUNIT_QUATERNION_H
 
-template<typename T>
-class CUnitQuaternionT {
- private:
-  T w_, x_, y_, z_;
-
+class CUnitQuaternion {
  public:
-  CUnitQuaternionT(T w, T x, T y, T z) :
+  CUnitQuaternion(double w, double x, double y, double z) :
    w_(w), x_(x), y_(y), z_(z) {
     normalize();
   }
 
-  CUnitQuaternionT(const CUnitQuaternionT &q) :
+  CUnitQuaternion(const CUnitQuaternion &q) :
    w_(q.w_), x_(q.x_), y_(q.y_), z_(q.z_) {
   }
 
-  CUnitQuaternionT(const CQuaternionT<T> &q) :
+  CUnitQuaternion(const CQuaternion &q) :
    w_(q.w_), x_(q.x_), y_(q.y_), z_(q.z_) {
     normalize();
   }
 
- ~CUnitQuaternionT() { }
+ ~CUnitQuaternion() { }
 
-  CQuaternionT<T> quaternion() const {
-    return CQuaternionT<T>(w_, x_, y_, z_);
+  CQuaternion quaternion() const {
+    return CQuaternion(w_, x_, y_, z_);
   }
 
-  CUnitQuaternionT &operator=(const CUnitQuaternionT &q) {
+  CUnitQuaternion &operator=(const CUnitQuaternion &q) {
     w_ = q.w_; x_ = q.x_; y_ = q.y_; z_ = q.z_;
 
     return *this;
   }
 
-  CUnitQuaternionT &operator=(const CQuaternionT<T> &q) {
+  CUnitQuaternion &operator=(const CQuaternion &q) {
     w_ = q.w_; x_ = q.x_; y_ = q.y_; z_ = q.z_;
 
     normalize();
@@ -41,7 +37,7 @@ class CUnitQuaternionT {
     return *this;
   }
 
-  CUnitQuaternionT &operator+=(const CUnitQuaternionT &rhs) {
+  CUnitQuaternion &operator+=(const CUnitQuaternion &rhs) {
     w_ += rhs.w_;
     x_ += rhs.x_;
     y_ += rhs.y_;
@@ -52,15 +48,15 @@ class CUnitQuaternionT {
     return *this;
   }
 
-  CUnitQuaternionT operator+(const CUnitQuaternionT &rhs) const {
-    CUnitQuaternionT lhs = *this;
+  CUnitQuaternion operator+(const CUnitQuaternion &rhs) const {
+    CUnitQuaternion lhs = *this;
 
     lhs += rhs;
 
     return lhs;
   }
 
-  CUnitQuaternionT &operator-=(const CUnitQuaternionT &rhs) {
+  CUnitQuaternion &operator-=(const CUnitQuaternion &rhs) {
     w_ -= rhs.w_;
     x_ -= rhs.x_;
     y_ -= rhs.y_;
@@ -71,16 +67,16 @@ class CUnitQuaternionT {
     return *this;
   }
 
-  CUnitQuaternionT operator-(const CUnitQuaternionT &rhs) const {
-    CUnitQuaternionT lhs = *this;
+  CUnitQuaternion operator-(const CUnitQuaternion &rhs) const {
+    CUnitQuaternion lhs = *this;
 
     lhs -= rhs;
 
     return lhs;
   }
 
-  CUnitQuaternionT &operator*=(const CUnitQuaternionT &rhs) {
-    CUnitQuaternionT lhs = *this;
+  CUnitQuaternion &operator*=(const CUnitQuaternion &rhs) {
+    CUnitQuaternion lhs = *this;
 
     w_ = lhs.w_*rhs.w_ - lhs.x_*rhs.x_ - lhs.y_*rhs.y_ - lhs.z_*rhs.z_;
     x_ = lhs.w_*rhs.x_ + lhs.x_*rhs.w_ + lhs.y_*rhs.z_ - lhs.z_*rhs.y_;
@@ -92,39 +88,39 @@ class CUnitQuaternionT {
     return *this;
   }
 
-  CUnitQuaternionT operator*(const CUnitQuaternionT &rhs) const {
-    CUnitQuaternionT lhs = *this;
+  CUnitQuaternion operator*(const CUnitQuaternion &rhs) const {
+    CUnitQuaternion lhs = *this;
 
     lhs *= rhs;
 
     return lhs;
   }
 
-  CUnitQuaternionT operator-() const {
-    return CUnitQuaternionT(-w_, -x_, -y_, -z_);
+  CUnitQuaternion operator-() const {
+    return CUnitQuaternion(-w_, -x_, -y_, -z_);
   }
 
-  const CUnitQuaternionT &invert() {
+  const CUnitQuaternion &invert() {
     x_ = -x_; y_ = -y_; z_ = -z_;
 
     return *this;
   }
 
-  CUnitQuaternionT inverted() const {
-    return CUnitQuaternionT(w_, -x_, -y_, -z_);
+  CUnitQuaternion inverted() const {
+    return CUnitQuaternion(w_, -x_, -y_, -z_);
   }
 
-  CUnitQuaternionT exp() const {
-    T angle = ::sqrt(x_*x_ + y_*y_ + z_*z_);
+  CUnitQuaternion exp() const {
+    double angle = ::sqrt(x_*x_ + y_*y_ + z_*z_);
 
-    T s = ::sin(angle);
+    double s = ::sin(angle);
 
-    CUnitQuaternionT q(0.0, 0.0, 0.0, 0.0);
+    CUnitQuaternion q(0.0, 0.0, 0.0, 0.0);
 
     q.w_ = ::cos(angle);
 
     if (::fabs(s) >= 1E-6) {
-      T coeff = s/angle;
+      double coeff = s/angle;
 
       q.x_ = coeff*x_;
       q.y_ = coeff*y_;
@@ -141,18 +137,18 @@ class CUnitQuaternionT {
     return q;
   }
 
-  CUnitQuaternionT log() const {
-    CUnitQuaternionT q(0.0, 0.0, 0.0, 0.0);
+  CUnitQuaternion log() const {
+    CUnitQuaternion q(0.0, 0.0, 0.0, 0.0);
 
     q.w_ = 0.0;
 
     if (::fabs(w_) < 1.0) {
-      T angle = acos(w_);
+      double angle = acos(w_);
 
-      T s = ::sin(angle);
+      double s = ::sin(angle);
 
       if (::fabs(s) >= 1E-6) {
-        T coeff = angle/s;
+        double coeff = angle/s;
 
         q.x_ = coeff*x_;
         q.y_ = coeff*y_;
@@ -171,20 +167,20 @@ class CUnitQuaternionT {
     return q;
   }
 
-  static void intermediate(const CUnitQuaternionT &q0,
-                           const CUnitQuaternionT &q1,
-                           const CUnitQuaternionT &q2,
-                           CUnitQuaternionT &a,
-                           CUnitQuaternionT &b) {
-    CUnitQuaternionT q0i = q0.inverted();
-    CUnitQuaternionT q1i = q1.inverted();
+  static void intermediate(const CUnitQuaternion &q0,
+                           const CUnitQuaternion &q1,
+                           const CUnitQuaternion &q2,
+                           CUnitQuaternion &a,
+                           CUnitQuaternion &b) {
+    CUnitQuaternion q0i = q0.inverted();
+    CUnitQuaternion q1i = q1.inverted();
 
-    CQuaternionT<T> p0 = q0i.quaternion()*q1.quaternion();
-    CQuaternionT<T> p1 = q1i.quaternion()*q2.quaternion();
+    CQuaternion p0 = q0i.quaternion()*q1.quaternion();
+    CQuaternion p1 = q1i.quaternion()*q2.quaternion();
 
-    CQuaternionT<T> arg = quarter_*(p0.log() - p1.log());
+    CQuaternion arg = quarter_*(p0.log() - p1.log());
 
-    CQuaternionT<T> argi = -arg;
+    CQuaternion argi = -arg;
 
     a = q1*arg .exp();
     b = q1*argi.exp();
@@ -192,18 +188,19 @@ class CUnitQuaternionT {
 
  private:
   void normalize() {
-    T l = ::sqrt(w_*w_ + x_*x_ + y_*y_ + z_*z_);
+    double l = ::sqrt(w_*w_ + x_*x_ + y_*y_ + z_*z_);
 
     if (l <= 0.0)
       CTHROW("Divide by zero");
     else {
-      T li = 1.0/l;
+      double li = 1.0/l;
 
       w_ *= li; x_ *= li; y_ *= li; z_ *= li;
     }
   }
-};
 
-typedef CUnitQuaternionT<double> CUnitQuaternion;
+ private:
+  double w_ { 0 }, x_ { 0 }, y_ { 0 }, z_ { 0 };
+};
 
 #endif

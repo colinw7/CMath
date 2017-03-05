@@ -1,36 +1,34 @@
 #ifndef CPOINT_4D_H
 #define CPOINT_4D_H
 
+#include <cmath>
 #include <iostream>
+#include <cassert>
 
-template<typename T>
-class CPoint4DT {
+class CPoint4D {
  public:
-  T x, y, z, w;
-
- public:
-  CPoint4DT() :
+  CPoint4D() :
    x(0), y(0), z(0), w(1) {
   }
 
-  CPoint4DT(T x1, T y1, T z1, T w1=1) :
+  CPoint4D(double x1, double y1, double z1, double w1=1) :
    x(x1), y(y1), z(z1), w(w1) {
   }
 
-  CPoint4DT(const CPoint4DT &point) :
+  CPoint4D(const CPoint4D &point) :
    x(point.x), y(point.y), z(point.z), w(point.w) {
   }
 
-  T getX() const { return x; }
-  T getY() const { return y; }
-  T getZ() const { return z; }
-  T getW() const { return w; }
+  double getX() const { return x; }
+  double getY() const { return y; }
+  double getZ() const { return z; }
+  double getW() const { return w; }
 
-  void getXYZW(T *x1, T *y1, T *z1, T *w1) const {
+  void getXYZW(double *x1, double *y1, double *z1, double *w1) const {
     *x1 = x; *y1 = y; *z1 = z; *w1 = w;
   }
 
-  T operator[](int i) const {
+  double operator[](int i) const {
     switch (i) {
       case 0 : return x;
       case 1 : return y;
@@ -40,7 +38,7 @@ class CPoint4DT {
     }
   }
 
-  T &operator[](int i) {
+  double &operator[](int i) {
     switch (i) {
       case 0 : return x;
       case 1 : return y;
@@ -50,36 +48,36 @@ class CPoint4DT {
     }
   }
 
-  void setX(T x1) { x = x1; }
-  void setY(T y1) { y = y1; }
-  void setZ(T z1) { z = z1; }
-  void setW(T w1) { w = w1; }
+  void setX(double x1) { x = x1; }
+  void setY(double y1) { y = y1; }
+  void setZ(double z1) { z = z1; }
+  void setW(double w1) { w = w1; }
 
-  void setXYZW(T x1, T y1, T z1, T w1) {
+  void setXYZW(double x1, double y1, double z1, double w1) {
     x = x1; y = y1; z = z1; w = w1;
   }
 
-  T modulus() const {
+  double modulus() const {
     return ::sqrt(x*x + y*y + z*z + w*w);
   }
 
-  T modulusSquared() const {
+  double modulusSquared() const {
     return (x*x + y*y + z*z + w*w);
   }
 
-  T getDistance(const CPoint4DT &point) const {
-    CPoint4DT diff = *this - point;
+  double getDistance(const CPoint4D &point) const {
+    CPoint4D diff = *this - point;
 
     return diff.modulus();
   }
 
-  T getDistanceSquared(const CPoint4DT &point) const {
-    CPoint4DT diff = *this - point;
+  double getDistanceSquared(const CPoint4D &point) const {
+    CPoint4D diff = *this - point;
 
     return diff.modulusSquared();
   }
 
-  CPoint4DT &zero() {
+  CPoint4D &zero() {
     x = 0.0; y = 0.0; z = 0.0; w = 0.0;
 
     return *this;
@@ -87,36 +85,36 @@ class CPoint4DT {
 
   //-----
 
-  CPoint4DT operator+() {
-    return CPoint4DT(x, y, z);
+  CPoint4D operator+() {
+    return CPoint4D(x, y, z);
   }
 
-  CPoint4DT operator-() {
-    return CPoint4DT(-x, -y, -z);
+  CPoint4D operator-() {
+    return CPoint4D(-x, -y, -z);
   }
 
   //-----
 
-  friend bool operator==(const CPoint4DT &lhs, const CPoint4DT &rhs) {
+  friend bool operator==(const CPoint4D &lhs, const CPoint4D &rhs) {
     return (lhs.x == rhs.x && lhs.y == rhs.y &&
             lhs.z == rhs.z && lhs.w == rhs.w);
   }
 
-  friend bool operator!=(const CPoint4DT &lhs, const CPoint4DT &rhs) {
+  friend bool operator!=(const CPoint4D &lhs, const CPoint4D &rhs) {
     return (lhs.x != rhs.x || lhs.y != rhs.y ||
             lhs.z != rhs.z || lhs.w != rhs.w);
   }
 
   //------
 
-  CPoint4DT &operator+=(const CPoint4DT &rhs) {
+  CPoint4D &operator+=(const CPoint4D &rhs) {
     x += rhs.x; y += rhs.y; z += rhs.z; w += rhs.w;
 
     return *this;
   }
 
-  CPoint4DT operator+(const CPoint4DT &rhs) const {
-    CPoint4DT t = *this;
+  CPoint4D operator+(const CPoint4D &rhs) const {
+    CPoint4D t = *this;
 
     t += rhs;
 
@@ -125,14 +123,14 @@ class CPoint4DT {
 
   //------
 
-  CPoint4DT &operator-=(const CPoint4DT &rhs) {
+  CPoint4D &operator-=(const CPoint4D &rhs) {
     x -= rhs.x; y -= rhs.y; z -= rhs.z; w -= rhs.w;
 
     return *this;
   }
 
-  CPoint4DT operator-(const CPoint4DT &rhs) const {
-    CPoint4DT t = *this;
+  CPoint4D operator-(const CPoint4D &rhs) const {
+    CPoint4D t = *this;
 
     t -= rhs;
 
@@ -141,14 +139,14 @@ class CPoint4DT {
 
   //------
 
-  CPoint4DT &operator*=(T rhs) {
+  CPoint4D &operator*=(double rhs) {
     x *= rhs; y *= rhs; z *= rhs; w *= rhs;
 
     return *this;
   }
 
-  CPoint4DT operator*(T rhs) const {
-    CPoint4DT t = *this;
+  CPoint4D operator*(double rhs) const {
+    CPoint4D t = *this;
 
     t *= rhs;
 
@@ -157,16 +155,16 @@ class CPoint4DT {
 
   //------
 
-  CPoint4DT &operator/=(T rhs) {
-    T irhs = 1.0/rhs;
+  CPoint4D &operator/=(double rhs) {
+    double irhs = 1.0/rhs;
 
     x *= irhs; y *= irhs; z *= irhs; w *= irhs;
 
     return *this;
   }
 
-  CPoint4DT operator/(T rhs) const {
-    CPoint4DT t = *this;
+  CPoint4D operator/(double rhs) const {
+    CPoint4D t = *this;
 
     t /= rhs;
 
@@ -174,16 +172,17 @@ class CPoint4DT {
   }
 
   void print(std::ostream &os) const {
-    return os << "(" << x << "," << y << "," << z << "," << w << ")";
+    os << "(" << x << "," << y << "," << z << "," << w << ")";
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const CPoint4DT &point) {
+  friend std::ostream &operator<<(std::ostream &os, const CPoint4D &point) {
     point.print(os);
 
     return os;
   }
-};
 
-typedef CPoint4DT<double> CPoint4D;
+ public:
+  double x { 0 }, y { 0 }, z { 0 }, w { 1 };
+};
 
 #endif

@@ -4,6 +4,7 @@
 #include <CMatrix2D.h>
 #include <CPoint2D.h>
 #include <vector>
+#include <sstream>
 #include <cassert>
 
 enum class CMatrixTransformType {
@@ -18,12 +19,7 @@ enum class CMatrixTransformType {
   MATRIX
 };
 
-template<typename T>
-class CMatrixStack2DT {
- public:
-  typedef CMatrix2DT<T> Matrix;
-  typedef CPoint2DT<T>  Point;
-
+class CMatrixStack2D {
  public:
   class Transform {
    public:
@@ -45,7 +41,7 @@ class CMatrixStack2DT {
       v_[1] = v2;
     }
 
-    Transform(double a, const Point &p) :
+    Transform(double a, const CPoint2D &p) :
      type_(CMatrixTransformType::ROTATE_ORIGIN) {
       memset(&v_[0], 0, NUM_VALUES*sizeof(double));
 
@@ -54,7 +50,7 @@ class CMatrixStack2DT {
       v_[2] = p.y;
     }
 
-    Transform(const Matrix &m) :
+    Transform(const CMatrix2D &m) :
      type_(CMatrixTransformType::MATRIX) {
       m.getValues(v_, 6);
     }
@@ -112,33 +108,33 @@ class CMatrixStack2DT {
 
     const double *values() const { return &v_[0]; }
 
-    Matrix rotateMatrix() const {
-      Matrix m1 = Matrix::translation(-v_[1], -v_[2]);
-      Matrix m2 = Matrix::rotation   ( v_[0]);
-      Matrix m3 = Matrix::translation( v_[1],  v_[2]);
+    CMatrix2D rotateMatrix() const {
+      CMatrix2D m1 = CMatrix2D::translation(-v_[1], -v_[2]);
+      CMatrix2D m2 = CMatrix2D::rotation   ( v_[0]);
+      CMatrix2D m3 = CMatrix2D::translation( v_[1],  v_[2]);
 
       return m3*m2*m1;
     }
 
-    Matrix valueMatrix() const {
-      Matrix m;
+    CMatrix2D valueMatrix() const {
+      CMatrix2D m;
 
       m.setValues(v_[0], v_[1], v_[2], v_[3], v_[4], v_[5]);
 
       return m;
     }
 
-    Matrix calcMatrix() const {
+    CMatrix2D calcMatrix() const {
       switch (type_) {
-        case CMatrixTransformType::TRANSLATE    : return Matrix::translation(v_[0], v_[1]);
-        case CMatrixTransformType::SCALE1       : return Matrix::scale      (v_[0], v_[0]);
-        case CMatrixTransformType::SCALE2       : return Matrix::scale      (v_[0], v_[1]);
-        case CMatrixTransformType::ROTATE       : return Matrix::rotation   (v_[0]    );
-        case CMatrixTransformType::ROTATE_ORIGIN: return rotateMatrix       ();
-        case CMatrixTransformType::SKEWX        : return Matrix::skewX      (v_[0]);
-        case CMatrixTransformType::SKEWY        : return Matrix::skewY      (v_[0]);
-        case CMatrixTransformType::MATRIX       : return valueMatrix        ();
-        default                                 : assert(false); return Matrix();
+        case CMatrixTransformType::TRANSLATE    : return CMatrix2D::translation(v_[0], v_[1]);
+        case CMatrixTransformType::SCALE1       : return CMatrix2D::scale      (v_[0], v_[0]);
+        case CMatrixTransformType::SCALE2       : return CMatrix2D::scale      (v_[0], v_[1]);
+        case CMatrixTransformType::ROTATE       : return CMatrix2D::rotation   (v_[0]    );
+        case CMatrixTransformType::ROTATE_ORIGIN: return rotateMatrix          ();
+        case CMatrixTransformType::SKEWX        : return CMatrix2D::skewX      (v_[0]);
+        case CMatrixTransformType::SKEWY        : return CMatrix2D::skewY      (v_[0]);
+        case CMatrixTransformType::MATRIX       : return valueMatrix           ();
+        default                                 : assert(false); return CMatrix2D();
       }
     }
 
@@ -198,22 +194,22 @@ class CMatrixStack2DT {
   //---
 
  public:
-  CMatrixStack2DT() :
+  CMatrixStack2D() :
    transformStack_(), mValid_(false), m_() {
   }
 
-  CMatrixStack2DT(const CMatrixStack2DT &m) :
+  CMatrixStack2D(const CMatrixStack2D &m) :
    transformStack_(m.transformStack_), mValid_(m.mValid_), m_(m.m_) {
   }
 
-  CMatrixStack2DT(const Matrix &m) :
+  CMatrixStack2D(const CMatrix2D &m) :
    transformStack_() {
     transformStack_.push_back(Transform(m));
 
     mValid_ = false;
   }
 
-  const CMatrixStack2DT &operator=(const CMatrixStack2DT &m) {
+  const CMatrixStack2D &operator=(const CMatrixStack2D &m) {
     transformStack_ = m.transformStack_;
     mValid_         = m.mValid_;
     m_              = m.m_;
@@ -231,7 +227,7 @@ class CMatrixStack2DT {
     return Transform(CMatrixTransformType::TRANSLATE, dx, dy);
   }
 
-  void translate(const Point &d) {
+  void translate(const CPoint2D &d) {
     transformStack_.push_back(translateTransform(d));
 
     mValid_ = false;
@@ -277,7 +273,7 @@ class CMatrixStack2DT {
     mValid_ = false;
   }
 
-  void rotate(double a, const Point &o) {
+  void rotate(double a, const CPoint2D &o) {
     transformStack_.push_back(rotateTransform(a, o));
 
     mValid_ = false;
@@ -296,7 +292,7 @@ class CMatrixStack2DT {
   }
 
   void matrix(double m00, double m01, double m10, double m11, double tx, double ty) {
-    Matrix m;
+    CMatrix2D m;
 
     m.setValues(m00, m01, m10, m11, tx, ty);
 
@@ -305,7 +301,7 @@ class CMatrixStack2DT {
     mValid_ = false;
   }
 
-  void matrix(const Matrix &m) {
+  void matrix(const CMatrix2D &m) {
     transformStack_.push_back(Transform(m));
 
     mValid_ = false;
@@ -335,16 +331,16 @@ class CMatrixStack2DT {
     transformStack_[i] = t;
   }
 
-  void append(const CMatrixStack2DT &m) {
+  void append(const CMatrixStack2D &m) {
     for (const auto &t : m.transformStack_)
       transformStack_.push_back(t);
 
     mValid_ = false;
   }
 
-  const Matrix &getMatrix() const {
+  const CMatrix2D &getMatrix() const {
     if (! mValid_) {
-      CMatrixStack2DT *th = const_cast<CMatrixStack2DT *>(this);
+      CMatrixStack2D *th = const_cast<CMatrixStack2D *>(this);
 
       th->m_.setIdentity();
 
@@ -362,23 +358,23 @@ class CMatrixStack2DT {
     return m_;
   }
 
-  void multiplyPoint(const Point &point1, Point &point2) const {
+  void multiplyPoint(const CPoint2D &point1, CPoint2D &point2) const {
     getMatrix().multiplyPoint(point1, point2);
   }
 
-  void multiplyPoint(T xi, T yi, T *xo, T *yo) const {
+  void multiplyPoint(double xi, double yi, double *xo, double *yo) const {
     getMatrix().multiplyPoint(xi, yi, xo, yo);
   }
 
-  void preMultiplyPoint(const Point &point1, Point &point2) const {
+  void preMultiplyPoint(const CPoint2D &point1, CPoint2D &point2) const {
     getMatrix().preMultiplyPoint(point1, point2);
   }
 
-  void preMultiplyPoint(T xi, T yi, T *xo, T *yo) const {
+  void preMultiplyPoint(double xi, double yi, double *xo, double *yo) const {
     getMatrix().preMultiplyPoint(xi, yi, xo, yo);
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const CMatrixStack2DT &rhs) {
+  friend std::ostream &operator<<(std::ostream &os, const CMatrixStack2D &rhs) {
     rhs.print(os);
 
     return os;
@@ -411,9 +407,7 @@ class CMatrixStack2DT {
  private:
   TransformStack transformStack_;
   bool           mValid_ { false };
-  Matrix         m_;
+  CMatrix2D      m_;
 };
-
-typedef CMatrixStack2DT<double> CMatrixStack2D;
 
 #endif

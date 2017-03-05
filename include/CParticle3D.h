@@ -3,67 +3,63 @@
 
 #include <CVector3D.h>
 
-template<typename T>
-class CParticle3DT {
- private:
-  typedef CVector3DT<T> Vector;
-
+class CParticle3D {
  public:
-  CParticle3DT(T m=0.0) :
+  CParticle3D(double m=0.0) :
    mass_(m), fixed_(false) {
   }
 
- ~CParticle3DT() { }
+ ~CParticle3D() { }
 
-  void setPosition(T x, T y, T z) {
-    position_ = Vector(x, y, z);
+  void setPosition(double x, double y, double z) {
+    position_ = CVector3D(x, y, z);
   }
 
-  void setPosition(const Vector &position) {
+  void setPosition(const CVector3D &position) {
     position_ = position;
   }
 
-  void incPosition(const Vector &position) {
+  void incPosition(const CVector3D &position) {
     position_ += position;
   }
 
-  void setVelocity(T x, T y, T z) {
-    velocity_ = Vector(x, y, z);
+  void setVelocity(double x, double y, double z) {
+    velocity_ = CVector3D(x, y, z);
   }
 
-  void setVelocity(const Vector &velocity) {
+  void setVelocity(const CVector3D &velocity) {
     velocity_ = velocity;
   }
 
-  void incVelocity(const Vector &velocity) {
+  void incVelocity(const CVector3D &velocity) {
     velocity_ += velocity;
   }
 
-  void setAcceleration(T x, T y, T z) {
-    acceleration_ = Vector(x, y, z);
+  void setAcceleration(double x, double y, double z) {
+    acceleration_ = CVector3D(x, y, z);
   }
 
-  void setAcceleration(const Vector &acceleration) {
+  void setAcceleration(const CVector3D &acceleration) {
     acceleration_ = acceleration;
   }
 
-  void incAcceleration(const Vector &acceleration) {
+  void incAcceleration(const CVector3D &acceleration) {
     acceleration_ += acceleration;
   }
 
-  void setForce(T x, T y, T z) {
-    acceleration_ = Vector(x, y, z)/mass_;
+  void setForce(double x, double y, double z) {
+    acceleration_ = CVector3D(x, y, z)/mass_;
   }
 
-  void setForce(const Vector &f) {
+  void setForce(const CVector3D &f) {
     acceleration_ = f/mass_;
   }
 
-  void incForce(const Vector &f) {
+  void incForce(const CVector3D &f) {
     acceleration_ += f/mass_;
   }
 
-  void setMass(T mass) {
+  void setMass(double mass) {
     mass_ = mass;
   }
 
@@ -71,20 +67,18 @@ class CParticle3DT {
     fixed_ = fixed;
   }
 
-  const Vector &getPosition    () const { return position_    ; }
-  const Vector &getVelocity    () const { return velocity_    ; }
-  const Vector &getAcceleration() const { return acceleration_; }
-  T             getMass        () const { return mass_        ; }
-  bool          isFixed        () const { return fixed_       ; }
+  const CVector3D &getPosition    () const { return position_    ; }
+  const CVector3D &getVelocity    () const { return velocity_    ; }
+  const CVector3D &getAcceleration() const { return acceleration_; }
+  double           getMass        () const { return mass_        ; }
+  bool             isFixed        () const { return fixed_       ; }
 
  private:
-  Vector position_;
-  Vector velocity_;
-  Vector acceleration_;
-  T      mass_;
-  bool   fixed_;
+  CVector3D position_;
+  CVector3D velocity_;
+  CVector3D acceleration_;
+  double    mass_;
+  bool      fixed_;
 };
-
-typedef CParticle3DT<double> CParticle3D;
 
 #endif

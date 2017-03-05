@@ -5,41 +5,37 @@
 //#include <CMathGen.h>
 #include <C2Bezier2D.h>
 
-template<typename T>
-class C3Bezier2DT {
- private:
-  typedef CPoint2DT<T>   Point;
-  typedef C3Bezier2DT<T> Bezier;
-
+class C3Bezier2D {
  public:
-  C3Bezier2DT() :
+  C3Bezier2D() :
    p1_(), p2_(), p3_(), p4_() {
   }
 
-  C3Bezier2DT(T x1, T y1, T x2, T y2, T x3, T y3, T x4, T y4) :
+  C3Bezier2D(double x1, double y1, double x2, double y2,
+             double x3, double y3, double x4, double y4) :
    p1_(x1, y1), p2_(x2, y2), p3_(x3, y3), p4_(x4, y4) {
   }
 
-  C3Bezier2DT(const Point &p1, const Point &p2, const Point &p3, const Point &p4) :
+  C3Bezier2D(const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p3, const CPoint2D &p4) :
    p1_(p1), p2_(p2), p3_(p3), p4_(p4) {
   }
 
-  C3Bezier2DT(const C3Bezier2DT<T> &bezier) :
+  C3Bezier2D(const C3Bezier2D &bezier) :
     p1_(bezier.p1_), p2_(bezier.p2_), p3_(bezier.p3_), p4_(bezier.p4_) {
   }
 
   // create order 3 bezier from order 2 using 'degree elevation'
-  C3Bezier2DT(const C2Bezier2DT<T> &bezier2) {
+  C3Bezier2D(const C2Bezier2D &bezier2) {
     p1_ = bezier2.getFirstPoint();
     p4_ = bezier2.getLastPoint ();
 
-    const Point &p = bezier2.getControlPoint();
+    const CPoint2D &p = bezier2.getControlPoint();
 
     p2_ = (p1_ + 2*p)/3;
     p3_ = (2*p + p4_)/3;
   }
 
-  C3Bezier2DT &operator=(const C3Bezier2DT<T> &bezier) {
+  C3Bezier2D &operator=(const C3Bezier2D &bezier) {
     p1_ = bezier.p1_;
     p2_ = bezier.p2_;
     p3_ = bezier.p3_;
@@ -48,40 +44,40 @@ class C3Bezier2DT {
     return *this;
   }
 
-  const Point &getFirstPoint   () const { return p1_; }
-  const Point &getControlPoint1() const { return p2_; }
-  const Point &getControlPoint2() const { return p3_; }
-  const Point &getLastPoint    () const { return p4_; }
+  const CPoint2D &getFirstPoint   () const { return p1_; }
+  const CPoint2D &getControlPoint1() const { return p2_; }
+  const CPoint2D &getControlPoint2() const { return p3_; }
+  const CPoint2D &getLastPoint    () const { return p4_; }
 
-  void setFirstPoint   (const Point &p1) { p1_ = p1; }
-  void setControlPoint1(const Point &p2) { p2_ = p2; };
-  void setControlPoint2(const Point &p3) { p3_ = p3; };
-  void setLastPoint    (const Point &p4) { p4_ = p4; };
+  void setFirstPoint   (const CPoint2D &p1) { p1_ = p1; }
+  void setControlPoint1(const CPoint2D &p2) { p2_ = p2; };
+  void setControlPoint2(const CPoint2D &p3) { p3_ = p3; };
+  void setLastPoint    (const CPoint2D &p4) { p4_ = p4; };
 
-  void getFirstPoint   (T *x, T *y) const { *x = p1_.x; *y = p1_.y; }
-  void getControlPoint1(T *x, T *y) const { *x = p2_.x; *y = p2_.y; }
-  void getControlPoint2(T *x, T *y) const { *x = p3_.x; *y = p3_.y; }
-  void getLastPoint    (T *x, T *y) const { *x = p4_.x; *y = p4_.y; }
+  void getFirstPoint   (double *x, double *y) const { *x = p1_.x; *y = p1_.y; }
+  void getControlPoint1(double *x, double *y) const { *x = p2_.x; *y = p2_.y; }
+  void getControlPoint2(double *x, double *y) const { *x = p3_.x; *y = p3_.y; }
+  void getLastPoint    (double *x, double *y) const { *x = p4_.x; *y = p4_.y; }
 
-  void setFirstPoint   (T x, T y) { setFirstPoint   (Point(x, y)); }
-  void setControlPoint1(T x, T y) { setControlPoint1(Point(x, y)); }
-  void setControlPoint2(T x, T y) { setControlPoint2(Point(x, y)); }
-  void setLastPoint    (T x, T y) { setLastPoint    (Point(x, y)); }
+  void setFirstPoint   (double x, double y) { setFirstPoint   (CPoint2D(x, y)); }
+  void setControlPoint1(double x, double y) { setControlPoint1(CPoint2D(x, y)); }
+  void setControlPoint2(double x, double y) { setControlPoint2(CPoint2D(x, y)); }
+  void setLastPoint    (double x, double y) { setLastPoint    (CPoint2D(x, y)); }
 
-  void setPoints(T x1, T y1, T x2, T y2, T x3, T y3, T x4, T y4) {
-    setPoints(Point(x1, y1), Point(x2, y2), Point(x3, y3), Point(x4, y4));
+  void setPoints(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+    setPoints(CPoint2D(x1, y1), CPoint2D(x2, y2), CPoint2D(x3, y3), CPoint2D(x4, y4));
   }
 
-  void setPoints(const Point &p1, const Point &p2, const Point &p3, const Point &p4) {
+  void setPoints(const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p3, const CPoint2D &p4) {
     p1_ = p1; p2_ = p2; p3_ = p3; p4_ = p4;
   }
 
-  void getPoints(Point &p1, Point &p2, Point &p3, Point &p4) const {
+  void getPoints(CPoint2D &p1, CPoint2D &p2, CPoint2D &p3, CPoint2D &p4) const {
     p1 = p1_; p2 = p2_; p3 = p3_; p4 = p4_;
   }
 
-  void calc(T t, T *x, T *y) const {
-    Point p;
+  void calc(double t, double *x, double *y) const {
+    CPoint2D p;
 
     calc(t, p);
 
@@ -89,36 +85,36 @@ class C3Bezier2DT {
     *y = p.y;
   }
 
-  void calc(T t, Point &p) const {
+  void calc(double t, CPoint2D &p) const {
     p = calc(t);
   }
 
-  Point calc(T t) const {
-    T u = (1.0 - t);
+  CPoint2D calc(double t) const {
+    double u = (1.0 - t);
 
-    T tt  = t*t;
-    T ttt = tt*t;
+    double tt  = t*t;
+    double ttt = tt*t;
 
-    T uu  = u*u;
-    T uuu = uu*u;
+    double uu  = u*u;
+    double uuu = uu*u;
 
     return p1_*uuu + 3.0*p2_*t*uu + 3.0*p3_*tt*u + p4_*ttt;
   }
 
-  bool interp(T x, T y, T *t) const {
-    return interp(Point(x, y), t);
+  bool interp(double x, double y, double *t) const {
+    return interp(CPoint2D(x, y), t);
   }
 
-  bool interp(const Point &p, T *t) const {
-    T t1 = (::fabs(p.x   - p1_.x) + ::fabs(p.y   - p1_.y))/
+  bool interp(const CPoint2D &p, double *t) const {
+    double t1 = (::fabs(p.x   - p1_.x) + ::fabs(p.y   - p1_.y))/
            (::fabs(p4_.x - p1_.x) + ::fabs(p4_.y - p1_.y));
 
-    Point pp;
+    CPoint2D pp;
 
     calc(t1, pp);
 
-    T dx1 = ::fabs(p.x - pp.x);
-    T dy1 = ::fabs(p.y - pp.y);
+    double dx1 = ::fabs(p.x - pp.x);
+    double dy1 = ::fabs(p.y - pp.y);
 
     while (dx1 > 1E-5 || dy1 > 1E-5) {
       if ((pp.x < p.x && pp.x < p4_.x) || (pp.x > p.x && pp.x > p4_.x)) {
@@ -136,8 +132,8 @@ class C3Bezier2DT {
 
       calc(t1, pp);
 
-      T dx2 = ::fabs(p.x - pp.x);
-      T dy2 = ::fabs(p.y - pp.y);
+      double dx2 = ::fabs(p.x - pp.x);
+      double dy2 = ::fabs(p.y - pp.y);
 
       if (dx2 < dx1 && dy2 < dy1)
         goto next;
@@ -173,32 +169,32 @@ class C3Bezier2DT {
     return true;
   }
 
-  T gradientStart() const {
+  double gradientStart() const {
     //return CMathGen::atan2(p2_.x - p1_.x, p2_.y - p1_.y);
     return atan2(p2_.y - p1_.y, p2_.x - p1_.x);
   }
 
-  T gradientEnd() const {
+  double gradientEnd() const {
     //return CMathGen::atan2(p4_.x - p3_.x, p4_.y - p3_.y);
     return atan2(p4_.y - p3_.y, p4_.x - p3_.x);
   }
 
-  T gradient(T t) const {
-    T u = 1.0 - t;
+  double gradient(double t) const {
+    double u = 1.0 - t;
 
-    T tt = t*t;
-    T uu = u*u;
-    T tu = t*u;
+    double tt = t*t;
+    double uu = u*u;
+    double tu = t*u;
 
-    Point p = (p2_ - p1_)*uu + 2.0*(p3_ - p2_)*tu + (p4_ - p3_)*tt;
+    CPoint2D p = (p2_ - p1_)*uu + 2.0*(p3_ - p2_)*tu + (p4_ - p3_)*tt;
 
-    //T g = CMathGen::atan2(p.x, p.y);
-    T g = atan2(p.y, p.x);
+    //double g = CMathGen::atan2(p.x, p.y);
+    double g = atan2(p.y, p.x);
 
     return g;
   }
 
-  void getHullPolygon(std::vector<Point> &points) const {
+  void getHullPolygon(std::vector<CPoint2D> &points) const {
     points.push_back(p1_);
     points.push_back(p2_);
     points.push_back(p3_);
@@ -214,28 +210,28 @@ class C3Bezier2DT {
     bbox.add(p4_);
   }
 
-  void split(Bezier &bezier1, Bezier &bezier2) const {
+  void split(C3Bezier2D &bezier1, C3Bezier2D &bezier2) const {
     split(0.5, bezier1, bezier2);
   }
 
-  void split(double t, Bezier &bezier1, Bezier &bezier2) const {
+  void split(double t, C3Bezier2D &bezier1, C3Bezier2D &bezier2) const {
     // split at t (0 - 1) of curve
-    T u = 1.0 - t;
+    double u = 1.0 - t;
 
-    Point p11 = u*p1_ + t*p2_;
-    Point p12 = u*p2_ + t*p3_;
-    Point p13 = u*p3_ + t*p4_;
+    CPoint2D p11 = u*p1_ + t*p2_;
+    CPoint2D p12 = u*p2_ + t*p3_;
+    CPoint2D p13 = u*p3_ + t*p4_;
 
-    Point p21 = u*p11 + t*p12;
-    Point p22 = u*p12 + t*p13;
+    CPoint2D p21 = u*p11 + t*p12;
+    CPoint2D p22 = u*p12 + t*p13;
 
-    Point p31 = u*p21 + t*p22;
+    CPoint2D p31 = u*p21 + t*p22;
 
-    bezier1 = Bezier(p1_, p11, p21, p31);
-    bezier2 = Bezier(p31, p22, p13, p4_);
+    bezier1 = C3Bezier2D(p1_, p11, p21, p31);
+    bezier2 = C3Bezier2D(p31, p22, p13, p4_);
   }
 
-  bool split(const CPoint2D &p, Bezier &bezier1, Bezier &bezier2) const {
+  bool split(const CPoint2D &p, C3Bezier2D &bezier1, C3Bezier2D &bezier2) const {
     double t;
 
     if (! interp(p, &t)) return false;
@@ -245,24 +241,24 @@ class C3Bezier2DT {
     return true;
   }
 
-  Point deCasteljauInterp(double t) const {
-    T u = 1.0 - t;
+  CPoint2D deCasteljauInterp(double t) const {
+    double u = 1.0 - t;
 
-    Point p11 = u*p1_ + t*p2_;
-    Point p12 = u*p2_ + t*p3_;
-    Point p13 = u*p3_ + t*p4_;
+    CPoint2D p11 = u*p1_ + t*p2_;
+    CPoint2D p12 = u*p2_ + t*p3_;
+    CPoint2D p13 = u*p3_ + t*p4_;
 
-    Point p21 = u*p11 + t*p12;
-    Point p22 = u*p12 + t*p13;
+    CPoint2D p21 = u*p11 + t*p12;
+    CPoint2D p22 = u*p12 + t*p13;
 
-    Point p31 = u*p21 + t*p22;
+    CPoint2D p31 = u*p21 + t*p22;
 
     return p31;
   }
 
   template<typename FUNC>
-  static Bezier bestFit(FUNC f, double x1, double y1, double g1,
-                        double x2, double y2, double g2, int steps=50) {
+  static C3Bezier2D bestFit(FUNC f, double x1, double y1, double g1,
+                            double x2, double y2, double g2, int steps=50) {
     double c1 = y1 - g1*x1;
     double c2 = y2 - g2*x2;
 
@@ -293,7 +289,7 @@ class C3Bezier2DT {
         double x11 = (x2  - x1)*i*s + x1;
         double y11 = (y1e - y1)*i*s + y1;
 
-        Bezier b(x1, y1, x11, y11, x21, y21, x2, y2);
+        C3Bezier2D b(x1, y1, x11, y11, x21, y21, x2, y2);
 
         double bx, by;
 
@@ -323,7 +319,7 @@ class C3Bezier2DT {
         double x21 = (x1  - x2)*i*s + x2;
         double y21 = (y2e - y2)*i*s + y2;
 
-        Bezier b(x1, y1, x11, y11, x21, y21, x2, y2);
+        C3Bezier2D b(x1, y1, x11, y11, x21, y21, x2, y2);
 
         double bx, by;
 
@@ -347,11 +343,11 @@ class C3Bezier2DT {
       --max_iter;
     }
 
-    return Bezier(x1, y1, x11, y11, x21, y21, x2, y2);
+    return C3Bezier2D(x1, y1, x11, y11, x21, y21, x2, y2);
   }
 
   template<typename FUNC>
-  static Bezier bestParamFit(FUNC f, double t1=0, double t2=1, int steps=50) {
+  static C3Bezier2D bestParamFit(FUNC f, double t1=0, double t2=1, int steps=50) {
     assert(t2 > t1);
 
     CPoint2D p1 = f(t1);
@@ -386,7 +382,7 @@ class C3Bezier2DT {
         double x11 = i*dx + x1;
         double y11 = g1*(x11 - x1) + y1;
 
-        Bezier b(x1, y1, x11, y11, x21, y21, x2, y2);
+        C3Bezier2D b(x1, y1, x11, y11, x21, y21, x2, y2);
 
         double bx, by;
 
@@ -418,7 +414,7 @@ class C3Bezier2DT {
         double x21 = i*dx + x1;
         double y21 = g2*(x21 - x2) + y2;
 
-        Bezier b(x1, y1, x11, y11, x21, y21, x2, y2);
+        C3Bezier2D b(x1, y1, x11, y11, x21, y21, x2, y2);
 
         double bx, by;
 
@@ -444,12 +440,12 @@ class C3Bezier2DT {
       --max_iter;
     }
 
-    return Bezier(x1, y1, x11, y11, x21, y21, x2, y2);
+    return C3Bezier2D(x1, y1, x11, y11, x21, y21, x2, y2);
   }
 
   template<typename FUNC>
-  static Bezier bestPolarFit(FUNC f, double a1, double r1, double g1,
-                             double a2, double r2, double g2, int steps=50) {
+  static C3Bezier2D bestPolarFit(FUNC f, double a1, double r1, double g1,
+                                 double a2, double r2, double g2, int steps=50) {
     double x1 = r1*cos(a1);
     double y1 = r1*sin(a1);
 
@@ -499,7 +495,7 @@ class C3Bezier2DT {
           x11 = (y11 - c1)/g1;
         }
 
-        Bezier b(x1, y1, x11, y11, x21, y21, x2, y2);
+        C3Bezier2D b(x1, y1, x11, y11, x21, y21, x2, y2);
 
         double bx, by;
 
@@ -549,7 +545,7 @@ class C3Bezier2DT {
           x21 = (y21 - c2)/g2;
         }
 
-        Bezier b(x1, y1, x11, y11, x21, y21, x2, y2);
+        C3Bezier2D b(x1, y1, x11, y11, x21, y21, x2, y2);
 
         double bx, by;
 
@@ -583,7 +579,7 @@ class C3Bezier2DT {
       changed2 = (minI2 != oldI2);
     }
 
-    return Bezier(x1, y1, x11, y11, x21, y21, x2, y2);
+    return C3Bezier2D(x1, y1, x11, y11, x21, y21, x2, y2);
   }
 
   double arcLength(double tol=1E-3) const {
@@ -593,7 +589,7 @@ class C3Bezier2DT {
     if (fabs(l2 - l1) < tol)
       return l1;
 
-    Bezier bezier1, bezier2;
+    C3Bezier2D bezier1, bezier2;
 
     split(bezier1, bezier2);
 
@@ -607,16 +603,14 @@ class C3Bezier2DT {
                   p4_.x << ", " << p4_.y << "]]";
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const Bezier &bezier) {
+  friend std::ostream &operator<<(std::ostream &os, const C3Bezier2D &bezier) {
     bezier.print(os);
 
     return os;
   }
 
  private:
-  Point p1_, p2_, p3_, p4_;
+  CPoint2D p1_, p2_, p3_, p4_;
 };
-
-typedef C3Bezier2DT<double> C3Bezier2D;
 
 #endif

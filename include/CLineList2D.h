@@ -8,35 +8,28 @@
 #include <CMathGeom2D.h>
 #include <CBBox2D.h>
 
-template<typename T>
-class CLineList2DT {
- private:
-  typedef CPoint2DT<T> Point;
-
-  typedef std::vector<Point> PointList;
-
- private:
-  PointList points_;
+class CLineList2D {
+ public:
+  typedef std::vector<CPoint2D> PointList;
 
  public:
-  CLineList2DT() {
-  }
+  CLineList2D() { }
 
-  CLineList2DT(const PointList &points) :
+  CLineList2D(const PointList &points) :
    points_(points) {
   }
 
-  CLineList2DT(const Point *points, uint num_points) :
+  CLineList2D(const CPoint2D *points, uint num_points) :
    points_(&points[0], &points[num_points]) {
   }
 
-  CLineList2DT(const T *x, const T *y, uint num_xy) :
+  CLineList2D(const double *x, const double *y, uint num_xy) :
    points_() {
     for (uint i = 0; i < num_xy; ++i)
-      points_.push_back(Point(x[i], y[i]));
+      points_.push_back(CPoint2D(x[i], y[i]));
   }
 
- ~CLineList2DT() { }
+ ~CLineList2D() { }
 
   const PointList &getPoints() const { return points_; }
 
@@ -44,28 +37,28 @@ class CLineList2DT {
     return points_.size();
   }
 
-  const Point &getPoint(uint i) const {
+  const CPoint2D &getPoint(uint i) const {
     return points_[i];
   }
 
-  Point getPoint(uint i) {
+  CPoint2D getPoint(uint i) {
     return points_[i];
   }
 
-  void getPoint(uint i, T *x, T *y) const {
+  void getPoint(uint i, double *x, double *y) const {
     *x = points_[i].x;
     *y = points_[i].y;
   }
 
-  void setPoint(uint i, T x, T y) {
+  void setPoint(uint i, double x, double y) {
     points_[i] = CPoint2D(x, y);
   }
 
-  void setPoint(uint i, const Point &point) {
+  void setPoint(uint i, const CPoint2D &point) {
     points_[i] = point;
   }
 
-  void addPoint(const Point &point) {
+  void addPoint(const CPoint2D &point) {
     points_.push_back(point);
   }
 
@@ -84,21 +77,21 @@ class CLineList2DT {
   void setBBox(const CBBox2D &bbox) {
     CBBox2D obbox = getBBox();
 
-    T sx = bbox.getWidth () / obbox.getWidth ();
-    T sy = bbox.getHeight() / obbox.getHeight();
+    double sx = bbox.getWidth () / obbox.getWidth ();
+    double sy = bbox.getHeight() / obbox.getHeight();
 
     typename PointList::iterator ps = points_.begin();
     typename PointList::iterator pe = points_.end  ();
 
     for ( ; ps != pe; ++ps) {
-      Point &p = *ps;
+      CPoint2D &p = *ps;
 
       p.x = sx*(p.x - obbox.getXMin()) + bbox.getXMin();
       p.y = sy*(p.y - obbox.getYMin()) + bbox.getYMin();
     }
   }
 
-  void moveBy(const Point &p) {
+  void moveBy(const CPoint2D &p) {
     typename PointList::iterator ps = points_.begin();
     typename PointList::iterator pe = points_.end  ();
 
@@ -106,35 +99,44 @@ class CLineList2DT {
       *ps += p;
   }
 
-  void resizeBy(const Point &ll, const Point &ur) {
+  void resizeBy(const CPoint2D &ll, const CPoint2D &ur) {
     CBBox2D bbox = getBBox();
 
-    T w = bbox.getWidth ();
-    T h = bbox.getHeight();
+    double w = bbox.getWidth ();
+    double h = bbox.getHeight();
 
-    T dw = ur.x - ll.x;
-    T dh = ur.y - ll.y;
+    double dw = ur.x - ll.x;
+    double dh = ur.y - ll.y;
 
-    T sx = (w > 0 ? (w + dw) / w : 1);
-    T sy = (h > 0 ? (h + dh) / h : 1);
+    double sx = (w > 0 ? (w + dw) / w : 1);
+    double sy = (h > 0 ? (h + dh) / h : 1);
 
     typename PointList::iterator ps = points_.begin();
     typename PointList::iterator pe = points_.end  ();
 
     for ( ; ps != pe; ++ps) {
-      Point &p = *ps;
+      CPoint2D &p = *ps;
 
       p.x = sx*(p.x - bbox.getXMin()) + bbox.getXMin() + ll.x;
       p.y = sy*(p.y - bbox.getYMin()) + bbox.getYMin() + ll.y;
     }
   }
 
-  void rotateBy(double da, const Point &o) {
+  void rotateBy(double da, const CPoint2D &o) {
     typename PointList::iterator ps = points_.begin();
     typename PointList::iterator pe = points_.end  ();
 
     for ( ; ps != pe; ++ps)
       *ps = rotatePoint(*ps, da, o);
+  }
+
+  CPoint2D rotatePoint(const CPoint2D &point, double da, const CPoint2D &o) {
+    double s = sin(da), c = cos(da);
+
+    double x1 = point.x - o.x, y1 = point.y - o.y;
+    double x2 = x1*c - y1*s  , y2 = x1*s + y1*c  ;
+
+    return CPoint2D(x2 + o.x, y2 + o.y);
   }
 
   double includedAngle() const {
@@ -145,7 +147,8 @@ class CLineList2DT {
     return CMathGeom2D::IncludedAngle(points_[0], points_[1], points_[2]);
   }
 
-  bool arcThrough(T xr, T yr, T *xc, T *yc, T *xt1, T *yt1, T *xt2, T *yt2) {
+  bool arcThrough(double xr, double yr, double *xc, double *yc,
+                  double *xt1, double *yt1, double *xt2, double *yt2) {
     uint np = points_.size();
 
     assert(np >= 3);
@@ -155,8 +158,9 @@ class CLineList2DT {
                                    points_[2].x, points_[2].y, xr, yr,
                                    xc, yc, xt1, yt1, xt2, yt2);
   }
-};
 
-typedef CLineList2DT<double> CLineList2D;
+ private:
+  PointList points_;
+};
 
 #endif

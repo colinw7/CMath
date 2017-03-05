@@ -7,12 +7,11 @@
 #include <CIBBox2D.h>
 #include <CIterator.h>
 
-template<typename T>
-class CIPolygon2DT {
+class CIPolygon2D {
  private:
-  typedef CIPolygon2DT<T> Polygon;
-  typedef CIPoint2DT<T>   Point;
-  typedef CILine2DT<T>    Line;
+  typedef CIPolygon2D Polygon;
+  typedef CIPoint2D   Point;
+  typedef CILine2D    Line;
 
  public:
   typedef std::vector<Point> PointList;
@@ -54,9 +53,10 @@ class CIPolygon2DT {
     }
 
    private:
-    const Polygon *poly_;
-    int            len_, pos_;
-    bool           end_;
+    const Polygon *poly_ { nullptr };
+    int            len_ { 0 };
+    int            pos_ { 0 };
+    bool           end_ { true };
   };
 
   typedef CInputIterator<PointIteratorState, Point> PointIterator;
@@ -73,7 +73,7 @@ class CIPolygon2DT {
     }
 
     LineIteratorState() :
-     poly_(0), len_(0), pos_(0), end_(true) {
+     poly_(nullptr), len_(0), pos_(0), end_(true) {
     }
 
     void next() {
@@ -101,9 +101,10 @@ class CIPolygon2DT {
     }
 
    private:
-    const Polygon *poly_;
-    int            len_, pos_;
-    bool           end_;
+    const Polygon *poly_ { nullptr };
+    int            len_ { 0 };
+    int            pos_ { 0 };
+    bool           end_ { true };
     mutable Line   line_;
   };
 
@@ -112,15 +113,15 @@ class CIPolygon2DT {
   //------
 
  public:
-  CIPolygon2DT() :
+  CIPolygon2D() :
    array_set_(false), x_(), y_() {
   }
 
-  CIPolygon2DT(const CIPolygon2DT &rhs) :
+  CIPolygon2D(const CIPolygon2D &rhs) :
    points_(rhs.points_), array_set_(false), x_(), y_() {
   }
 
-  CIPolygon2DT &operator=(const CIPolygon2DT &rhs) {
+  CIPolygon2D &operator=(const CIPolygon2D &rhs) {
     points_ = rhs.points_;
 
     array_set_ = false;
@@ -128,21 +129,21 @@ class CIPolygon2DT {
     return *this;
   }
 
-  CIPolygon2DT(const PointList &points) :
+  CIPolygon2D(const PointList &points) :
    points_(points), array_set_(false), x_(), y_() {
   }
 
-  CIPolygon2DT(const Point *points, uint num_points) :
+  CIPolygon2D(const Point *points, uint num_points) :
    points_(&points[0], &points[num_points]), array_set_(false), x_(), y_() {
   }
 
-  CIPolygon2DT(const T *x, const T *y, uint num_xy) :
+  CIPolygon2D(const int *x, const int *y, uint num_xy) :
    points_(), array_set_(false), x_(), y_() {
     for (uint i = 0; i < num_xy; ++i)
       points_.push_back(Point(x[i], y[i]));
   }
 
- ~CIPolygon2DT() { }
+ ~CIPolygon2D() { }
 
   const PointList &getPoints() const { return points_; }
 
@@ -162,7 +163,7 @@ class CIPolygon2DT {
     return points_[i];
   }
 
-  void getPoint(uint i, T *x, T *y) const {
+  void getPoint(uint i, int *x, int *y) const {
     *x = points_[i].x;
     *y = points_[i].y;
   }
@@ -173,7 +174,7 @@ class CIPolygon2DT {
     array_set_ = false;
   }
 
-  void setPoint(uint i, T x, T y) {
+  void setPoint(uint i, int x, int y) {
     points_[i] = CIPoint2D(x, y);
 
     array_set_ = false;
@@ -206,8 +207,8 @@ class CIPolygon2DT {
   void setBBox(const CIBBox2D &bbox) {
     CIBBox2D obbox = getBBox();
 
-    T sx = bbox.getWidth () / obbox.getWidth ();
-    T sy = bbox.getHeight() / obbox.getHeight();
+    int sx = bbox.getWidth () / obbox.getWidth ();
+    int sy = bbox.getHeight() / obbox.getHeight();
 
     typename PointList::iterator ps = points_.begin();
     typename PointList::iterator pe = points_.end  ();
@@ -225,7 +226,7 @@ class CIPolygon2DT {
   Point centroid() const {
     initArray();
 
-    T cx, cy;
+    int cx, cy;
 
     uint n = points_.size();
 
@@ -234,20 +235,20 @@ class CIPolygon2DT {
     return Point(cx, cy);
   }
 
-  void centroid(T *cx, T *cy) const {
+  void centroid(int *cx, int *cy) const {
     Point c = centroid();
 
     *cx = c.x;
     *cy = c.y;
   }
 
-  bool intersect(const CIPolygon2DT &polygon, CIPolygon2DT &ipolygon) const {
+  bool intersect(const CIPolygon2D &polygon, CIPolygon2D &ipolygon) const {
     initArray();
 
     polygon.initArray();
 
-    uint  ni;
-    T    *xi, *yi;
+    uint  ni { 0 };
+    int  *xi { nullptr }, *yi { nullptr };
 
     uint n  = points_.size();
     uint n1 = polygon.points_.size();
@@ -257,15 +258,21 @@ class CIPolygon2DT {
                                          &xi, &yi, &ni))
       return false;
 
-    ipolygon = CIPolygon2DT(xi, yi, ni);
+    ipolygon = CIPolygon2D(xi, yi, ni);
+
+    delete [] xi;
+    delete [] yi;
 
     return true;
   }
 
+#if 0
   bool intersect(const Line &line, std::vector<Point> &ipoints) const {
     return CMathGeom2D::PolygonLineIntersect(points_, line, ipoints);
   }
+#endif
 
+#if 0
   bool insideConvex(const Point &point) const {
     return CMathGeom2D::PointInsideConvex(point, points_);
   }
@@ -277,6 +284,7 @@ class CIPolygon2DT {
   bool inside(const Point &point) const {
     return insideEvenOdd(point);
   }
+#endif
 
   void moveBy(const Point &p) {
     typename PointList::iterator ps = points_.begin();
@@ -291,14 +299,14 @@ class CIPolygon2DT {
   void resizeBy(const Point &ll, const Point &ur) {
     CIBBox2D bbox = getBBox();
 
-    T w = bbox.getWidth ();
-    T h = bbox.getHeight();
+    int w = bbox.getWidth ();
+    int h = bbox.getHeight();
 
-    T dw = ur.x - ll.x;
-    T dh = ur.y - ll.y;
+    int dw = ur.x - ll.x;
+    int dh = ur.y - ll.y;
 
-    T sx = (w > 0 ? (w + dw) / w : 1);
-    T sy = (h > 0 ? (h + dh) / h : 1);
+    int sx = (w > 0 ? (w + dw) / w : 1);
+    int sy = (h > 0 ? (h + dh) / h : 1);
 
     typename PointList::iterator ps = points_.begin();
     typename PointList::iterator pe = points_.end  ();
@@ -313,6 +321,7 @@ class CIPolygon2DT {
     array_set_ = false;
   }
 
+#if 0
   void rotateBy(double da, const Point &o) {
     typename PointList::iterator ps = points_.begin();
     typename PointList::iterator pe = points_.end  ();
@@ -322,6 +331,7 @@ class CIPolygon2DT {
 
     array_set_ = false;
   }
+#endif
 
   int orientation() const {
     initArray();
@@ -331,7 +341,7 @@ class CIPolygon2DT {
     return CMathGeom2D::PolygonOrientation(&x_[0], &y_[0], n);
   }
 
-  T area() const {
+  int area() const {
     initArray();
 
     uint n = points_.size();
@@ -339,16 +349,18 @@ class CIPolygon2DT {
     return CMathGeom2D::PolygonArea(&x_[0], &y_[0], n);
   }
 
-  bool distanceTo(const Point &point, T *dist) const {
+#if 0
+  bool distanceTo(const Point &point, int *dist) const {
     return CMathGeom2D::PointLineDistance(point, *this, dist);
   }
+#endif
 
   bool isConvex() const {
     initArray();
 
     uint n = points_.size();
 
-    return CMathGeom2D::PolygonIsConvex(x_, y_, n);
+    return CMathGeom2D::PolygonIsConvex(&x_[0], &y_[0], n);
   }
 
   const int *getX() const {
@@ -386,10 +398,8 @@ class CIPolygon2DT {
  private:
   PointList points_;
 
-  mutable bool           array_set_;
-  mutable std::vector<T> x_, y_;
+  mutable bool             array_set_ { false };
+  mutable std::vector<int> x_, y_;
 };
-
-typedef CIPolygon2DT<int> CIPolygon2D;
 
 #endif

@@ -4,72 +4,55 @@
 #include <CMathGen.h>
 #include <CVector3D.h>
 
-template<typename T>
-class CVector3DT;
-
-template<typename T>
-class CNormal3DT {
- private:
-  union {
-    struct {
-      T x_, y_, z_;
-    };
-
-    T m_[3];
-  };
-
-  bool normalized_;
-
+class CNormal3D {
  public:
-  explicit CNormal3DT(T x=0.0,
-                      T y=0.0,
-                      T z=0.0) :
+  explicit CNormal3D(double x=0.0, double y=0.0, double z=0.0) :
    x_(x), y_(y), z_(z), normalized_(false) {
   }
 
-  CNormal3DT(const CNormal3DT &normal) :
+  CNormal3D(const CNormal3D &normal) :
     x_(normal.x_), y_(normal.y_), z_(normal.z_),
     normalized_(normal.normalized_) {
   }
 
-  explicit CNormal3DT(const CVector3DT<T> &vector) :
+  explicit CNormal3D(const CVector3D &vector) :
     x_(vector.getX()), y_(vector.getY()), z_(vector.getZ()),
     normalized_(vector.getNormalized()) {
   }
 
   //------
 
-  T getX() const { return x_; }
-  T getY() const { return y_; }
-  T getZ() const { return z_; }
+  double getX() const { return x_; }
+  double getY() const { return y_; }
+  double getZ() const { return z_; }
 
-  void getXYZ(T *x, T *y, T *z) const {
+  void getXYZ(double *x, double *y, double *z) const {
     *x = x_; *y = y_; *z = z_;
   }
 
-  T operator[](int i) const { return m_[i]; }
+  double operator[](int i) const { assert(i < 3); return (&x_)[i]; }
 
   // Reference routine would break encapsulation
 
-  void setX(T x) {
+  void setX(double x) {
     x_ = x;
 
     normalized_ = false;
   }
 
-  void setY(T y) {
+  void setY(double y) {
     y_ = y;
 
     normalized_ = false;
   }
 
-  void setZ(T z) {
+  void setZ(double z) {
     z_ = z;
 
     normalized_ = false;
   }
 
-  void setXYZ(T x, T y, T z) {
+  void setXYZ(double x, double y, double z) {
     x_ = x; y_ = y; z_ = z;
 
     normalized_ = false;
@@ -81,18 +64,25 @@ class CNormal3DT {
 
   //------
 
-  T length() const {
+  double length() const {
     if (normalized_)
       return 1.0 ;
     else
       return ::sqrt(x_*x_ + y_*y_ + z_*z_);
   }
 
-  T modulus() const {
+  double fastLength() const {
+    if (normalized_)
+      return 1.0 ;
+    else
+      return CMathGen::fastDistance(x_, y_, z_);
+  }
+
+  double modulus() const {
     return length();
   }
 
-  T lengthSqr() const {
+  double lengthSqr() const {
     if (normalized_)
       return 1.0 ;
     else
@@ -101,7 +91,7 @@ class CNormal3DT {
 
   //------
 
-  CNormal3DT &zero() {
+  CNormal3D &zero() {
     x_ = 0.0; y_ = 0.0; z_ = 0.0;
 
     normalized_ = false;
@@ -109,29 +99,29 @@ class CNormal3DT {
     return *this;
   }
 
-  CNormal3DT unit() const {
+  CNormal3D unit() const {
     if (normalized_)
       return *this;
 
-    T len = length();
+    double len = length();
 
-    T factor = 0.0;
+    double factor = 0.0;
 
     if (len > 0.0)
       factor = 1.0 /len;
 
-    return CNormal3DT(x_*factor, y_*factor, z_*factor, true);
+    return CNormal3D(x_*factor, y_*factor, z_*factor, true);
   }
 
   //------
 
-  CNormal3DT &normalize() {
+  CNormal3D &normalize() {
     if (normalized_)
       return *this;
 
-    T len = length();
+    double len = length();
 
-    T factor = 0.0;
+    double factor = 0.0;
 
     if (len > 0.0)
       factor = 1.0 /len;
@@ -145,29 +135,29 @@ class CNormal3DT {
     return *this;
   }
 
-  CNormal3DT normalized() const {
+  CNormal3D normalized() const {
     if (normalized_)
       return *this;
 
-    T len = length();
+    double len = length();
 
-    T factor = 0.0;
+    double factor = 0.0;
 
     if (len > 0.0)
       factor = 1.0 /len;
 
-    return CNormal3DT(x_*factor, y_*factor, z_*factor, true);
+    return CNormal3D(x_*factor, y_*factor, z_*factor, true);
   }
 
   //------
 
-  CNormal3DT &setMagnitude(T magnitude) {
-    T factor = 0.0;
+  CNormal3D &setMagnitude(double magnitude) {
+    double factor = 0.0;
 
     if (normalized_)
       factor = magnitude;
     else {
-      T len = length();
+      double len = length();
 
       if (len > 0.0)
         factor = magnitude/len;
@@ -184,45 +174,45 @@ class CNormal3DT {
 
   //------
 
-  T getDistance(const CNormal3DT &normal) {
-    CNormal3DT diff = *this - normal;
+  double getDistance(const CNormal3D &normal) {
+    CNormal3D diff = *this - normal;
 
     return diff.length();
   }
 
   //------
 
-  void incX(T x = 1.0 ) {
+  void incX(double x = 1.0 ) {
     x_ += x;
 
     normalized_ = false;
   }
 
-  void incY(T y = 1.0 ) {
+  void incY(double y = 1.0 ) {
     y_ += y;
 
     normalized_ = false;
   }
 
-  void incZ(T z = 1.0 ) {
+  void incZ(double z = 1.0 ) {
     z_ += z;
 
     normalized_ = false;
   }
 
-  void decX(T x = 1.0 ) {
+  void decX(double x = 1.0 ) {
     x_ -= x;
 
     normalized_ = false;
   }
 
-  void decY(T y = 1.0 ) {
+  void decY(double y = 1.0 ) {
     y_ -= y;
 
     normalized_ = false;
   }
 
-  void decZ(T z = 1.0 ) {
+  void decZ(double z = 1.0 ) {
     z_ -= z;
 
     normalized_ = false;
@@ -230,27 +220,25 @@ class CNormal3DT {
 
   //------
 
-  T minComponent() {
-    return min(min(x_, y_), z_);
+  double minComponent() {
+    return std::min(std::min(x_, y_), z_);
   }
 
-  T maxComponent() {
-    return max(max(x_, y_), z_);
+  double maxComponent() {
+    return std::max(std::max(x_, y_), z_);
   }
 
-  T minAbsComponent() {
-    return min(min(::fabs(x_), ::fabs(y_)),
-               ::fabs(z_));
+  double minAbsComponent() {
+    return std::min(std::min(std::fabs(x_), std::fabs(y_)), std::fabs(z_));
   }
 
-  T maxAbsComponent() {
-    return max(max(::fabs(x_), ::fabs(y_)),
-               ::fabs(z_));
+  double maxAbsComponent() {
+    return std::max(std::max(std::fabs(x_), std::fabs(y_)), std::fabs(z_));
   }
 
   //------
 
-  CNormal3DT &operator=(const CNormal3DT &normal) {
+  CNormal3D &operator=(const CNormal3D &normal) {
     x_ = normal.x_; y_ = normal.y_; z_ = normal.z_;
 
     normalized_ = normal.normalized_;
@@ -260,27 +248,27 @@ class CNormal3DT {
 
   //------
 
-  CNormal3DT operator+() const {
-    return CNormal3DT(x_, y_, z_);
+  CNormal3D operator+() const {
+    return CNormal3D(x_, y_, z_);
   }
 
-  CNormal3DT operator-() const {
-    return CNormal3DT(-x_, -y_, -z_);
+  CNormal3D operator-() const {
+    return CNormal3D(-x_, -y_, -z_);
   }
 
   //------
 
-  friend bool operator==(const CNormal3DT &lhs, const CNormal3DT &rhs) {
+  friend bool operator==(const CNormal3D &lhs, const CNormal3D &rhs) {
     return (lhs.x_ == rhs.x_ && lhs.y_ == rhs.y_ && lhs.z_ == rhs.z_);
   }
 
-  friend bool operator!=(const CNormal3DT &lhs, const CNormal3DT &rhs) {
+  friend bool operator!=(const CNormal3D &lhs, const CNormal3D &rhs) {
     return (lhs.x_ != rhs.x_ || lhs.y_ != rhs.y_ || lhs.z_ != rhs.z_);
   }
 
   //------
 
-  CNormal3DT &operator+=(const CNormal3DT &rhs) {
+  CNormal3D &operator+=(const CNormal3D &rhs) {
     x_ += rhs.x_; y_ += rhs.y_; z_ += rhs.z_;
 
     normalized_ = false;
@@ -288,13 +276,13 @@ class CNormal3DT {
     return *this;
   }
 
-  CNormal3DT operator+(const CNormal3DT &rhs) const {
-    return CNormal3DT(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_);
+  CNormal3D operator+(const CNormal3D &rhs) const {
+    return CNormal3D(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_);
   }
 
   //------
 
-  CNormal3DT &operator-=(const CNormal3DT &rhs) {
+  CNormal3D &operator-=(const CNormal3D &rhs) {
     x_ -= rhs.x_; y_ -= rhs.y_; z_ -= rhs.z_;
 
     normalized_ = false;
@@ -302,13 +290,21 @@ class CNormal3DT {
     return *this;
   }
 
-  CNormal3DT operator-(const CNormal3DT &rhs) const {
-    return CNormal3DT(x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_);
+  CNormal3D operator-(const CNormal3D &rhs) const {
+    return CNormal3D(x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_);
+  }
+
+  friend CVector3D operator-(const CNormal3D &lhs, const CVector3D &rhs) {
+    return CVector3D(lhs.x_ - rhs.getX(), lhs.y_ - rhs.getY(), lhs.z_ - rhs.getZ());
+  }
+
+  friend CVector3D operator-(const CVector3D &lhs, const CNormal3D &rhs) {
+    return CVector3D(lhs.getX() - rhs.x_, lhs.getY() - rhs.y_, lhs.getZ() - rhs.z_);
   }
 
   //------
 
-  CNormal3DT &operator*=(T rhs) {
+  CNormal3D &operator*=(double rhs) {
     x_ *= rhs; y_ *= rhs; z_ *= rhs;
 
     normalized_ = false;
@@ -316,18 +312,18 @@ class CNormal3DT {
     return *this;
   }
 
-  friend CNormal3DT operator*(const CNormal3DT &lhs, T rhs) {
-    return CNormal3DT(lhs.x_*rhs, lhs.y_*rhs, lhs.z_*rhs);
+  friend CNormal3D operator*(const CNormal3D &lhs, double rhs) {
+    return CNormal3D(lhs.x_*rhs, lhs.y_*rhs, lhs.z_*rhs);
   }
 
-  friend CNormal3DT operator*(T lhs, const CNormal3DT &rhs) {
-    return CNormal3DT(lhs*rhs.x_, lhs*rhs.y_, lhs*rhs.z_);
+  friend CNormal3D operator*(double lhs, const CNormal3D &rhs) {
+    return CNormal3D(lhs*rhs.x_, lhs*rhs.y_, lhs*rhs.z_);
   }
 
   //------
 
-  CNormal3DT &operator/=(T rhs) {
-    T irhs = 1.0 /rhs;
+  CNormal3D &operator/=(double rhs) {
+    double irhs = 1.0 /rhs;
 
     x_ *= irhs; y_ *= irhs; z_ *= irhs;
 
@@ -336,10 +332,10 @@ class CNormal3DT {
     return *this;
   }
 
-  CNormal3DT operator/(T rhs) const {
-    T irhs = 1.0 /rhs;
+  CNormal3D operator/(double rhs) const {
+    double irhs = 1.0 /rhs;
 
-    return CNormal3DT(x_*irhs, y_*irhs, z_*irhs);
+    return CNormal3D(x_*irhs, y_*irhs, z_*irhs);
   }
 
   //------
@@ -348,7 +344,7 @@ class CNormal3DT {
     os << "(" << x_ << "," << y_ << "," << z_ << ")";
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const CNormal3DT &normal) {
+  friend std::ostream &operator<<(std::ostream &os, const CNormal3D &normal) {
     normal.print(os);
 
     return os;
@@ -356,66 +352,62 @@ class CNormal3DT {
 
   //------
 
-  T dotProduct(const CNormal3DT &normal) const {
+  double dotProduct(const CNormal3D &normal) const {
     return (x_*normal.x_ + y_*normal.y_ + z_*normal.z_);
   }
 
-  T dotProduct(const CVector3DT<T> &vector) const {
+  double dotProduct(const CVector3D &vector) const {
     return (x_*vector.getX() + y_*vector.getY() + z_*vector.getZ());
   }
 
-  T dotProduct(T x, T y, T z) const {
+  friend double dotProduct(const CVector3D &vector, const CNormal3D &normal) {
+    return (vector.getX()*normal.x_ + vector.getY()*normal.y_ + vector.getZ()*normal.z_);
+  }
+
+  double dotProduct(double x, double y, double z) const {
     return (x_*x + y_*y + z_*z);
   }
 
-  static T dotProduct(const CNormal3DT &normal1,
-                      const CNormal3DT &normal2) {
+  static double dotProduct(const CNormal3D &normal1, const CNormal3D &normal2) {
     return (normal1.x_*normal2.x_ +
             normal1.y_*normal2.y_ +
             normal1.z_*normal2.z_);
   }
 
-  static T dotProduct(const CNormal3DT &normal1,
-                      const CVector3DT<T> &vector2) {
+  static double dotProduct(const CNormal3D &normal1, const CVector3D &vector2) {
     return (normal1.x_*vector2.getX() +
             normal1.y_*vector2.getY() +
             normal1.z_*vector2.getZ());
   }
 
-  static T dotProduct(const CVector3DT<T> &vector1,
-                      const CNormal3DT &normal2) {
+  static double dotProduct(const CVector3D &vector1, const CNormal3D &normal2) {
     return (vector1.getX()*normal2.x_ +
             vector1.getY()*normal2.y_ +
             vector1.getZ()*normal2.z_);
   }
 
-  static T dotProduct(const CNormal3DT &normal1, T x2, T y2, T z2) {
+  static double dotProduct(const CNormal3D &normal1, double x2, double y2, double z2) {
     return (normal1.x_*x2 + normal1.y_*y2 + normal1.z_*z2);
   }
 
-  T dotProductSelf() const {
+  double dotProductSelf() const {
     return (x_*x_ + y_*y_ + z_*z_);
   }
 
-  static T absDotProduct(const CNormal3DT &normal1,
-                         const CNormal3DT &normal2) {
-    return ::fabs(normal1.x_*normal2.x_ +
-                           normal1.y_*normal2.y_ +
-                           normal1.z_*normal2.z_);
+  static double absDotProduct(const CNormal3D &normal1, const CNormal3D &normal2) {
+    return ::fabs(normal1.x_*normal2.x_ + normal1.y_*normal2.y_ + normal1.z_*normal2.z_);
   }
 
-  static T absDotProduct(const CNormal3DT &normal1,
-                         const CVector3DT<T> &vector2) {
+  static double absDotProduct(const CNormal3D &normal1, const CVector3D &vector2) {
     return ::fabs(normal1.x_*vector2.getX() +
-                           normal1.y_*vector2.getY() +
-                           normal1.z_*vector2.getZ());
+                  normal1.y_*vector2.getY() +
+                  normal1.z_*vector2.getZ());
   }
 
-  static T absDotProduct(const CVector3DT<T> &vector1,
-                         const CNormal3DT &normal2) {
+  static double absDotProduct(const CVector3D &vector1, const CNormal3D &normal2) {
     return ::fabs(vector1.getX()*normal2.x_ +
-                           vector1.getY()*normal2.y_ +
-                           vector1.getZ()*normal2.z_);
+                  vector1.getY()*normal2.y_ +
+                  vector1.getZ()*normal2.z_);
   }
 
   //------
@@ -426,8 +418,8 @@ class CNormal3DT {
 
   //------
 
-  T cosIncluded(const CNormal3DT &normal1) const {
-    T dot = dotProduct(normal1);
+  double cosIncluded(const CNormal3D &normal1) const {
+    double dot = dotProduct(normal1);
 
     if (! normalized_)
       dot /= length();
@@ -438,9 +430,8 @@ class CNormal3DT {
     return dot;
   }
 
-  static T cosIncluded(const CNormal3DT &normal1,
-                       const CNormal3DT &normal2) {
-    T dot = normal1.dotProduct(normal2);
+  static double cosIncluded(const CNormal3D &normal1, const CNormal3D &normal2) {
+    double dot = normal1.dotProduct(normal2);
 
     if (! normal1.normalized_)
       dot /= normal1.length();
@@ -454,11 +445,13 @@ class CNormal3DT {
   //------
 
  private:
-  CNormal3DT(T x, T y, T z, bool normalized) :
+  CNormal3D(double x, double y, double z, bool normalized) :
    x_(x), y_(y), z_(z), normalized_(normalized) {
   }
-};
 
-typedef CNormal3DT<double> CNormal3D;
+ private:
+  double x_ { 0 }, y_ { 0 }, z_ { 0 };
+  bool   normalized_ { false };
+};
 
 #endif

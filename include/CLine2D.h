@@ -7,55 +7,53 @@
 #include <CMathGen.h>
 #include <CBBox2D.h>
 
-template<class T>
-class CLine2DT : public CShape2DT<T> {
- private:
-  typedef CLine2DT<T>   Line;
-  typedef CPoint2DT<T>  Point;
-  typedef CVector2DT<T> Vector;
-  typedef CBBox2DT<T>   BBox;
-
+class CLine2D : public CShape2D {
  public:
-  static void setInsideTolerance(T t) {
-    *CLine2DT<T>::insideToleranceP() = t;
+  static void setInsideTolerance(double t) {
+    *CLine2D::insideToleranceP() = t;
   }
 
-  static T getInsideTolerance() {
-    return *CLine2DT<T>::insideToleranceP();
+  static double getInsideTolerance(const double &tol=1E-6) {
+    double tolerance = *insideToleranceP();
+
+    if (tolerance < 0)
+      tolerance = tol;
+
+    return tolerance;
   }
 
-  CLine2DT(T x1=0, T y1=0, T x2=0, T y2=0) :
+  CLine2D(double x1=0, double y1=0, double x2=0, double y2=0) :
    p1_(x1, y1), p2_(x2, y2), v_(x2 - x1, y2 - y1) {
   }
 
-  CLine2DT(const Point &p1, const Point &p2) :
+  CLine2D(const CPoint2D &p1, const CPoint2D &p2) :
    p1_(p1), p2_(p2), v_(p2_ - p1_) {
   }
 
-  const Point  &start () const { return p1_; }
-  const Point  &end   () const { return p2_; }
-  const Vector &vector() const { return v_ ; }
+  const CPoint2D  &start () const { return p1_; }
+  const CPoint2D  &end   () const { return p2_; }
+  const CVector2D &vector() const { return v_ ; }
 
-  void setStart(const Point &p1) {
+  void setStart(const CPoint2D &p1) {
     p1_ = p1;
     v_  = p2_ - p1_;
   }
 
-  void setEnd(const Point &p2) {
+  void setEnd(const CPoint2D &p2) {
     p2_ = p2;
     v_  = p2_ - p1_;
   }
 
-  Point getMid() {
-    return Point((p1_.x + p2_.x)/2, (p1_.y + p2_.y)/2);
+  CPoint2D getMid() {
+    return CPoint2D((p1_.x + p2_.x)/2, (p1_.y + p2_.y)/2);
   }
 
-  BBox getBBox() const {
-    return BBox(p1_, p2_);
+  CBBox2D getBBox() const {
+    return CBBox2D(p1_, p2_);
   }
 
-  void setBBox(const BBox &bbox) {
-    BBox obbox = getBBox();
+  void setBBox(const CBBox2D &bbox) {
+    CBBox2D obbox = getBBox();
 
     if (p1_.x < p2_.x) {
       p1_.x += bbox.getXMin() - obbox.getXMin();
@@ -76,19 +74,23 @@ class CLine2DT : public CShape2DT<T> {
     }
   }
 
-  bool inside(const Point &p) const {
+  bool inside(const CPoint2D &p) const {
+    return insideTol(p, 1E-6);
+  }
+
+  bool insideTol(const CPoint2D &p, const double &tol) const {
     if ((p.x < std::min(p1_.x, p2_.x) || p.x > std::max(p1_.x, p2_.x)) &&
         (p.y < std::min(p1_.y, p2_.y) || p.y > std::max(p1_.y, p2_.y)))
       return false;
 
-    return pointOn(p, getInsideTolerance());
+    return pointOn(p, getInsideTolerance(tol));
   }
 
-  void moveBy(const Point &p) {
+  void moveBy(const CPoint2D &p) {
     p1_ += p; p2_ += p;
   }
 
-  void resizeBy(const Point &ll, const Point &ur) {
+  void resizeBy(const CPoint2D &ll, const CPoint2D &ur) {
     if (p1_.x < p2_.x) {
       p1_.x += ll.x;
       p2_.x += ur.x;
@@ -108,22 +110,22 @@ class CLine2DT : public CShape2DT<T> {
     }
   }
 
-  void rotateBy(double da, const Point &o) {
+  void rotateBy(double da, const CPoint2D &o) {
     p1_ = CShape2D::rotatePoint(p1_, da, o);
     p2_ = CShape2D::rotatePoint(p2_, da, o);
   }
 
   CMathGen::IntersectType
-  intersectParms(const Line &line, T *t1, T *t2) const {
-    T det = (v_.getX()*line.v_.getY() - v_.getY()*line.v_.getX());
+  intersectParms(const CLine2D &line, double *t1, double *t2) const {
+    double det = (v_.getX()*line.v_.getY() - v_.getY()*line.v_.getX());
 
     if (::fabs(det) == 0.0)
       return CMathGen::INTERSECT_NONE;
 
-    T idet = 1.0/det;
+    double idet = 1.0/det;
 
-    T dx = p1_.x - line.p1_.x;
-    T dy = p1_.y - line.p1_.y;
+    double dx = p1_.x - line.p1_.x;
+    double dy = p1_.y - line.p1_.y;
 
     *t1 = (line.v_.getX()*dy - line.v_.getY()*dx)*idet;
     *t2 = (     v_.getX()*dy -      v_.getY()*dx)*idet;
@@ -135,8 +137,8 @@ class CLine2DT : public CShape2DT<T> {
   }
 
   CMathGen::IntersectType
-  intersect(const Line &line, Point &point) const {
-    T t1, t2;
+  intersect(const CLine2D &line, CPoint2D &point) const {
+    double t1, t2;
 
     CMathGen::IntersectType type = intersectParms(line, &t1, &t2);
 
@@ -149,7 +151,7 @@ class CLine2DT : public CShape2DT<T> {
   }
 
   CMathGen::IntersectType
-  intersect(const Line &line, Point &point, T *mu1, T *mu2) const {
+  intersect(const CLine2D &line, CPoint2D &point, double *mu1, double *mu2) const {
     CMathGen::IntersectType type = intersectParms(line, mu1, mu2);
 
     if (type != CMathGen::INTERSECT_NONE) {
@@ -160,67 +162,72 @@ class CLine2DT : public CShape2DT<T> {
     return type;
   }
 
-  bool intersects(const Line &line) const;
+  bool intersects(const CLine2D &line) const;
 
-  bool leftOrOn(const Point &point) const;
+  bool leftOrOn(const CPoint2D &point) const;
 
-  bool left(const Point &point) const;
+  bool left(const CPoint2D &point) const;
 
 #if 0
-  bool intersectsProperly(const Line &line) {
+  bool intersectsProperly(const CLine2D &line) {
     return CMathGeom2D::IntersectsProperly(p1_, p2_, line.p1_, line.p2_);
   }
 
   // TODO: tolerance
-  bool pointLeft(const Point &point) {
+  bool pointLeft(const CPoint2D &point) {
     return triangleArea2(p1_, p2_, point) > 0.0;
   }
 
-  bool pointLeftOn(const Point &point) {
+  bool pointLeftOn(const CPoint2D &point) {
     return triangleArea2(p1_, p2_, point) >= 0.0;
   }
 #endif
 
-  bool pointOn(const Point &point, T tol=0.0) const {
-    return triangleArea2(p1_, p2_, point) <= tol;
+  bool pointOn(const CPoint2D &point, double tol=0.0) const {
+    double a = fabs(triangleArea2(p1_, p2_, point));
+
+    if (a <= tol)
+      return true;
+
+    return false;
   }
 
 #if 0
-  bool pointIn(const Point &point) {
+  bool pointIn(const CPoint2D &point) {
     if (! pointOn(point))
       return FALSE;
 
     return pointBetween(point);
   }
 
-  bool pointBetween(const Point &point) {
+  bool pointBetween(const CPoint2D &point) {
     return CMathGeom2D::PointBetween(p1_, p2_, point);
   }
 #endif
 
-  bool clip(const BBox &bbox, Line &line) const;
+  bool clip(const CBBox2D &bbox, CLine2D &line) const;
 
-  T lengthSqr() const {
+  double lengthSqr() const {
     return v_.lengthSqr();
   }
 
-  T length() const {
+  double length() const {
     return ::sqrt(lengthSqr());
   }
 
-  Point interp(double t) const {
+  CPoint2D interp(double t) const {
     return p1_ + t*v_;
   }
 
-  void split(double t, Line &line1, Line &line2) const {
-    Point pi = interp(t);
+  void split(double t, CLine2D &line1, CLine2D &line2) const {
+    CPoint2D pi = interp(t);
 
-    line1 = Line(p1_, pi);
-    line2 = Line(pi, p2_);
+    line1 = CLine2D(p1_, pi);
+    line2 = CLine2D(pi, p2_);
   }
 
   // assume already checked point on line
-  double getParam(const Point &p) const {
+  double getParam(const CPoint2D &p) const {
     double dx = p2_.x - p1_.x;
     double dy = p2_.y - p1_.y;
 
@@ -234,65 +241,49 @@ class CLine2DT : public CShape2DT<T> {
     os << p1_ << " " << p2_;
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const Line &line) {
+  friend std::ostream &operator<<(std::ostream &os, const CLine2D &line) {
     line.print(os);
 
     return os;
   }
 
  private:
-  static T *insideToleranceP() {
-    static T tolerance;
+  static double *insideToleranceP() {
+    static double tolerance = -1;
 
     return &tolerance;
   }
 
-  static double triangleArea2(const Point &point1, const Point &point2, const Point &point3) {
+  static double triangleArea2(const CPoint2D &point1, const CPoint2D &point2,
+                              const CPoint2D &point3) {
     return (point2.x - point1.x)*(point3.y - point1.y) -
            (point3.x - point1.x)*(point2.y - point1.y);
 
   }
 
  private:
-  Point  p1_, p2_;
-  Vector v_;
+  CPoint2D  p1_, p2_;
+  CVector2D v_;
 };
-
-typedef CLine2DT<double> CLine2D;
 
 //---------
 
 #include <CMathGeom2D.h>
 
-template<class T>
-bool
-CLine2DT<T>::
-intersects(const Line &line) const
-{
+inline bool CLine2D::intersects(const CLine2D &line) const {
   return CMathGeom2D::Intersects(p1_, p2_, line.p1_, line.p2_);
 }
 
-template<class T>
-bool
-CLine2DT<T>::
-leftOrOn(const Point &point) const
+inline bool CLine2D::leftOrOn(const CPoint2D &point) const
 {
   return CMathGeom2D::PointLineLeftOn(p1_, p2_, point);
 }
 
-template<class T>
-bool
-CLine2DT<T>::
-left(const Point &point) const
-{
+inline bool CLine2D::left(const CPoint2D &point) const {
   return CMathGeom2D::PointLineLeft(p1_, p2_, point);
 }
 
-template<class T>
-bool
-CLine2DT<T>::
-clip(const BBox &bbox, Line &line) const
-{
+inline bool CLine2D::clip(const CBBox2D &bbox, CLine2D &line) const {
   double x1 = p1_.x;
   double y1 = p1_.y;
   double x2 = p2_.x;
@@ -300,7 +291,7 @@ clip(const BBox &bbox, Line &line) const
 
   if (CMathGeom2D::clipLine(bbox.getXMin(), bbox.getYMin(), bbox.getXMax(), bbox.getYMax(),
                             &x1, &y1, &x2, &y2)) {
-    line = Line(x1, y1, x2, y2);
+    line = CLine2D(x1, y1, x2, y2);
     return true;
   }
 

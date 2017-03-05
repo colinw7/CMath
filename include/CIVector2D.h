@@ -2,63 +2,62 @@
 #define CIVECTOR_2D_H
 
 #include <iostream>
+#include <CMathGen.h>
 
-template<typename T>
-class CIVector2DT {
- private:
-  typedef CIPoint2DT<T> Point;
-
-  T x_, y_;
-
+class CIVector2D {
  public:
-  CIVector2DT(T x=0, T y=0) :
+  explicit CIVector2D(int x=0, int y=0) :
    x_(x), y_(y) {
   }
 
-  CIVector2DT(const CIVector2DT &vector) :
+  CIVector2D(const CIVector2D &vector) :
    x_(vector.x_), y_(vector.y_) {
   }
 
-  explicit CIVector2DT(const Point &point) :
+  explicit CIVector2D(const CIPoint2D &point) :
    x_(point.x), y_(point.y) {
   }
 
-  CIVector2DT(const Point &point1, const Point &point2) :
+  CIVector2D(const CIPoint2D &point1, const CIPoint2D &point2) :
    x_(point2.x - point1.x), y_(point2.y - point1.y) {
   }
 
-  CIVector2DT(const CIVector2DT &vector1, const CIVector2DT &vector2) :
+  CIVector2D(const CIVector2D &vector1, const CIVector2D &vector2) :
    x_(vector2.x_ - vector1.x_), y_(vector2.y_ - vector1.y_) {
   }
 
-  T getX() const { return x_; }
-  T getY() const { return y_; }
+  int getX() const { return x_; }
+  int getY() const { return y_; }
 
-  void getXY(T *x, T *y) const {
+  void getXY(int *x, int *y) const {
     *x = x_; *y = y_;
   }
 
-  void setX(T x) {
+  void setX(int x) {
     x_ = x;
   }
 
-  void setY(T y) {
+  void setY(int y) {
     y_ = y;
   }
 
-  void setXY(T x, T y) {
+  void setXY(int x, int y) {
     x_ = x; y_ = y;
   }
 
-  Point point() const {
-    return Point(x_, y_);
+  CIPoint2D point() const {
+    return CIPoint2D(x_, y_);
   }
 
   double length() const {
     return sqrt(x_*x_ + y_*y_);
   }
 
-  T lengthSqr() const {
+  int fastLength() const {
+    return CMathGen::fastDistance(x_, y_);
+  }
+
+  int lengthSqr() const {
     return (x_*x_ + y_*y_);
   }
 
@@ -66,134 +65,151 @@ class CIVector2DT {
     return length();
   }
 
-  CIVector2DT &zero() {
+  CIVector2D &zero() {
     x_ = 0.0; y_ = 0.0;
 
     return *this;
   }
 
-  void incX(T x) {
+  void incX(int x) {
     x_ += x;
   }
 
-  void incY(T y) {
+  void incY(int y) {
     y_ += y;
   }
 
-  T minComponent() {
-    return min(x_, y_);
+  int minComponent() {
+    return std::min(x_, y_);
   }
 
-  T maxComponent() {
-    return max(x_, y_);
+  int maxComponent() {
+    return std::max(x_, y_);
   }
 
-  T minAbsComponent() {
-    return min(abs(x_), abs(y_));
+  int minAbsComponent() {
+    return std::min(std::abs(x_), std::abs(y_));
   }
 
-  T maxAbsComponent() {
-    return max(abs(x_), abs(y_));
+  int maxAbsComponent() {
+    return std::max(std::abs(x_), std::abs(y_));
   }
 
-  CIVector2DT operator+() const {
-    return CIVector2DT(x_, y_);
+  CIVector2D operator+() const {
+    return CIVector2D(x_, y_);
   }
 
-  CIVector2DT operator-() const {
-    return CIVector2DT(-x_, -y_);
+  CIVector2D operator-() const {
+    return CIVector2D(-x_, -y_);
   }
 
-  friend bool operator==(const CIVector2DT &lhs, const CIVector2DT &rhs) {
+  friend bool operator==(const CIVector2D &lhs, const CIVector2D &rhs) {
     return (lhs.x_ == rhs.x_ && lhs.y_ == rhs.y_);
   }
 
-  friend bool operator!=(const CIVector2DT &lhs, const CIVector2DT &rhs) {
+  friend bool operator!=(const CIVector2D &lhs, const CIVector2D &rhs) {
     return (lhs.x_ != rhs.x_ || lhs.y_ != rhs.y_);
   }
 
-  CIVector2DT &operator+=(const CIVector2DT &rhs) {
+  CIVector2D &operator+=(const CIVector2D &rhs) {
     x_ += rhs.x_; y_ += rhs.y_;
 
     return *this;
   }
 
-  CIVector2DT operator+(const CIVector2DT &rhs) const {
-    return CIVector2DT(x_ + rhs.x_, y_ + rhs.y_);
+  CIVector2D operator+(const CIVector2D &rhs) const {
+    return CIVector2D(x_ + rhs.x_, y_ + rhs.y_);
   }
 
-  CIVector2DT &operator-=(const CIVector2DT &rhs) {
+  CIVector2D &operator-=(const CIVector2D &rhs) {
     x_ -= rhs.x_; y_ -= rhs.y_;
 
     return *this;
   }
 
-  CIVector2DT operator-(const CIVector2DT &rhs) const {
-    return CIVector2DT(x_ - rhs.x_, y_ - rhs.y_);
+  CIVector2D operator-(const CIVector2D &rhs) const {
+    return CIVector2D(x_ - rhs.x_, y_ - rhs.y_);
   }
 
-  CIVector2DT &operator*=(T rhs) {
+  //---
+
+  CIVector2D &operator*=(int rhs) {
     x_ *= rhs; y_ *= rhs;
 
     return *this;
   }
 
-  friend CIVector2DT operator*(const CIVector2DT &lhs, T rhs) {
-    return CIVector2DT(lhs.x_*rhs, lhs.y_*rhs);
+  friend CIVector2D operator*(const CIVector2D &lhs, int rhs) {
+    return CIVector2D(lhs.x_*rhs, lhs.y_*rhs);
   }
 
-  friend CIVector2DT operator*(T lhs, CIVector2DT &rhs) {
-    return CIVector2DT(lhs*rhs.x_, lhs*rhs.y_);
+  friend CIVector2D operator*(int lhs, CIVector2D &rhs) {
+    return CIVector2D(lhs*rhs.x_, lhs*rhs.y_);
   }
+
+  //---
+
+  CIVector2D &operator/=(int rhs) {
+    x_ /= rhs; y_ /= rhs;
+
+    return *this;
+  }
+
+  friend CIVector2D operator/(const CIVector2D &lhs, int rhs) {
+    return CIVector2D(lhs.x_/rhs, lhs.y_/rhs);
+  }
+
+  //---
 
   void print(std::ostream &os) const {
     os << "(" << x_ << "," << y_ << ")";
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const CIVector2DT &vector) {
+  friend std::ostream &operator<<(std::ostream &os, const CIVector2D &vector) {
     vector.print(os);
 
     return os;
   }
 
-  CIVector2DT crossProduct(const CIVector2DT &vector) const {
-    return CIVector2DT(y_*vector.x_ - x_*vector.y_,
+  CIVector2D crossProduct(const CIVector2D &vector) const {
+    return CIVector2D(y_*vector.x_ - x_*vector.y_,
                        x_*vector.y_ - y_*vector.x_);
   }
 
-  CIVector2DT crossProduct(T x, T y) const {
-    return CIVector2DT(y_*x - x_*y, x_*y - y_*x);
+  CIVector2D crossProduct(int x, int y) const {
+    return CIVector2D(y_*x - x_*y, x_*y - y_*x);
   }
 
-  static CIVector2DT crossProduct(const CIVector2DT &vector1,
-                                const CIVector2DT &vector2) {
-    return CIVector2DT(vector1.y_*vector2.x_ - vector1.x_*vector2.y_,
+  static CIVector2D crossProduct(const CIVector2D &vector1,
+                                const CIVector2D &vector2) {
+    return CIVector2D(vector1.y_*vector2.x_ - vector1.x_*vector2.y_,
                        vector1.x_*vector2.y_ - vector1.y_*vector2.x_);
   }
 
-  T dotProduct(const CIVector2DT &vector) const {
+  int dotProduct(const CIVector2D &vector) const {
     return (x_*vector.x_ + y_*vector.y_);
   }
 
-  T dotProduct(T x, T y) const {
+  int dotProduct(int x, int y) const {
     return (x_*x + y_*y);
   }
 
-  static T dotProduct(const CIVector2DT &vector1,
-                      const CIVector2DT &vector2) {
+  static int dotProduct(const CIVector2D &vector1,
+                      const CIVector2D &vector2) {
     return (vector1.x_*vector2.x_ + vector1.y_*vector2.y_);
   }
 
-  static T dotProduct(const CIVector2DT &vector1,
-                      T x2, T y2) {
+  static int dotProduct(const CIVector2D &vector1,
+                      int x2, int y2) {
     return (vector1.x_*x2 + vector1.y_*y2);
   }
 
-  T dotProductSelf() const {
+  int dotProductSelf() const {
     return (x_*x_ + y_*y_);
   }
-};
 
-typedef class CIVector2DT<int> CIVector2D;
+ private:
+  int x_ { 0 }, y_ { 0 };
+};
 
 #endif

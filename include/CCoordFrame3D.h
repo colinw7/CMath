@@ -5,44 +5,34 @@
 #include <COrthonormalBasis3D.h>
 
 /// Coordinate Frame
-template<typename T>
-class CCoordFrame3DT {
- private:
-  typedef CPoint3DT<T>            Point;
-  typedef CVector3DT<T>           Vector;
-  typedef CMatrix3DT<T>           Matrix;
-  typedef COrthonormalBasis3DT<T> OrthonormalBasis;
-
-  Vector           origin_;
-  OrthonormalBasis basis_;
-
+class CCoordFrame3D {
  public:
-  CCoordFrame3DT() :
+  CCoordFrame3D() :
    origin_(0,0,0), basis_() {
   }
 
   explicit
-  CCoordFrame3DT(const Point &origin, const Vector &u=Vector(1,0,0),
-                 const Vector &v=Vector(0,1,0), const Vector &w=Vector(0,0,1)) :
+  CCoordFrame3D(const CPoint3D &origin, const CVector3D &u=CVector3D(1,0,0),
+                const CVector3D &v=CVector3D(0,1,0), const CVector3D &w=CVector3D(0,0,1)) :
    origin_(origin), basis_(u, v, w) {
   }
 
   explicit
-  CCoordFrame3DT(const Vector &origin, const Vector &u=Vector(1,0,0),
-                 const Vector &v=Vector(0,1,0), const Vector &w=Vector(0,0,1)) :
+  CCoordFrame3D(const CVector3D &origin, const CVector3D &u=CVector3D(1,0,0),
+                const CVector3D &v=CVector3D(0,1,0), const CVector3D &w=CVector3D(0,0,1)) :
    origin_(origin), basis_(u, v, w) {
   }
 
-  CCoordFrame3DT(const Vector &origin, const OrthonormalBasis &basis) :
+  CCoordFrame3D(const CVector3D &origin, const COrthonormalBasis3D &basis) :
    origin_(origin), basis_(basis) {
   }
 
-  CCoordFrame3DT(const CCoordFrame3DT &coord_frame) :
+  CCoordFrame3D(const CCoordFrame3D &coord_frame) :
     origin_(coord_frame.origin_),
     basis_ (coord_frame.basis_ ) {
   }
 
-  const CCoordFrame3DT &operator=(const CCoordFrame3DT &coord_frame) {
+  const CCoordFrame3D &operator=(const CCoordFrame3D &coord_frame) {
     origin_ = coord_frame.origin_;
     basis_  = coord_frame.basis_ ;
 
@@ -50,20 +40,20 @@ class CCoordFrame3DT {
   }
 
   void init() {
-    origin_ = Point(0,0,0);
-    basis_  = OrthonormalBasis(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1));
+    origin_ = CPoint3D(0,0,0);
+    basis_  = COrthonormalBasis3D(CVector3D(1,0,0), CVector3D(0,1,0), CVector3D(0,0,1));
   }
 
-  const Vector &getOrigin() const { return origin_; }
+  const CVector3D &getOrigin() const { return origin_; }
 
-  Point getOriginPoint() const { return origin_.point(); }
+  CPoint3D getOriginPoint() const { return origin_.point(); }
 
-  const OrthonormalBasis &getBasis() const { return basis_; }
+  const COrthonormalBasis3D &getBasis() const { return basis_; }
 
-  void setOrigin(const Point  &origin) { origin_ = origin; }
-  void setOrigin(const Vector &origin) { origin_ = origin; }
+  void setOrigin(const CPoint3D  &origin) { origin_ = origin; }
+  void setOrigin(const CVector3D &origin) { origin_ = origin; }
 
-  void setBasis(const Vector &u, const Vector &v, const Vector &w) {
+  void setBasis(const CVector3D &u, const CVector3D &v, const CVector3D &w) {
     if (u.isZero() || v.isZero() || w.isZero()) {
       std::cerr << "Invalid Basis" << std::endl;
       return;
@@ -72,11 +62,11 @@ class CCoordFrame3DT {
     basis_.setUVW(u, v, w);
   }
 
-  void getBasis(Vector &u, Vector &v, Vector &w) {
+  void getBasis(CVector3D &u, CVector3D &v, CVector3D &w) {
     basis_.getUVW(u, v, w);
   }
 
-  const Matrix &getMatrix() const {
+  const CMatrix3D &getMatrix() const {
     return basis_.getMatrix();
   }
 
@@ -172,13 +162,15 @@ class CCoordFrame3DT {
   }
 
   friend std::ostream &operator<<(std::ostream &os,
-                                  const CCoordFrame3DT &frame) {
+                                  const CCoordFrame3D &frame) {
     frame.print(os);
 
     return os;
   }
-};
 
-typedef class CCoordFrame3DT<double> CCoordFrame3D;
+ private:
+  CVector3D           origin_;
+  COrthonormalBasis3D basis_;
+};
 
 #endif

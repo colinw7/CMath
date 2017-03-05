@@ -1,15 +1,11 @@
 #ifndef CAXIS_ALIGNED_BOX2D_H
 #define CAXIS_ALIGNED_BOX2D_H
 
-template <class T>
 class CAxisAlignedBox2D {
- private:
-  T xmin_, ymin_, xmax_, ymax_;
-
  public:
   CAxisAlignedBox2D() { }
 
-  CAxisAlignedBox2D(T xmin, T xmax, T xmin, T xmax) :
+  CAxisAlignedBox2D(double xmin, double xmax, double xmin, double xmax) :
    xmin_(xmin), ymin_(ymin), xmax_(xmax), ymax_(ymax) {
   }
 
@@ -39,8 +35,10 @@ class CAxisAlignedBox2D {
 
     return true;
   }
-};
 
-typedef CAxisAlignedBox2D<double> CAxisAlignedBox2D;
+ private:
+  double xmin_ { 0 }, ymin_ { 0 }, xmax_ { 0 }, ymax_ { 0 };
+
+};
 
 #endif

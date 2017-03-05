@@ -20,39 +20,24 @@
  *  z = r*cos(theta)
 */
 
-template<typename T>
-class CSphere3DT : public CShape3DT<T> {
- private:
-  typedef typename CShape3DT<T>::BBox BBox;
-  typedef CVector3DT<T>               Vector;
-  typedef CLine3DT<T>                 Line;
-  typedef CPoint3DT<T>                Point;
-
-  T        radius_;      //! Radius R
-  T        zmin_, zmax_; //! Height Limits
-  T        phi_max_;     //! Angle/Sweep Limit
-
-  T        theta_min_, theta_max_; // Temporaries
-
-  COptReal area_;
-
+class CSphere3D : public CShape3D {
  public:
-  CSphere3DT(T radius=T(1)) :
+  CSphere3D(double radius=double(1)) :
    radius_(radius), zmin_(), zmax_(), phi_max_(), theta_min_(), theta_max_(), area_() {
     setZLimit(-radius_, radius_);
 
     setPhiLimit(360.0);
   }
 
-  T getRadius() const { return radius_; }
+  double getRadius() const { return radius_; }
 
-  void setRadius(T radius) {
+  void setRadius(double radius) {
     radius_ = radius;
 
     area_.setInvalid();
   }
 
-  void setZLimit(T zmin, T zmax) {
+  void setZLimit(double zmin, double zmax) {
     zmin_ = std::min(std::max(std::min(zmin, zmax), -radius_), radius_);
     zmax_ = std::min(std::max(std::max(zmin, zmax), -radius_), radius_);
 
@@ -62,20 +47,20 @@ class CSphere3DT : public CShape3DT<T> {
     area_.setInvalid();
   }
 
-  void setPhiLimit(T phi_max) {
+  void setPhiLimit(double phi_max) {
     phi_max_ = CMathGen::DegToRad(std::min(std::max(phi_max, 0.0), 360.0));
 
     area_.setInvalid();
   }
 
-  BBox getBBox() const {
-    Point p1(-radius_, -radius_, zmin_);
-    Point p2( radius_,  radius_, zmax_);
+  CBBox3D getBBox() const {
+    CPoint3D p1(-radius_, -radius_, zmin_);
+    CPoint3D p2( radius_,  radius_, zmax_);
 
-    return BBox(CShape3D::transformFrom(p1), CShape3D::transformFrom(p2));
+    return CBBox3D(CShape3D::transformFrom(p1), CShape3D::transformFrom(p2));
   }
 
-  bool intersect(const Line &line, T *tmin, T *tmax) const {
+  bool intersect(const CLine3D &line, double *tmin, double *tmax) const {
     // solve
     //  x^2 + y^2 + z^2 = r^2 at line (o + t*d)
     //
@@ -104,18 +89,18 @@ class CSphere3DT : public CShape3DT<T> {
     //  c = ox^2 + oy^2 + oz^2 - r^2
     //
 
-    Point p1 = CShape3D::transformTo(line.start());
-    Point p2 = CShape3D::transformTo(line.end  ());
+    CPoint3D p1 = CShape3D::transformTo(line.start());
+    CPoint3D p2 = CShape3D::transformTo(line.end  ());
 
-    Line l(p1, p2);
+    CLine3D l(p1, p2);
 
-    Vector ro(l.start());
+    CVector3D ro(l.start());
 
-    const Vector &rd = l.vector();
+    const CVector3D &rd = l.vector();
 
-    T a = rd.dotProductSelf();
-    T b = 2.0*rd.dotProduct(ro);
-    T c = ro.dotProductSelf() - radius_*radius_;
+    double a = rd.dotProductSelf();
+    double b = 2.0*rd.dotProduct(ro);
+    double c = ro.dotProductSelf() - radius_*radius_;
 
     if (! CMathGen::solveQuadratic(a, b, c, tmin, tmax))
       return false;
@@ -131,36 +116,36 @@ class CSphere3DT : public CShape3DT<T> {
     return true;
   }
 
-  Vector pointNormal(const Point &point) const {
-    Point p = CShape3D::transformTo(point);
+  CVector3D pointNormal(const CPoint3D &point) const {
+    CPoint3D p = CShape3D::transformTo(point);
 
-    Vector dpdu, dpdv;
+    CVector3D dpdu, dpdv;
 
     pointDetails(p, NULL, NULL, &dpdu, &dpdv);
 
     dpdu = CShape3D::transformFrom(dpdu);
     dpdv = CShape3D::transformFrom(dpdv);
 
-    Vector n = dpdu.crossProduct(dpdv).unit();
+    CVector3D n = dpdu.crossProduct(dpdv).unit();
 
     return n;
   }
 
-  CVector2D pointToSurfaceVector(const Point &point) const {
-    Point p = CShape3D::transformTo(point);
+  CVector2D pointToSurfaceVector(const CPoint3D &point) const {
+    CPoint3D p = CShape3D::transformTo(point);
 
-    T u, v;
+    double u, v;
 
     pointDetails(p, &u, &v);
 
     return CVector2D(u, v);
   }
 
-  T getArea() const {
+  double getArea() const {
     if (! area_.isValid()) {
-      T area = phi_max_*radius_*(zmax_ - zmin_);
+      double area = phi_max_*radius_*(zmax_ - zmin_);
 
-      CSphere3DT *th = const_cast<CSphere3DT *>(this);
+      CSphere3D *th = const_cast<CSphere3D *>(this);
 
       th->area_.setValue(area);
     }
@@ -169,12 +154,12 @@ class CSphere3DT : public CShape3DT<T> {
   }
 
  private:
-  bool checkPoint(const Point &point) const {
-    T z = point.z;
+  bool checkPoint(const CPoint3D &point) const {
+    double z = point.z;
 
     if (z < zmin_ || z > zmax_) return false;
 
-    T phi = getPhi(point);
+    double phi = getPhi(point);
 
     if (phi > phi_max_)
       return false;
@@ -182,44 +167,44 @@ class CSphere3DT : public CShape3DT<T> {
     return true;
   }
 
-  void pointDetails(const Point &point, T *u, T *v,
-                    Vector *dpdu=0, Vector *dpdv=0) const {
+  void pointDetails(const CPoint3D &point, double *u, double *v,
+                    CVector3D *dpdu=0, CVector3D *dpdv=0) const {
     if (u) {
-      T phi = getPhi(point);
+      double phi = getPhi(point);
 
       *u = phi/phi_max_;
     }
 
-    T theta     = acos(point.z/radius_);
-    T theta_len = theta_max_ - theta_min_;
+    double theta     = acos(point.z/radius_);
+    double theta_len = theta_max_ - theta_min_;
 
     if (v)
       *v = (theta - theta_min_)/theta_len;
 
     if (dpdu || dpdv) {
-      T zradius2 = point.x*point.x + point.y*point.y;
+      double zradius2 = point.x*point.x + point.y*point.y;
 
       if (zradius2 != 0.0) {
         if (dpdu)
-          *dpdu = Vector(-phi_max_*point.y, phi_max_*point.x, 0.0);
+          *dpdu = CVector3D(-phi_max_*point.y, phi_max_*point.x, 0.0);
 
         if (dpdv) {
-          T zradius  = sqrt(zradius2);
-          T izradius = 1.0/zradius;
+          double zradius  = sqrt(zradius2);
+          double izradius = 1.0/zradius;
 
-          T cos_phi = point.x*izradius;
-          T sin_phi = point.y*izradius;
+          double cos_phi = point.x*izradius;
+          double sin_phi = point.y*izradius;
 
-          *dpdv = theta_len*Vector( point.z*cos_phi,
+          *dpdv = theta_len*CVector3D( point.z*cos_phi,
                                     point.z*sin_phi,
                                    -radius_*sin(theta));
         }
       }
       else {
-        T cos_phi = 0;
-        T sin_phi = 1;
+        double cos_phi = 0;
+        double sin_phi = 1;
 
-        Vector tdpdv = theta_len*Vector( point.z*cos_phi,
+        CVector3D tdpdv = theta_len*CVector3D( point.z*cos_phi,
                                          point.z*sin_phi,
                                         -radius_*sin(theta));
 
@@ -227,20 +212,27 @@ class CSphere3DT : public CShape3DT<T> {
           *dpdv = tdpdv;
 
         if (dpdu)
-          *dpdu = tdpdv.crossProduct(Vector(point));
+          *dpdu = tdpdv.crossProduct(CVector3D(point));
       }
     }
   }
 
-  T getPhi(const Point &point) const {
-    T phi = atan2(point.y, point.x);
+  double getPhi(const CPoint3D &point) const {
+    double phi = atan2(point.y, point.x);
 
     if (phi < 0.0) phi += 2.0*M_PI;
 
     return phi;
   }
-};
 
-typedef CSphere3DT<double> CSphere3D;
+ private:
+  double   radius_;      //! Radius R
+  double   zmin_, zmax_; //! Height Limits
+  double   phi_max_;     //! Angle/Sweep Limit
+
+  double   theta_min_, theta_max_; // Temporaries
+
+  COptReal area_;
+};
 
 #endif

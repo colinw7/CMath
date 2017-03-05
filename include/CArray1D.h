@@ -2,7 +2,10 @@
 #define CARRAY_1D_H
 
 #include <CThrow.h>
+#include <iostream>
+#include <cstddef>
 
+// 1D Array of specified type, data is optionally owned
 template<typename T, bool OWNER>
 class CArray2D;
 
@@ -26,11 +29,6 @@ class CArray1D {
   typedef const_pointer const_reverse_iterator;
 
   typedef reference slice_type;
-
- private:
-  T          *data_;
-  index_type  d1_;
-  size_type   size_;
 
  public:
   CArray1D(value_type *data, index_type d1) :
@@ -101,7 +99,7 @@ class CArray1D {
     return data_[i1];
   }
 
-  void print(ostream &os) const {
+  void print(std::ostream &os) const {
     os << "[";
 
     for (index_type i = 0; i < d1_; ++i)
@@ -110,7 +108,7 @@ class CArray1D {
     os << " ]";
   }
 
-  friend ostream &operator<<(ostream &os, const CArray1D &array) {
+  friend std::ostream &operator<<(std::ostream &os, const CArray1D &array) {
     array.print(os);
 
     return os;
@@ -118,6 +116,11 @@ class CArray1D {
 
   friend class CArray2D<T, false>;
   friend class CArray2D<T, true>;
+
+ private:
+  T          *data_ { nullptr };
+  index_type  d1_ { 0 };
+  size_type   size_ { 0 };
 };
 
 #endif

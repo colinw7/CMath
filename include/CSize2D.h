@@ -4,82 +4,76 @@
 #include <CISize2D.h>
 #include <CPoint2D.h>
 
-template<typename T>
-class CSize2DT {
- private:
-  typedef CSize2DT<T>  Size;
-  typedef CPoint2DT<T> Point;
-
+class CSize2D {
  public:
-  T width, height;
-
-  CSize2DT() :
+  CSize2D() :
    width(0), height(0) {
   }
 
-  CSize2DT(T w, T h) :
+  CSize2D(double w, double h) :
    width(w), height(h) {
   }
 
-  CSize2DT(const CISize2D &size) :
+  explicit CSize2D(const CISize2D &size) :
    width(size.getWidth()), height(size.getHeight()) {
   }
 
-  CSize2DT(const CSize2DT &size) :
+  CSize2D(const CSize2D &size) :
    width(size.width), height(size.height) {
   }
 
-  void set(T w, T h) {
+  void set(double w, double h) {
     width  = w;
     height = h;
   }
 
-  void get(T *w, T *h) const {
+  void get(double *w, double *h) const {
     *w = width;
     *h = height;
   }
 
-  T getWidth () const { return width ; }
-  T getHeight() const { return height; }
+  double getWidth () const { return width ; }
+  double getHeight() const { return height; }
 
-  void setWidth (T w) { width  = w; }
-  void setHeight(T h) { height = h; }
+  void setWidth (double w) { width  = w; }
+  void setHeight(double h) { height = h; }
 
-  T area() const { return width*height; }
+  double area() const { return width*height; }
 
-  friend Size operator*(T m, const Size &size) {
-    return Size(m*size.width, m*size.height);
+  friend CSize2D operator*(double m, const CSize2D &size) {
+    return CSize2D(m*size.width, m*size.height);
   }
 
-  friend Size operator*(const Size &size, T m) {
-    return Size(m*size.width, m*size.height);
+  friend CSize2D operator*(const CSize2D &size, double m) {
+    return CSize2D(m*size.width, m*size.height);
   }
 
-  friend Size operator/(const Size &size, T m) {
-    return Size(size.width/m, size.height/m);
+  friend CSize2D operator/(const CSize2D &size, double m) {
+    return CSize2D(size.width/m, size.height/m);
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const Size &size) {
+  friend std::ostream &operator<<(std::ostream &os, const CSize2D &size) {
     return os << "(" << size.width << "," << size.height << ")";
   }
 
-  friend Point operator+(const Size &s, const Point &p) {
-    return Point(p.x + s.width, p.y + s.height);
+  friend CPoint2D operator+(const CSize2D &s, const CPoint2D &p) {
+    return CPoint2D(p.x + s.width, p.y + s.height);
   }
 
-  friend Point operator+(const Point &p, const Size &s) {
+  friend CPoint2D operator+(const CPoint2D &p, const CSize2D &s) {
     return (s + p);
   }
 
-  friend bool operator==(const Size &lhs, const Size &rhs) {
+  friend bool operator==(const CSize2D &lhs, const CSize2D &rhs) {
     return (lhs.width == rhs.width && lhs.height == rhs.height);
   }
 
-  friend bool operator!=(const Size &lhs, const Size &rhs) {
+  friend bool operator!=(const CSize2D &lhs, const CSize2D &rhs) {
     return ! (lhs == rhs);
   }
-};
 
-typedef CSize2DT<double> CSize2D;
+ public:
+  double width { 0 }, height { 0 };
+};
 
 #endif

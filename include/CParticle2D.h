@@ -6,88 +6,49 @@
 #include <accessor.h>
 #include <vector>
 
-template<typename T>
-class CParticle2DT;
+class CParticle2D;
 
-template<typename T>
-class CParticleSystem2DT {
- private:
-  typedef CVector2DT<T> Vector;
+class CParticleSystem2D {
+ public:
+  typedef std::vector<CParticle2D *> ParticleList;
 
  public:
-  typedef CParticle2DT<T>         Particle;
-  typedef std::vector<Particle *> ParticleList;
+  CParticleSystem2D() { }
 
- private:
-  Vector       gravity_;
-  ParticleList particles_;
+  virtual ~CParticleSystem2D() { }
 
- public:
-  CParticleSystem2DT() { }
+  void setGravity(double gravity) { gravity_ = CVector2D(0, gravity); }
 
-  virtual ~CParticleSystem2DT() { }
+  double getGravity() const { return gravity_.getY(); }
 
-  void setGravity(T gravity) { gravity_ = Vector(0, gravity); }
-
-  T getGravity() const { return gravity_.getY(); }
-
-  const Vector &getGravityVector() const { return gravity_; }
+  const CVector2D &getGravityVector() const { return gravity_; }
 
   const ParticleList &getParticles() const { return particles_; }
 
-  Particle *addParticle() {
-    typename ParticleList::iterator p1 = particles_.begin(), p2 = particles_.end();
+  CParticle2D *addParticle();
 
-    for ( ; p1 != p2; ++p1)
-      if ((*p1)->isDead()) {
-        (*p1)->init();
+  virtual CParticle2D *createParticle();
 
-        return *p1;
-      }
-
-    Particle *particle = createParticle();
-
-    particles_.push_back(particle);
-
-    particle->init();
-
-    return particle;
-  }
-
-  virtual Particle *createParticle() {
-    return new Particle(*this);
-  }
+ private:
+  CVector2D    gravity_;
+  ParticleList particles_;
 };
 
-template<typename T>
-class CParticle2DT {
- private:
-  typedef CParticleSystem2DT<T> ParticleSystem;
-  typedef CVector2DT<T>         Vector;
+//---
 
+class CParticle2D {
  public:
   enum State {
     ALIVE,
     DEAD
   };
 
- private:
-  const ParticleSystem &system_;
-
-  T      mass_;
-  Vector position_;
-  Vector velocity_;
-  Vector acceleration_;
-  uint   age_;
-  CRGBA  color_;
-  State  state_;
-
  public:
-  CParticle2DT(const ParticleSystem &system) :
+  CParticle2D(const CParticleSystem2D &system) :
    system_(system), mass_(0.0), age_(0), state_(DEAD) {
   }
 
-  virtual ~CParticle2DT() { }
+  virtual ~CParticle2D() { }
 
   void init() {
     mass_ = 0;
@@ -101,31 +62,31 @@ class CParticle2DT {
     acceleration_.zero();
   }
 
-  ACCESSOR(Mass        ,      T, mass)
-  ACCESSOR(Position    , Vector, position)
-  ACCESSOR(Velocity    , Vector, velocity)
-  ACCESSOR(Acceleration, Vector, acceleration)
+  ACCESSOR(Mass        ,      double, mass)
+  ACCESSOR(Position    , CVector2D, position)
+  ACCESSOR(Velocity    , CVector2D, velocity)
+  ACCESSOR(Acceleration, CVector2D, acceleration)
   ACCESSOR(Age         , uint  , age)
   ACCESSOR(Color       , CRGBA , color)
   ACCESSOR(State       , State , state)
 
-  void setPosition(T x, T y) {
-    position_ = Vector(x, y);
+  void setPosition(double x, double y) {
+    position_ = CVector2D(x, y);
   }
 
-  void setVelocity(T x, T y) {
-    velocity_ = Vector(x, y);
+  void setVelocity(double x, double y) {
+    velocity_ = CVector2D(x, y);
   }
 
-  void setAcceleration(T x, T y) {
-    acceleration_ = Vector(x, y);
+  void setAcceleration(double x, double y) {
+    acceleration_ = CVector2D(x, y);
   }
 
-  void incVelocity(const Vector &velocity) {
+  void incVelocity(const CVector2D &velocity) {
     velocity_ += velocity;
   }
 
-  void incAcceleration(const Vector &acceleration) {
+  void incAcceleration(const CVector2D &acceleration) {
     acceleration_ += acceleration;
   }
 
@@ -139,18 +100,26 @@ class CParticle2DT {
   bool isAlive() const { return state_ == ALIVE; }
   bool isDead () const { return state_ == DEAD ; }
 
-  void step(T t) {
-    Vector a = acceleration_ - system_.getGravityVector();
+  void step(double t) {
+    CVector2D a = acceleration_ - system_.getGravityVector();
 
-    Vector v = a*t;
+    CVector2D v = a*t;
 
     position_ += (velocity_ + 0.5*v)*t;
 
     velocity_ += v;
   }
-};
 
-typedef CParticle2DT<double>       CParticle2D;
-typedef CParticleSystem2DT<double> CParticleSystem2D;
+ private:
+  const CParticleSystem2D &system_;
+
+  double    mass_;
+  CVector2D position_;
+  CVector2D velocity_;
+  CVector2D acceleration_;
+  uint      age_;
+  CRGBA     color_;
+  State     state_;
+};
 
 #endif

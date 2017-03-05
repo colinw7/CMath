@@ -1,19 +1,11 @@
 #ifndef CARC_2D_H
 #define CARC_2D_H
 
-template<typename T>
-class CArc2DT {
- private:
-  typedef CPoint2D<T>  Point;
-  typedef CVector2D<T> Vector;
-
-  Point center_;
-  T     radius_;
-  Point start_, end_;
-
+class CArc2D {
  public:
-  CArc2DT();
-  CArc2DT(const Point &center, T radius, const Point &start, const Point &end) :
+  CArc2D() { }
+
+  CArc2D(const Point &center, double radius, const Point &start, const Point &end) :
    center_(center), radius_(radius), start_(start), end_(end) {
   }
 
@@ -26,12 +18,18 @@ class CArc2DT {
     Vector pe = point - end_;
     Vector ee = end_ - start_;
 
-    T d = pe.dotPerpendicular(ee);
+    double d = pe.dotPerpendicular(ee);
 
     return d >= 0.0;
   }
-};
 
-typedef CArc2DT<double> CArc2D;
+ private:
+  typedef CPoint2D  Point;
+  typedef CVector2D Vector;
+
+  Point  center_;
+  double radius_ { 1 };
+  Point  start_, end_;
+};
 
 #endif

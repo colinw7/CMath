@@ -4,29 +4,19 @@
 #include <CPoint2D.h>
 #include <CMathGeom2D.h>
 
-template<typename T>
-class CTriangle2DT {
- private:
-  typedef CPoint2DT<T>  Point;
-  typedef CVector2DT<T> Vector;
-
- private:
-  Point point1_;
-  Point point2_;
-  Point point3_;
-
+class CTriangle2D {
  public:
-  CTriangle2DT() { }
+  CTriangle2D() { }
 
-  CTriangle2DT(const Point &point1, const Point &point2, const Point &point3) :
+  CTriangle2D(const CPoint2D &point1, const CPoint2D &point2, const CPoint2D &point3) :
    point1_(point1), point2_(point2), point3_(point3) {
   }
 
-  const Point &getPoint1() const { return point1_; }
-  const Point &getPoint2() const { return point2_; }
-  const Point &getPoint3() const { return point3_; }
+  const CPoint2D &getPoint1() const { return point1_; }
+  const CPoint2D &getPoint2() const { return point2_; }
+  const CPoint2D &getPoint3() const { return point3_; }
 
-  Point centroid() { return 0.333333333*(point1_ + point2_ + point3_); }
+  CPoint2D centroid() { return 0.333333333*(point1_ + point2_ + point3_); }
 
   double area() { return ::fabs(0.5*area2()); }
 
@@ -40,34 +30,36 @@ class CTriangle2DT {
                                            point3_.x, point3_.y);
   }
 
-  void getBarycentrics(const Point &point, T *u, T *v) const {
-    Vector v1 = Vector(point  , point3_);
-    Vector v2 = Vector(point3_, point1_);
-    Vector v3 = Vector(point3_, point2_);
+  void getBarycentrics(const CPoint2D &point, double *u, double *v) const {
+    CVector2D v1 = CVector2D(point  , point3_);
+    CVector2D v2 = CVector2D(point3_, point1_);
+    CVector2D v3 = CVector2D(point3_, point2_);
 
-    T a, b, c, d, e, f, g, h, i;
+    double a, b, c, d, e, f;
 
     v2.getXY(&a, &d);
     v3.getXY(&b, &e);
     v1.getXY(&c, &f);
 
     if (a == 0 && b == 0) {
-      swap(a, d);
-      swap(b, e);
-      swap(c, f);
+      std::swap(a, d);
+      std::swap(b, e);
+      std::swap(c, f);
    }
 
-    T a1 = b*f - c*e;
-    T a2 = a*e - b*d;
-    T b1 = a*f - c*d;
-    T b2 = b*d - a*e;
+    double a1 = b*f - c*e;
+    double a2 = a*e - b*d;
+    double b1 = a*f - c*d;
+    double b2 = b*d - a*e;
 
     *u = (a2 != 0 ? a1/a2 : 0.0);
     *v = (b2 != 0 ? b1/b2 : 0.0);
   }
 
+ private:
+  CPoint2D point1_;
+  CPoint2D point2_;
+  CPoint2D point3_;
 };
-
-typedef CTriangle2DT<double> CTriangle2D;
 
 #endif

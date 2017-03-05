@@ -6,21 +6,16 @@
 #include <CPoint3D.h>
 #include <CVector3D.h>
 
-template<typename T>
-class CRefTransform3DT {
+class CRefTransform3D {
  private:
-  typedef CMatrix3DT<T>   Matrix;
-  typedef CVector3DT<T>   Vector;
-  typedef CPoint3DT<T>    Point;
-  typedef CNormal3DT<T>   Normal;
+  typedef CMatrix3D       Matrix;
+  typedef CVector3D       Vector;
+  typedef CPoint3D        Point;
+  typedef CNormal3D       Normal;
   typedef CRefPtr<Matrix> MatrixPtr;
 
-  MatrixPtr m_;
-  MatrixPtr im_;
-  bool      inverse_set_;
-
  public:
-  CRefTransform3DT() {
+  CRefTransform3D() {
     m_ = new Matrix(Matrix::CMATRIX_3D_IDENTITY);
 
     im_ = m_;
@@ -28,7 +23,7 @@ class CRefTransform3DT {
     inverse_set_ = true;
   }
 
-  CRefTransform3DT(const CRefTransform3DT &t) {
+  CRefTransform3D(const CRefTransform3D &t) {
     m_           = t.m_;
     inverse_set_ = t.inverse_set_;
 
@@ -36,26 +31,26 @@ class CRefTransform3DT {
       im_ = t.im_;
   }
 
-  CRefTransform3DT(const Matrix &m) {
+  CRefTransform3D(const Matrix &m) {
     m_ = new Matrix(m);
 
     inverse_set_ = false;
   }
 
-  CRefTransform3DT(const Matrix &m, const Matrix &im) {
+  CRefTransform3D(const Matrix &m, const Matrix &im) {
     m_  = new Matrix(m);
     im_ = new Matrix(im);
 
     inverse_set_ = true;
   }
 
-  CRefTransform3DT(const MatrixPtr &m) {
+  CRefTransform3D(const MatrixPtr &m) {
     m_ = m;
 
     inverse_set_ = false;
   }
 
-  CRefTransform3DT(const MatrixPtr &m, const MatrixPtr &im) {
+  CRefTransform3D(const MatrixPtr &m, const MatrixPtr &im) {
     m_  = m;
     im_ = im;
 
@@ -72,54 +67,52 @@ class CRefTransform3DT {
     return im_;
   }
 
-  CRefTransform3DT getInverse() {
-    return CRefTransform3DT(im_, m_);
+  CRefTransform3D getInverse() {
+    return CRefTransform3D(im_, m_);
   }
 
-  CRefTransform3DT translation(const Vector &v) {
+  CRefTransform3D translation(const Vector &v) {
     Matrix m, im;
 
     m .setTranslation( v.getX(),  v.getY(),  v.getZ());
     im.setTranslation(-v.getX(), -v.getY(), -v.getZ());
 
-    return CRefTransform3DT(m, im);
+    return CRefTransform3D(m, im);
   }
 
-  CRefTransform3DT scale(T x, T y, T z) {
+  CRefTransform3D scale(double x, double y, double z) {
     Matrix m, im;
 
     m.setScale(x, y, z);
 
     im.setScale(1.0/x, 1.0/y, 1.0/z);
 
-    return CRefTransform3DT(m, im);
+    return CRefTransform3D(m, im);
   }
 
-  CRefTransform3DT rotation(CMathGen::AxisType3D axis, T angle,
-                           CMathGen::Handedness handedness =
-                            CMathGen::RIGHT_HANDEDNESS) {
+  CRefTransform3D rotation(CMathGen::AxisType3D axis, double angle,
+                           CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     Matrix m, im;
 
     m.setRotation(axis, angle, handedness);
 
     im = m.transposed();
 
-    return CRefTransform3DT(m, im);
+    return CRefTransform3D(m, im);
   }
 
-  CRefTransform3DT genRotation(const Vector &axis, T angle,
-                              CMathGen::Handedness handedness =
-                               CMathGen::RIGHT_HANDEDNESS) {
+  CRefTransform3D genRotation(const Vector &axis, double angle,
+                              CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     Matrix m, im;
 
     m.setGenRotation(axis, angle, handedness);
 
     im = m.transposed();
 
-    return CRefTransform3DT(m, im);
+    return CRefTransform3D(m, im);
   }
 
-  CRefTransform3DT lookAt(const Point &eye, const Point &center,
+  CRefTransform3D lookAt(const Point &eye, const Point &center,
                           const Vector &up) {
     Matrix m, im;
 
@@ -127,18 +120,18 @@ class CRefTransform3DT {
 
     im = m.transposed();
 
-    return CRefTransform3DT(m, im);
+    return CRefTransform3D(m, im);
   }
 
   bool swapsHandedness() const {
     return m_.upperDeterminant() < 0.0;
   }
 
-  CRefTransform3DT operator*(const CRefTransform3DT &rhs) const {
+  CRefTransform3D operator*(const CRefTransform3D &rhs) const {
     if (inverse_set_ && rhs.inverse_set_)
-      return CRefTransform3DT(m_*rhs.m_, im_*rhs.im_)
+      return CRefTransform3D(m_*rhs.m_, im_*rhs.im_)
     else
-      return CRefTransform3DT(m_*rhs.m_);
+      return CRefTransform3D(m_*rhs.m_);
   }
 
   Point operator()(const Point &p) {
@@ -158,29 +151,29 @@ class CRefTransform3DT {
   }
 
   Normal operator()(const Normal &n) {
-    T ix, iy, iz;
+    double ix, iy, iz;
 
     n.getXYZ(&ix, &iy, &iz);
 
     calcInverse();
 
-    T ox = im_.m00_*ix + im_.m10_*iy + im_.m20_*iz;
-    T oy = im_.m01_*ix + im_.m11_*iy + im_.m21_*iz;
-    T oz = im_.m02_*ix + im_.m12_*iy + im_.m22_*iz;
+    double ox = im_.m00_*ix + im_.m10_*iy + im_.m20_*iz;
+    double oy = im_.m01_*ix + im_.m11_*iy + im_.m21_*iz;
+    double oz = im_.m02_*ix + im_.m12_*iy + im_.m22_*iz;
 
     return Normal(ox, oy, oz);
   }
 
   void operator()(const Normal &in, Normal &on) {
-    T ix, iy, iz;
+    double ix, iy, iz;
 
     in.getXYZ(&ix, &iy, &iz);
 
     calcInverse();
 
-    T ox = im_.m00_*ix + im_.m10_*iy + im_.m20_*iz;
-    T oy = im_.m01_*ix + im_.m11_*iy + im_.m21_*iz;
-    T oz = im_.m02_*ix + im_.m12_*iy + im_.m22_*iz;
+    double ox = im_.m00_*ix + im_.m10_*iy + im_.m20_*iz;
+    double oy = im_.m01_*ix + im_.m11_*iy + im_.m21_*iz;
+    double oz = im_.m02_*ix + im_.m12_*iy + im_.m22_*iz;
 
     on.setXYZ(ox, oy, oz);
   }
@@ -193,8 +186,11 @@ class CRefTransform3DT {
       inverse_set_ = true;
     }
   }
-};
 
-typedef CRefTransform3DT<double> CRefTransform3D;
+ private:
+  MatrixPtr m_;
+  MatrixPtr im_;
+  bool      inverse_set_ { false };
+};
 
 #endif

@@ -5,38 +5,25 @@
 #include <CPoint3D.h>
 #include <CVector3D.h>
 
-template<typename T>
-class CSymmetricMatrix3DT {
- private:
-  union {
-    T m1_[16];
-    T m2_[4][4];
-
-    struct {
-      T m00_, m01_, m02_, m03_;
-      T m10_, m11_, m12_, m13_;
-      T m20_, m21_, m22_, m23_;
-      T m30_, m31_, m32_, m33_;
-    };
-  };
-
+class CSymmetricMatrix3D {
  public:
-  CSymmetricMatrix3DT() {
+  CSymmetricMatrix3D() {
   }
 
-  CSymmetricMatrix3DT(T a, T b, T c, T d, T e, T f) {
+  CSymmetricMatrix3D(double a, double b, double c, double d, double e, double f) {
     setValues(a, b, c, d, e, f, 0.0, 0.0, 0.0);
   }
 
-  CSymmetricMatrix3DT(T a, T b, T c, T d, T e, T f, T tx, T ty, T tz) {
+  CSymmetricMatrix3D(double a, double b, double c, double d, double e, double f,
+                     double tx, double ty, double tz) {
     setValues(a, b, c, d, e, f, tx, ty, tz);
   }
 
-  CSymmetricMatrix3DT(const CSymmetricMatrix3DT &a) {
-    memcpy(m1_, a.m1_, sizeof(m1_));
+  CSymmetricMatrix3D(const CSymmetricMatrix3D &a) {
+    memcpy(&m00_, &a.m00_, 16*sizeof(double));
   }
 
- ~CSymmetricMatrix3DT() { }
+ ~CSymmetricMatrix3D() { }
 
   void setIdentity() {
     setValues(1.0, 0.0, 0.0,
@@ -45,35 +32,33 @@ class CSymmetricMatrix3DT {
               0.0, 0.0, 0.0);
   }
 
-  void setTranslation(T tx, T ty, T tz) {
+  void setTranslation(double tx, double ty, double tz) {
     setValues(1.0, 0.0, 0.0,
                    1.0, 0.0,
                         1.0,
                tx,  ty, tz );
   }
 
-  void setScale(T sx, T sy, T sz) {
+  void setScale(double sx, double sy, double sz) {
     setValues(sx , 0.0, 0.0,
                     sy, 0.0,
                          sz,
               0.0, 0.0, 0.0);
   }
 
-  void multiplyPoint(T xi, T yi, T zi, T *xo, T *yo, T *zo) const {
+  void multiplyPoint(double xi, double yi, double zi, double *xo, double *yo, double *zo) const {
     *xo = m00_*xi + m01_*yi + m02_*zi + m03_;
     *yo = m10_*xi + m11_*yi + m12_*zi + m13_;
     *zo = m20_*xi + m21_*yi + m22_*zi + m23_;
   }
 
-  void multiplyPoint(const CPoint3DT<T> &ipoint,
-                     CPoint3DT<T> &opoint) const {
+  void multiplyPoint(const CPoint3D &ipoint, CPoint3D &opoint) const {
     opoint.x = m00_*ipoint.x + m01_*ipoint.y + m02_*ipoint.z + m03_;
     opoint.y = m10_*ipoint.x + m11_*ipoint.y + m12_*ipoint.z + m13_;
     opoint.z = m20_*ipoint.x + m21_*ipoint.y + m22_*ipoint.z + m23_;
   }
 
-  void multiplyVector(const CVector3DT<T> &ivector,
-                      CVector3DT<T> &ovector) const {
+  void multiplyVector(const CVector3D &ivector, CVector3D &ovector) const {
     ovector.setX(m00_*ivector.getX() +
                  m01_*ivector.getY() +
                  m02_*ivector.getZ() +
@@ -88,22 +73,23 @@ class CSymmetricMatrix3DT {
                  m23_);
   }
 
-  void setValues(T a, T b, T c, T d, T e, T f) {
+  void setValues(double a, double b, double c, double d, double e, double f) {
     m00_ =   a; m01_ =   b; m02_ =   c; m03_ = 0.0;
     m10_ =   b; m11_ =   d; m12_ =   e; m13_ = 0.0;
     m20_ =   c; m21_ =   e; m22_ =   f; m23_ = 0.0;
     m30_ = 0.0; m31_ = 0.0; m32_ = 0.0; m33_ = 1.0;
   }
 
-  void setValues(T a, T b, T c, T d, T e, T f, T tx, T ty, T tz) {
+  void setValues(double a, double b, double c, double d, double e, double f,
+                 double tx, double ty, double tz) {
     m00_ = a  ; m01_ = b  ; m02_ = c  ; m03_ = tx;
     m10_ = b  ; m11_ = d  ; m12_ = e  ; m13_ = ty;
     m20_ = c  ; m21_ = e  ; m22_ = f  ; m23_ = tz;
     m30_ = 0.0; m31_ = 0.0; m32_ = 0.0; m33_ = 1.0;
   }
 
-  void getValues(T *a, T *b, T *c, T *d, T *e, T *f,
-                 T *tx, T *ty, T *tz) const {
+  void getValues(double *a, double *b, double *c, double *d, double *e, double *f,
+                 double *tx, double *ty, double *tz) const {
     if (a ) *a  = m00_;
     if (b ) *b  = m01_;
     if (c ) *c  = m02_;
@@ -115,7 +101,7 @@ class CSymmetricMatrix3DT {
     if (tz) *tz = m23_;
   }
 
-  void getValues(T *a, T *b, T *c, T *d, T *e, T *f) const {
+  void getValues(double *a, double *b, double *c, double *d, double *e, double *f) const {
     if (a) *a  = m00_;
     if (b) *b  = m01_;
     if (c) *c  = m02_;
@@ -124,20 +110,20 @@ class CSymmetricMatrix3DT {
     if (f) *f  = m13_;
   }
 
-  void getValues(T v[9]) const {
+  void getValues(double v[9]) const {
     v[0] = m00_; v[1] = m01_; v[2] = m02_;
     v[3] = m10_; v[4] = m11_; v[5] = m12_;
     v[6] = m20_; v[7] = m21_; v[8] = m22_;
   }
 
-  CSymmetricMatrix3DT &operator=(const CSymmetricMatrix3DT &a) {
-    memcpy(m1_, a.m1_, 16*sizeof(T));
+  CSymmetricMatrix3D &operator=(const CSymmetricMatrix3D &a) {
+    memcpy(&m00_, &a.m00_, 16*sizeof(double));
 
     return *this;
   }
 
-  CSymmetricMatrix3DT &operator*=(T s) {
-    CSymmetricMatrix3DT a = *this;
+  CSymmetricMatrix3D &operator*=(double s) {
+    CSymmetricMatrix3D a = *this;
 
     m00_ = a.m00_*s; m01_ = a.m00_*s; m02_ = a.m00_*s; m03_ = a.m00_*s;
     m10_ = a.m10_*s; m11_ = a.m10_*s; m12_ = a.m10_*s; m13_ = a.m10_*s;
@@ -147,25 +133,25 @@ class CSymmetricMatrix3DT {
     return *this;
   }
 
-  CSymmetricMatrix3DT operator*(T s) {
-    CSymmetricMatrix3DT c = *this;
+  CSymmetricMatrix3D operator*(double s) {
+    CSymmetricMatrix3D c = *this;
 
     c *= s;
 
     return c;
   }
 
-  void setValue(unsigned int i, T value) { m1_[i] = value; }
+  void setValue(unsigned int i, double value) { (&m00_)[i] = value; }
 
-  T getValue(unsigned int i) { return m1_[i]; }
+  double getValue(unsigned int i) { return (&m00_)[i]; }
 
-  void zero() { memset(m1_, 0, sizeof(m1_)); }
+  void zero() { memset(&m00_, 0, 16*sizeof(double)); }
 
-  T operator[](unsigned int i) { return m1_[i]; }
+  double operator[](unsigned int i) { return (&m00_)[i]; }
 
-  const T &operator[](unsigned int i) const { return m1_[i]; }
+  const double &operator[](unsigned int i) const { return (&m00_)[i]; }
 
-  friend std::ostream &operator<<(std::ostream &os, const CSymmetricMatrix3DT &matrix) {
+  friend std::ostream &operator<<(std::ostream &os, const CSymmetricMatrix3D &matrix) {
     os << "(" << matrix.m00_ << "," <<
                  matrix.m01_ << "," <<
                  matrix.m02_ << "," <<
@@ -187,9 +173,13 @@ class CSymmetricMatrix3DT {
   }
 
  private:
-  static T calcDeterminant(T a, T b, T c, T d, T e, T f);
-};
+  static double calcDeterminant(double a, double b, double c, double d, double e, double f);
 
-typedef CSymmetricMatrix3DT<double> CSymmetricMatrix3D;
+ private:
+  double m00_, m01_, m02_, m03_;
+  double m10_, m11_, m12_, m13_;
+  double m20_, m21_, m22_, m23_;
+  double m30_, m31_, m32_, m33_;
+};
 
 #endif

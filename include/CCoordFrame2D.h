@@ -5,57 +5,49 @@
 #include <COrthonormalBasis2D.h>
 
 /// Coordinate Frame
-template<typename T>
-class CCoordFrame2DT {
- private:
-  typedef CPoint2DT<T>            Point;
-  typedef CVector2DT<T>           Vector;
-  typedef CMatrix2DT<T>           Matrix;
-  typedef COrthonormalBasis2DT<T> OrthonormalBasis;
-
-  Vector           origin_;
-  OrthonormalBasis basis_;
-
+class CCoordFrame2D {
  public:
-  CCoordFrame2DT() :
+  CCoordFrame2D() :
    origin_(0,0), basis_() {
   }
 
   explicit
-  CCoordFrame2DT(const Point &origin, const Vector &u=Vector(1,0), const Vector &v=Vector(0,1)) :
+  CCoordFrame2D(const CPoint2D &origin, const CVector2D &u=CVector2D(1,0),
+                const CVector2D &v=CVector2D(0,1)) :
    origin_(origin), basis_(u, v) {
   }
 
   explicit
-  CCoordFrame2DT(const Vector &origin, const Vector &u=Vector(1,0), const Vector &v=Vector(0,1)) :
+  CCoordFrame2D(const CVector2D &origin, const CVector2D &u=CVector2D(1,0),
+                const CVector2D &v=CVector2D(0,1)) :
    origin_(origin), basis_(u, v) {
   }
 
-  CCoordFrame2DT(const Vector &origin, const OrthonormalBasis &basis) :
+  CCoordFrame2D(const CVector2D &origin, const COrthonormalBasis2D &basis) :
    origin_(origin), basis_(basis) {
   }
 
-  CCoordFrame2DT(const CCoordFrame2DT &coord_frame) :
-    origin_(coord_frame.origin_), basis_ (coord_frame.basis_ ) {
+  CCoordFrame2D(const CCoordFrame2D &coord_frame) :
+   origin_(coord_frame.origin_), basis_ (coord_frame.basis_ ) {
   }
 
-  const CCoordFrame2DT &operator=(const CCoordFrame2DT &coord_frame) {
+  const CCoordFrame2D &operator=(const CCoordFrame2D &coord_frame) {
     origin_ = coord_frame.origin_;
     basis_  = coord_frame.basis_ ;
 
     return *this;
   }
 
-  const Vector &getOrigin() const { return origin_; }
+  const CVector2D &getOrigin() const { return origin_; }
 
-  Point getOriginPoint() const { return origin_.point(); }
+  CPoint2D getOriginPoint() const { return origin_.point(); }
 
-  const OrthonormalBasis &getBasis() const { return basis_; }
+  const COrthonormalBasis2D &getBasis() const { return basis_; }
 
-  void setOrigin(const Point  &origin) { origin_ = origin; }
-  void setOrigin(const Vector &origin) { origin_ = origin; }
+  void setOrigin(const CPoint2D  &origin) { origin_ = origin; }
+  void setOrigin(const CVector2D &origin) { origin_ = origin; }
 
-  void setBasis(const Vector &u, const Vector &v) {
+  void setBasis(const CVector2D &u, const CVector2D &v) {
     if (u.isZero() || v.isZero()) {
       std::cerr << "Invalid Basis" << std::endl;
       return;
@@ -64,11 +56,11 @@ class CCoordFrame2DT {
     basis_.setUV(u, v);
   }
 
-  void getBasis(Vector &u, Vector &v) {
+  void getBasis(CVector2D &u, CVector2D &v) {
     basis_.getUV(u, v);
   }
 
-  const Matrix &getMatrix() const {
+  const CMatrix2D &getMatrix() const {
     return basis_.getMatrix();
   }
 
@@ -135,13 +127,15 @@ class CCoordFrame2DT {
     os << "(" << basis_ << "), (" << origin_ << ")";
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const CCoordFrame2DT &frame) {
+  friend std::ostream &operator<<(std::ostream &os, const CCoordFrame2D &frame) {
     frame.print(os);
 
     return os;
   }
-};
 
-typedef class CCoordFrame2DT<double> CCoordFrame2D;
+ private:
+  CVector2D           origin_;
+  COrthonormalBasis2D basis_;
+};
 
 #endif

@@ -18,29 +18,18 @@
 /* | m10 m11 m12 | */
 /* \ m20 m21 m22 / */
 
-template<typename T>
-class CMatrix2DT {
- private:
-  typedef CPoint2DT<T>  Point;
-  typedef CVector2DT<T> Vector;
-
- private:
-  T m00_, m01_, m02_;
-  T m10_, m11_, m12_;
-  T m20_, m21_, m22_;
-
+class CMatrix2D {
  public:
   // constructor/destructor
-  CMatrix2DT() :
+  CMatrix2D() :
    m00_(0.0), m01_(0.0), m02_(0.0),
    m10_(0.0), m11_(0.0), m12_(0.0),
    m20_(0.0), m21_(0.0), m22_(0.0) {
   }
 
- ~CMatrix2DT() { }
+ ~CMatrix2D() { }
 
-  explicit
-  CMatrix2DT(CMatrixType type) :
+  explicit CMatrix2D(CMatrixType type) :
    m00_(0.0), m01_(0.0), m02_(0.0),
    m10_(0.0), m11_(0.0), m12_(0.0),
    m20_(0.0), m21_(0.0), m22_(0.0) {
@@ -50,19 +39,25 @@ class CMatrix2DT {
       CTHROW("Bad Matrix Type");
   }
 
-  CMatrix2DT(T a, T b, T c, T d) :
+  CMatrix2D(double a, double b, double c, double d) :
    m00_(a  ), m01_(b  ), m02_(0.0),
    m10_(c  ), m11_(d  ), m12_(0.0),
    m20_(0.0), m21_(0.0), m22_(0.0) {
     setBottomIdentity();
   }
 
-  CMatrix2DT(T a, T b, T c, T d, T tx, T ty) :
+  CMatrix2D(double a, double b, double c, double d, double tx, double ty) :
    m00_(a), m01_(b), m02_(tx), m10_(c), m11_(d), m12_(ty) {
     setBottomIdentity();
   }
 
-  CMatrix2DT(const T *m, int n) :
+  CMatrix2D(double m00, double m01, double m02, double m10, double m11, double m12,
+            double m20, double m21, double m22) :
+   m00_(m00), m01_(m01), m02_(m02), m10_(m10), m11_(m11), m12_(m12),
+   m20_(m20), m21_(m21), m22_(m22) {
+  }
+
+  CMatrix2D(const double *m, int n) :
    m00_(0.0), m01_(0.0), m02_(0.0),
    m10_(0.0), m11_(0.0), m12_(0.0),
    m20_(0.0), m21_(0.0), m22_(0.0) {
@@ -74,7 +69,7 @@ class CMatrix2DT {
      CTHROW("Invalid size");
   }
 
-  CMatrix2DT(const Vector &v0, const Vector &v1) :
+  CMatrix2D(const CVector2D &v0, const CVector2D &v1) :
    m00_(v0.getX()), m01_(v1.getX()), m02_(0.0),
    m10_(v0.getY()), m11_(v1.getY()), m12_(0.0),
    m20_(0.0      ), m21_(0.0      ), m22_(0.0) {
@@ -82,21 +77,21 @@ class CMatrix2DT {
     setBottomIdentity();
   }
 
-  CMatrix2DT *dup() const {
-    return new CMatrix2DT(*this);
+  CMatrix2D *dup() const {
+    return new CMatrix2D(*this);
   }
 
   //------
 
   // copy operations
-  CMatrix2DT(const CMatrix2DT &a) :
+  CMatrix2D(const CMatrix2D &a) :
    m00_(a.m00_), m01_(a.m01_), m02_(a.m02_),
    m10_(a.m10_), m11_(a.m11_), m12_(a.m12_),
    m20_(a.m20_), m21_(a.m21_), m22_(a.m22_) {
   }
 
-  const CMatrix2DT &operator=(const CMatrix2DT &a) {
-    memcpy(&m00_, &a.m00_, 9*sizeof(T));
+  const CMatrix2D &operator=(const CMatrix2D &a) {
+    memcpy(&m00_, &a.m00_, 9*sizeof(double));
 
     return *this;
   }
@@ -118,7 +113,7 @@ class CMatrix2DT {
           " (" << m20_ << "," << m21_ << "," << m22_ << "))";
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const CMatrix2DT &matrix) {
+  friend std::ostream &operator<<(std::ostream &os, const CMatrix2D &matrix) {
     matrix.print(os);
 
     return os;
@@ -126,84 +121,84 @@ class CMatrix2DT {
 
   //------
 
-  static CMatrix2DT identity() {
-    return CMatrix2DT(CMATRIX_TYPE_IDENTITY);
+  static CMatrix2D identity() {
+    return CMatrix2D(CMATRIX_TYPE_IDENTITY);
   }
 
-  static CMatrix2DT translation(const Point &point) {
+  static CMatrix2D translation(const CPoint2D &point) {
     return translation(point.x, point.y);
   }
 
-  static CMatrix2DT translation(T tx, T ty) {
-    CMatrix2DT matrix;
+  static CMatrix2D translation(double tx, double ty) {
+    CMatrix2D matrix;
 
     matrix.setTranslation(tx, ty);
 
     return matrix;
   }
 
-  static CMatrix2DT scale(const Point &point) {
+  static CMatrix2D scale(const CPoint2D &point) {
     return scale(point.x, point.y);
   }
 
-  static CMatrix2DT scale(T s) {
-    CMatrix2DT matrix;
+  static CMatrix2D scale(double s) {
+    CMatrix2D matrix;
 
     matrix.setScale(s, s);
 
     return matrix;
   }
 
-  static CMatrix2DT scale(T sx, T sy) {
-    CMatrix2DT matrix;
+  static CMatrix2D scale(double sx, double sy) {
+    CMatrix2D matrix;
 
     matrix.setScale(sx, sy);
 
     return matrix;
   }
 
-  static CMatrix2DT rotation(T a) {
-    CMatrix2DT matrix;
+  static CMatrix2D rotation(double a) {
+    CMatrix2D matrix;
 
     matrix.setRotation(a);
 
     return matrix;
   }
 
-  static CMatrix2DT skew(T sx, T sy) {
-    CMatrix2DT matrix;
+  static CMatrix2D skew(double sx, double sy) {
+    CMatrix2D matrix;
 
     matrix.setSkew(sx, sy);
 
     return matrix;
   }
 
-  static CMatrix2DT skewX(T a) {
-    CMatrix2DT matrix;
+  static CMatrix2D skewX(double a) {
+    CMatrix2D matrix;
 
     matrix.setSkewX(a);
 
     return matrix;
   }
 
-  static CMatrix2DT skewY(T a) {
-    CMatrix2DT matrix;
+  static CMatrix2D skewY(double a) {
+    CMatrix2D matrix;
 
     matrix.setSkewY(a);
 
     return matrix;
   }
 
-  static CMatrix2DT reflection(T a) {
-    CMatrix2DT matrix;
+  static CMatrix2D reflection(double a) {
+    CMatrix2D matrix;
 
     matrix.setReflection(a);
 
     return matrix;
   }
 
-  static CMatrix2DT reflection(T dx, T dy) {
-    CMatrix2DT matrix;
+  static CMatrix2D reflection(double dx, double dy) {
+    CMatrix2D matrix;
 
     matrix.setReflection(dx, dy);
 
@@ -216,85 +211,85 @@ class CMatrix2DT {
     setBottomIdentity();
   }
 
-  void setTranslation(T tx, T ty) {
+  void setTranslation(double tx, double ty) {
     setInnerIdentity ();
     setOuterTranslate(tx, ty);
     setBottomIdentity();
   }
 
-  void setTranslation(const Vector &vector) {
+  void setTranslation(const CVector2D &vector) {
     setInnerIdentity ();
     setOuterTranslate(vector.getX(), vector.getY());
     setBottomIdentity();
   }
 
-  void setScale(T s) {
+  void setScale(double s) {
     setInnerScale    (s, s);
     setOuterIdentity ();
     setBottomIdentity();
   }
 
-  void setScale(T sx, T sy) {
+  void setScale(double sx, double sy) {
     setInnerScale    (sx, sy);
     setOuterIdentity ();
     setBottomIdentity();
   }
 
-  void setScaleTranslation(T sx, T sy, T tx, T ty) {
+  void setScaleTranslation(double sx, double sy, double tx, double ty) {
     setInnerScale    (sx, sy);
     setOuterTranslate(tx, ty);
     setBottomIdentity();
   }
 
-  void setScaleTranslation(T s, T tx, T ty) {
+  void setScaleTranslation(double s, double tx, double ty) {
     setInnerScale    (s, s);
     setOuterTranslate(tx, ty);
     setBottomIdentity();
   }
 
-  void setRotation(T a) {
+  void setRotation(double a) {
     setInnerRotation (a);
     setOuterIdentity ();
     setBottomIdentity();
   }
 
-  void setRotationTranslation(T a, T tx, T ty) {
+  void setRotationTranslation(double a, double tx, double ty) {
     setInnerRotation (a);
     setOuterTranslate(tx, ty);
     setBottomIdentity();
   }
 
-  void setReflection(T a) {
+  void setReflection(double a) {
     setUnitInnerReflection(cos(a), sin(a));
     setOuterIdentity      ();
     setBottomIdentity     ();
   }
 
-  void setReflection(T dx, T dy) {
+  void setReflection(double dx, double dy) {
     setInnerReflection(dx, dy);
     setOuterIdentity  ();
     setBottomIdentity ();
   }
 
-  void setSkew(T x, T y) {
+  void setSkew(double x, double y) {
     setInnerSkew     (x, y);
     setOuterIdentity ();
     setBottomIdentity();
   }
 
-  void setSkewX(T a) {
+  void setSkewX(double a) {
     setInnerSkewX    (a);
     setOuterIdentity ();
     setBottomIdentity();
   }
 
-  void setSkewY(T a) {
+  void setSkewY(double a) {
     setInnerSkewY    (a);
     setOuterIdentity ();
     setBottomIdentity();
   }
 
-  void setValues(T a, T b, T c, T d) {
+  void setValues(double a, double b, double c, double d) {
     m00_ = a, m01_ = b;
     m10_ = c, m11_ = d;
 
@@ -302,20 +297,21 @@ class CMatrix2DT {
     setBottomIdentity();
   }
 
-  void setValues(T a, T b, T c, T d, T tx, T ty) {
+  void setValues(double a, double b, double c, double d, double tx, double ty) {
     m00_ = a, m01_ = b, m02_ = tx;
     m10_ = c, m11_ = d, m12_ = ty;
 
     setBottomIdentity();
   }
 
-  void setValues(T a, T b, T c, T d, T e, T f, T g, T h, T i) {
+  void setValues(double a, double b, double c, double d, double e, double f,
+                 double g, double h, double i) {
     m00_ = a, m01_ = b, m02_ = c;
     m10_ = d, m11_ = e, m12_ = f;
     m20_ = g, m21_ = h, m22_ = i;
   }
 
-  void setValues(const T *v, int n) {
+  void setValues(const double *v, int n) {
     if      (n == 4)
       setValues(v[0], v[1], v[2], v[3]);
     else if (n == 6)
@@ -326,14 +322,14 @@ class CMatrix2DT {
       CTHROW("Invalid Size");
   }
 
-  void getValues(T *a, T *b, T *c, T *d) const {
+  void getValues(double *a, double *b, double *c, double *d) const {
     if (a) *a = m00_;
     if (b) *b = m01_;
     if (c) *c = m10_;
     if (d) *d = m11_;
   }
 
-  void getValues(T *a, T *b, T *c, T *d, T *tx, T *ty) const {
+  void getValues(double *a, double *b, double *c, double *d, double *tx, double *ty) const {
     if (a ) *a  = m00_;
     if (b ) *b  = m01_;
     if (c ) *c  = m10_;
@@ -342,7 +338,7 @@ class CMatrix2DT {
     if (ty) *ty = m12_;
   }
 
-  void getValues(T *v, int n) const {
+  void getValues(double *v, int n) const {
     if      (n == 4) {
       v[0] = m00_; v[1] = m01_;
       v[2] = m10_; v[3] = m11_;
@@ -363,75 +359,75 @@ class CMatrix2DT {
 
   //---------
 
-  void setColumn(int c, T x, T y) {
+  void setColumn(int c, double x, double y) {
     switch (c) {
       case 0: m00_ = x; m10_ = y; break;
       case 1: m01_ = x; m11_ = y; break;
     }
   }
 
-  void setColumn(int c, const Point &point) {
+  void setColumn(int c, const CPoint2D &point) {
     switch (c) {
       case 0: m00_ = point.x; m10_ = point.y; break;
       case 1: m01_ = point.x; m11_ = point.y; break;
     }
   }
 
-  void setColumn(int c, const Vector &vector) {
+  void setColumn(int c, const CVector2D &vector) {
     switch (c) {
       case 0: vector.getXY(&m00_, &m10_); break;
       case 1: vector.getXY(&m01_, &m11_); break;
     }
   }
 
-  void setColumns(Vector &u, Vector &v) {
+  void setColumns(CVector2D &u, CVector2D &v) {
     setColumn(0, u);
     setColumn(1, v);
   }
 
-  void getColumn(int c, T *x, T *y) const {
+  void getColumn(int c, double *x, double *y) const {
     switch (c) {
       case 0: if (x) *x = m00_; if (y) *y = m10_; break;
       case 1: if (x) *x = m01_; if (y) *y = m11_; break;
     }
   }
 
-  void getColumn(int c, Vector &vector) {
+  void getColumn(int c, CVector2D &vector) {
     switch (c) {
-      case 0: vector = Vector(m00_, m10_); break;
-      case 1: vector = Vector(m01_, m11_); break;
+      case 0: vector = CVector2D(m00_, m10_); break;
+      case 1: vector = CVector2D(m01_, m11_); break;
     }
   }
 
-  void getColumns(Vector &u, Vector &v) {
+  void getColumns(CVector2D &u, CVector2D &v) {
     getColumn(0, u);
     getColumn(1, v);
   }
 
   //------
 
-  void setRow(int r, T x, T y) {
+  void setRow(int r, double x, double y) {
     switch (r) {
       case 0: m00_ = x; m01_ = y; break;
       case 1: m10_ = x; m11_ = y; break;
     }
   }
 
-  void setRow(int r, const Point &point) {
+  void setRow(int r, const CPoint2D &point) {
     switch (r) {
       case 0: m00_ = point.x; m01_ = point.y; break;
       case 1: m10_ = point.x; m11_ = point.y; break;
     }
   }
 
-  void setRow(int r, const Vector &vector) {
+  void setRow(int r, const CVector2D &vector) {
     switch (r) {
       case 0: vector.getXY(&m00_, &m01_); break;
       case 1: vector.getXY(&m10_, &m11_); break;
     }
   }
 
-  void getRow(int r, T *x, T *y) const {
+  void getRow(int r, double *x, double *y) const {
     switch (r) {
       case 0: if (x) *x = m00_; if (y) *y = m01_; break;
       case 1: if (x) *x = m10_; if (y) *y = m11_; break;
@@ -440,74 +436,74 @@ class CMatrix2DT {
 
   //------
 
-  void multiplyPoint(T xi, T yi, T *xo, T *yo) const {
+  void multiplyPoint(double xi, double yi, double *xo, double *yo) const {
     *xo = m00_*xi + m01_*yi + m02_;
     *yo = m10_*xi + m11_*yi + m12_;
   }
 
-  void multiplyPoint(const Point &point1, Point &point2) const {
+  void multiplyPoint(const CPoint2D &point1, CPoint2D &point2) const {
     point2.x = m00_*point1.x + m01_*point1.y + m02_;
     point2.y = m10_*point1.x + m11_*point1.y + m12_;
   }
 
-  void multiplyVector(const Vector &ivector, Vector &ovector) const {
-    T ix, iy;
+  void multiplyVector(const CVector2D &ivector, CVector2D &ovector) const {
+    double ix, iy;
 
     ivector.getXY(&ix, &iy);
 
-    T ox = m00_*ix + m01_*iy;
-    T oy = m10_*ix + m11_*iy;
+    double ox = m00_*ix + m01_*iy;
+    double oy = m10_*ix + m11_*iy;
 
     ovector.setXY(ox, oy);
   }
 
-  void preMultiplyPoint(T xi, T yi, T *xo, T *yo) const {
+  void preMultiplyPoint(double xi, double yi, double *xo, double *yo) const {
     *xo = m00_*xi + m10_*yi;
     *yo = m01_*xi + m11_*yi;
   }
 
-  void preMultiplyPoint(const Point &ipoint, Point &opoint) const {
+  void preMultiplyPoint(const CPoint2D &ipoint, CPoint2D &opoint) const {
     opoint.x = m00_*ipoint.x + m10_*ipoint.y;
     opoint.y = m01_*ipoint.x + m11_*ipoint.y;
   }
 
-  void preMultiplyVector(const Vector &ivector, Vector &ovector) const {
-    T ix, iy;
+  void preMultiplyVector(const CVector2D &ivector, CVector2D &ovector) const {
+    double ix, iy;
 
     ivector.getXY(&ix, &iy);
 
-    T ox = m00_*ix + m10_*iy;
-    T oy = m01_*ix + m11_*iy;
+    double ox = m00_*ix + m10_*iy;
+    double oy = m01_*ix + m11_*iy;
 
     ovector.setXY(ox, oy);
   }
 
-  const CMatrix2DT &translate(T x, T y) {
+  const CMatrix2D &translate(double x, double y) {
     m02_ += x;
     m12_ += y;
 
     return *this;
   }
 
-  const CMatrix2DT &transpose() {
-    swap(m10_, m01_);
-    swap(m20_, m02_);
-    swap(m21_, m12_);
+  const CMatrix2D &transpose() {
+    std::swap(m10_, m01_);
+    std::swap(m20_, m02_);
+    std::swap(m21_, m12_);
 
     return *this;
   }
 
-  CMatrix2DT transposed() const {
-    return CMatrix2DT(m00_, m10_, m20_, m01_, m11_, m21_, m02_, m12_, m22_);
+  CMatrix2D transposed() const {
+    return CMatrix2D(m00_, m10_, m20_, m01_, m11_, m21_, m02_, m12_, m22_);
   }
 
-  bool invert(CMatrix2DT &imatrix) const {
-    T d = determinant();
+  bool invert(CMatrix2D &imatrix) const {
+    double d = determinant();
 
     if (::fabs(d) == 0.0)
       return false;
 
-    T id = 1.0/d;
+    double id = 1.0/d;
 
     imatrix.m00_ =  id*calcDeterminant(m11_, m12_, m21_, m22_);
     imatrix.m10_ = -id*calcDeterminant(m10_, m12_, m20_, m22_);
@@ -524,8 +520,8 @@ class CMatrix2DT {
     return true;
   }
 
-  CMatrix2DT inverse() const {
-    CMatrix2DT imatrix;
+  CMatrix2D inverse() const {
+    CMatrix2D imatrix;
 
     if (! invert(imatrix))
       CTHROW("Divide by zero");
@@ -533,16 +529,16 @@ class CMatrix2DT {
     return imatrix;
   }
 
-  T determinant() const {
+  double determinant() const {
     return (m00_*calcDeterminant(m11_, m12_, m21_, m22_) -
             m01_*calcDeterminant(m10_, m12_, m20_, m22_) +
             m02_*calcDeterminant(m10_, m11_, m20_, m21_));
   }
 
-  const CMatrix2DT &normalize() {
-    T d = determinant();
+  const CMatrix2D &normalize() {
+    double d = determinant();
 
-    T id = 1.0/d;
+    double id = 1.0/d;
 
     m00_ *= id;
     m01_ *= id;
@@ -552,39 +548,40 @@ class CMatrix2DT {
     return *this;
   }
 
-  void setTransform(T xmin1, T ymin1, T xmax1, T ymax1, T xmin2, T ymin2, T xmax2, T ymax2) {
-    T sx = (xmax2 - xmin2)/(xmax1 - xmin1);
-    T sy = (ymax2 - ymin2)/(ymax1 - ymin1);
+  void setTransform(double xmin1, double ymin1, double xmax1, double ymax1,
+                    double xmin2, double ymin2, double xmax2, double ymax2) {
+    double sx = (xmax2 - xmin2)/(xmax1 - xmin1);
+    double sy = (ymax2 - ymin2)/(ymax1 - ymin1);
 
-    T tx = -xmin1*sx + xmin2;
-    T ty = -ymin1*sy + ymin2;
+    double tx = -xmin1*sx + xmin2;
+    double ty = -ymin1*sy + ymin2;
 
     setInnerScale    (sx, sy);
     setOuterTranslate(tx, ty);
     setBottomIdentity();
   }
 
-  static CMatrix2DT *newIdentityMatrix() {
-    CMatrix2DT *m = new CMatrix2DT();
+  static CMatrix2D *newIdentityMatrix() {
+    CMatrix2D *m = new CMatrix2D();
 
     m->setIdentity();
 
     return m;
   }
 
-  static bool solveAXeqB(const CMatrix2DT &a, CPoint2DT<T> &x, const CPoint2DT<T> &b) {
-    T det_a = a.determinant();
+  static bool solveAXeqB(const CMatrix2D &a, CPoint2D &x, const CPoint2D &b) {
+    double det_a = a.determinant();
 
     if (::fabs(det_a) <= 0.0)
       return false;
 
-    T idet_a = 1.0/det_a;
+    double idet_a = 1.0/det_a;
 
-    CMatrix2DT t(a);
+    CMatrix2D t(a);
 
     t.setColumn(0, b.x, b.y);
 
-    T det_t = t.determinant();
+    double det_t = t.determinant();
 
     x.x = det_t*idet_a;
 
@@ -635,9 +632,9 @@ class CMatrix2DT {
 
   //------
 
-  void zero() { memset(&m00_, 0, 9*sizeof(T)); }
+  void zero() { memset(&m00_, 0, 9*sizeof(double)); }
 
-  const CMatrix2DT &operator+=(const CMatrix2DT &b) {
+  const CMatrix2D &operator+=(const CMatrix2D &b) {
     m00_ += b.m00_; m01_ += b.m01_; m02_ += b.m02_;
     m10_ += b.m10_; m11_ += b.m11_; m12_ += b.m12_;
     m20_ += b.m20_; m21_ += b.m21_; m22_ += b.m22_;
@@ -645,15 +642,15 @@ class CMatrix2DT {
     return *this;
   }
 
-  CMatrix2DT operator+(const CMatrix2DT &b) const {
-    CMatrix2DT c = *this;
+  CMatrix2D operator+(const CMatrix2D &b) const {
+    CMatrix2D c = *this;
 
     c += b;
 
     return c;
   }
 
-  const CMatrix2DT &operator-=(const CMatrix2DT &b) {
+  const CMatrix2D &operator-=(const CMatrix2D &b) {
     m00_ -= b.m00_; m01_ -= b.m01_, m02_ -= b.m02_;
     m10_ -= b.m10_; m11_ -= b.m11_; m12_ -= b.m12_;
     m20_ -= b.m20_; m21_ -= b.m21_; m22_ -= b.m22_;
@@ -661,16 +658,16 @@ class CMatrix2DT {
     return *this;
   }
 
-  CMatrix2DT operator-(const CMatrix2DT &b) const {
-    CMatrix2DT c = *this;
+  CMatrix2D operator-(const CMatrix2D &b) const {
+    CMatrix2D c = *this;
 
     c -= b;
 
     return c;
   }
 
-  const CMatrix2DT &operator*=(const CMatrix2DT &b) {
-    CMatrix2DT a = *this;
+  const CMatrix2D &operator*=(const CMatrix2D &b) {
+    CMatrix2D a = *this;
 
     m00_ = a.m00_*b.m00_ + a.m01_*b.m10_ + a.m02_*b.m20_;
     m01_ = a.m00_*b.m01_ + a.m01_*b.m11_ + a.m02_*b.m21_;
@@ -687,16 +684,16 @@ class CMatrix2DT {
     return *this;
   }
 
-  CMatrix2DT operator*(const CMatrix2DT &b) const {
-    CMatrix2DT c = *this;
+  CMatrix2D operator*(const CMatrix2D &b) const {
+    CMatrix2D c = *this;
 
     c *= b;
 
     return c;
   }
 
-  const CMatrix2DT &operator*=(T s) {
-    CMatrix2DT a = *this;
+  const CMatrix2D &operator*=(double s) {
+    CMatrix2D a = *this;
 
     m00_ = a.m00_*s; m01_ = a.m01_*s; m02_ = a.m02_*s;
     m10_ = a.m10_*s; m11_ = a.m11_*s; m12_ = a.m12_*s;
@@ -705,48 +702,48 @@ class CMatrix2DT {
     return *this;
   }
 
-  CMatrix2DT operator*(T s) const {
-    CMatrix2DT c = *this;
+  CMatrix2D operator*(double s) const {
+    CMatrix2D c = *this;
 
     c *= s;
 
     return c;
   }
 
-  friend Point operator*(const CMatrix2DT &m, const Point &p) {
-    Point p1;
+  friend CPoint2D operator*(const CMatrix2D &m, const CPoint2D &p) {
+    CPoint2D p1;
 
     m.multiplyPoint(p, p1);
 
     return p1;
   }
 
-  friend Point operator*(const Point &p, const CMatrix2DT &m) {
-    Point p1;
+  friend CPoint2D operator*(const CPoint2D &p, const CMatrix2D &m) {
+    CPoint2D p1;
 
     m.preMultiplyPoint(p, p1);
 
     return p1;
   }
 
-  friend Vector operator*(const CMatrix2DT &m, const Vector &v) {
-    Vector v1;
+  friend CVector2D operator*(const CMatrix2D &m, const CVector2D &v) {
+    CVector2D v1;
 
     m.multiplyVector(v, v1);
 
     return v1;
   }
 
-  friend Vector operator*(const Vector &v, const CMatrix2DT &m) {
-    Vector v1;
+  friend CVector2D operator*(const CVector2D &v, const CMatrix2D &m) {
+    CVector2D v1;
 
     m.preMultiplyVector(v, v1);
 
     return v1;
   }
 
-  const CMatrix2DT &operator/=(const CMatrix2DT &b) {
-    CMatrix2DT bi;
+  const CMatrix2D &operator/=(const CMatrix2D &b) {
+    CMatrix2D bi;
 
     if (! b.invert(bi)) {
       CTHROW("Divide by zero");
@@ -756,8 +753,8 @@ class CMatrix2DT {
     return (*this) *= bi;
   }
 
-  CMatrix2DT operator/(const CMatrix2DT &b) const {
-    CMatrix2DT c = *this;
+  CMatrix2D operator/(const CMatrix2D &b) const {
+    CMatrix2D c = *this;
 
     c /= b;
 
@@ -766,39 +763,39 @@ class CMatrix2DT {
 
   //------
 
-  void setValue(uint i, T value) {
+  void setValue(uint i, double value) {
     (&m00_)[i] = value;
   }
 
-  void setValue(uint i, uint j, T value) {
+  void setValue(uint i, uint j, double value) {
     assert(i < 3 && j < 3);
 
-    T &m = (&m00_)[3*j + i];
+    double &m = (&m00_)[3*j + i];
 
     m = value;
   }
 
-  const T &getValue(uint i) const {
+  const double &getValue(uint i) const {
     assert(i < 9);
 
     return (&m00_)[i];
   }
 
-  const T &getValue(uint i, uint j) const {
+  const double &getValue(uint i, uint j) const {
     assert(i < 3 && j < 3);
 
-    const T &m = (&m00_)[3*j + i];
+    const double &m = (&m00_)[3*j + i];
 
     return m;
   }
 
-  const T &operator[](uint i) const {
+  const double &operator[](uint i) const {
     assert(i < 9);
 
     return (&m00_)[i];
   }
 
-  T &operator[](uint i) {
+  double &operator[](uint i) {
     assert(i < 9);
 
     return (&m00_)[i];
@@ -811,48 +808,48 @@ class CMatrix2DT {
     m10_ = 0.0, m11_ = 1.0;
   }
 
-  void setInnerScale(T sx, T sy) {
+  void setInnerScale(double sx, double sy) {
     m00_ = sx , m01_ = 0.0;
     m10_ = 0.0, m11_ = sy ;
   }
 
-  void setInnerRotation(T a) {
-    T c = ::cos(a);
-    T s = ::sin(a);
+  void setInnerRotation(double a) {
+    double c = ::cos(a);
+    double s = ::sin(a);
 
     m00_ =  c, m01_ = -s;
     m10_ =  s, m11_ =  c;
   }
 
-  void setInnerSkew(T x, T y) {
-    T tx = ::tan(x);
-    T ty = ::tan(y);
+  void setInnerSkew(double x, double y) {
+    double tx = ::tan(x);
+    double ty = ::tan(y);
 
     m00_ = 1 , m01_ = tx;
     m10_ = ty, m11_ = 1 ;
   }
 
-  void setInnerSkewX(T x) {
-    T tx = ::tan(x);
+  void setInnerSkewX(double x) {
+    double tx = ::tan(x);
 
     m00_ = 1, m01_ = tx;
     m10_ = 0, m11_ = 1 ;
   }
 
-  void setInnerSkewY(T y) {
-    T ty = ::tan(y);
+  void setInnerSkewY(double y) {
+    double ty = ::tan(y);
 
     m00_ = 1 , m01_ = 0;
     m10_ = ty, m11_ = 1;
   }
 
-  void setInnerReflection(T dx, T dy) {
+  void setInnerReflection(double dx, double dy) {
     double l = sqrt(dx*dx + dy*dy);
 
     setUnitInnerReflection(dx/l, dy/l);
   }
 
-  void setUnitInnerReflection(T dx, T dy) {
+  void setUnitInnerReflection(double dx, double dy) {
     //m00_ = (dx*dx - dy*dy)/l; m01_ = 2*dx*dy/l;
     //m10_ = m01_             ; m11_ = -m00_;
 
@@ -864,7 +861,7 @@ class CMatrix2DT {
     m02_ = 0.0; m12_ = 0.0;
   }
 
-  void setOuterTranslate(T tx, T ty) {
+  void setOuterTranslate(double tx, double ty) {
     m02_ = tx; m12_ = ty;
   }
 
@@ -874,7 +871,7 @@ class CMatrix2DT {
 
   //---
 
-  int cmp(const CMatrix2DT &m) const {
+  int cmp(const CMatrix2D &m) const {
     if (m00_ < m.m00_) return -1; if (m00_ > m.m00_) return  1;
     if (m10_ < m.m10_) return -1; if (m10_ > m.m10_) return  1;
     if (m01_ < m.m01_) return -1; if (m01_ > m.m01_) return  1;
@@ -888,19 +885,22 @@ class CMatrix2DT {
     return 0;
   }
 
-  friend bool operator< (const CMatrix2DT &lhs, const CMatrix2DT &rhs) { return lhs.cmp(rhs) <  0; }
-  friend bool operator<=(const CMatrix2DT &lhs, const CMatrix2DT &rhs) { return lhs.cmp(rhs) <= 0; }
-  friend bool operator> (const CMatrix2DT &lhs, const CMatrix2DT &rhs) { return lhs.cmp(rhs) >  0; }
-  friend bool operator>=(const CMatrix2DT &lhs, const CMatrix2DT &rhs) { return lhs.cmp(rhs) >= 0; }
-  friend bool operator==(const CMatrix2DT &lhs, const CMatrix2DT &rhs) { return lhs.cmp(rhs) == 0; }
-  friend bool operator!=(const CMatrix2DT &lhs, const CMatrix2DT &rhs) { return lhs.cmp(rhs) != 0; }
+  friend bool operator< (const CMatrix2D &lhs, const CMatrix2D &rhs) { return lhs.cmp(rhs) <  0; }
+  friend bool operator<=(const CMatrix2D &lhs, const CMatrix2D &rhs) { return lhs.cmp(rhs) <= 0; }
+  friend bool operator> (const CMatrix2D &lhs, const CMatrix2D &rhs) { return lhs.cmp(rhs) >  0; }
+  friend bool operator>=(const CMatrix2D &lhs, const CMatrix2D &rhs) { return lhs.cmp(rhs) >= 0; }
+  friend bool operator==(const CMatrix2D &lhs, const CMatrix2D &rhs) { return lhs.cmp(rhs) == 0; }
+  friend bool operator!=(const CMatrix2D &lhs, const CMatrix2D &rhs) { return lhs.cmp(rhs) != 0; }
 
  private:
-  static T calcDeterminant(T m00, T m01, T m10, T m11) {
+  static double calcDeterminant(double m00, double m01, double m10, double m11) {
     return m00*m11 - m01*m10;
   }
-};
 
-typedef CMatrix2DT<double> CMatrix2D;
+ private:
+  double m00_ { 0.0 }, m01_ { 0.0 }, m02_ { 0.0 };
+  double m10_ { 0.0 }, m11_ { 0.0 }, m12_ { 0.0 };
+  double m20_ { 0.0 }, m21_ { 0.0 }, m22_ { 0.0 };
+};
 
 #endif

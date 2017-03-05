@@ -5,75 +5,59 @@
 #include <CPoint3D.h>
 #include <CVector3D.h>
 #include <CThrow.h>
+#include <iostream>
+#include <cstring>
 
 /* / m00 m01 m02 \ */
 /* | m10 m11 m12 | */
 /* \ m20 m21 m22 / */
 
-template<typename T>
-class CMatrix3x3T {
+class CMatrix3x3 {
  public:
   enum Type {
     CMATRIX_3x3_IDENTITY
   };
 
  private:
-  typedef CPoint3DT<T>  Point;
-  typedef CVector3DT<T> Vector;
-
- private:
-  union {
-    T m1_[9];
-    T m2_[3][3];
-
-    struct {
-      T m00_, m01_, m02_;
-      T m10_, m11_, m12_;
-      T m20_, m21_, m22_;
-    };
-
-    struct {
-      T a_, b_, c_;
-      T d_, e_, f_;
-      T g_, h_, i_;
-    };
-  };
+  typedef CPoint3D  Point;
+  typedef CVector3D Vector;
 
  public:
-  CMatrix3x3T() { }
+  CMatrix3x3() { }
 
-  explicit CMatrix3x3T(typename CMatrix3x3T::Type type) {
+  explicit CMatrix3x3(typename CMatrix3x3::Type type) {
     if (type == CMATRIX_3x3_IDENTITY)
       setIdentity();
     else
       CTHROW("Bad Matrix Type");
   }
 
-  CMatrix3x3T(T m00, T m01, T m02, T m10, T m11, T m12, T m20, T m21, T m22) :
+  CMatrix3x3(double m00, double m01, double m02, double m10, double m11, double m12,
+             double m20, double m21, double m22) :
     m00_(m00), m01_(m01), m02_(m02),
     m10_(m10), m11_(m11), m12_(m12),
     m20_(m20), m21_(m21), m22_(m22) {
   }
 
-  CMatrix3x3T(const T *m, int n) {
+  CMatrix3x3(const double *m, int n) {
     if      (n == 9)
-      setValues(m[ 0], m[ 1], m[ 2],
-                m[ 3], m[ 4], m[ 5],
-                m[ 6], m[ 7], m[ 8]);
+      memcpy(&m00_, m, 9*sizeof(double));
     else
       CTHROW("Invalid size");
   }
 
-  CMatrix3x3T(CMathGen::AxisType3D axis, T angle,
+  CMatrix3x3(CMathGen::AxisType3D axis, double angle,
              CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     setRotation(axis, angle, handedness);
   }
 
-  CMatrix3x3T(const CMatrix3x3T &a) {
-    memcpy(m1_, a.m1_, sizeof(m1_));
+  CMatrix3x3(const CMatrix3x3 &a) {
+    memcpy(&m00_, &a.m00_, 9*sizeof(double));
   }
 
- ~CMatrix3x3T() { }
+ ~CMatrix3x3() { }
+
+  //----------
 
   void setIdentity() {
     m00_ = 1.0, m01_ = 0.0, m02_ = 0.0;
@@ -81,19 +65,33 @@ class CMatrix3x3T {
     m20_ = 0.0, m21_ = 0.0, m22_ = 1.0;
   }
 
-  void setScale(T s) {
+  //----------
+
+  void setTranslation(double tx, double ty, double tz) {
+    setIdentity();
+
+    m02_ = tx;
+    m10_ = ty;
+    m20_ = tz;
+  }
+
+  //----------
+
+  void setScale(double s) {
     m00_ = s  , m01_ = 0.0, m02_ = 0.0;
     m10_ = 0.0, m11_ = s  , m12_ = 0.0;
     m20_ = 0.0, m21_ = 0.0, m22_ = s  ;
   }
 
-  void setScale(T sx, T sy, T sz) {
+  void setScale(double sx, double sy, double sz) {
     m00_ = sx , m01_ = 0.0, m02_ = 0.0;
     m10_ = 0.0, m11_ = sy , m12_ = 0.0;
     m20_ = 0.0, m21_ = 0.0, m22_ = sz ;
   }
 
-  void setRotation(CMathGen::AxisType3D axis, T angle,
+  //----------
+
+  void setRotation(CMathGen::AxisType3D axis, double angle,
                    CMathGen::Handedness handedness =
                     CMathGen::RIGHT_HANDEDNESS) {
     if (handedness == CMathGen::RIGHT_HANDEDNESS)
@@ -102,12 +100,11 @@ class CMatrix3x3T {
       setInnerRotationLHS(axis, angle);
   }
 
-  void setXYZRotation(T x_angle, T y_angle, T z_angle,
-                      CMathGen::Handedness handedness =
-                       CMathGen::RIGHT_HANDEDNESS) {
-    CMatrix3x3T xmatrix(CMathGen::X_AXIS_3D, x_angle, handedness);
-    CMatrix3x3T ymatrix(CMathGen::Y_AXIS_3D, y_angle, handedness);
-    CMatrix3x3T zmatrix(CMathGen::Z_AXIS_3D, z_angle, handedness);
+  void setXYZRotation(double x_angle, double y_angle, double z_angle,
+                      CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
+    CMatrix3x3 xmatrix(CMathGen::X_AXIS_3D, x_angle, handedness);
+    CMatrix3x3 ymatrix(CMathGen::Y_AXIS_3D, y_angle, handedness);
+    CMatrix3x3 zmatrix(CMathGen::Z_AXIS_3D, z_angle, handedness);
 
     *this = xmatrix*ymatrix*zmatrix;
   }
@@ -115,29 +112,29 @@ class CMatrix3x3T {
   void setXYZRotation(const Vector &angles,
                       CMathGen::Handedness handedness =
                        CMathGen::RIGHT_HANDEDNESS) {
-    CMatrix3x3T xmatrix(CMathGen::X_AXIS_3D, angles.getX(), handedness);
-    CMatrix3x3T ymatrix(CMathGen::Y_AXIS_3D, angles.getY(), handedness);
-    CMatrix3x3T zmatrix(CMathGen::Z_AXIS_3D, angles.getZ(), handedness);
+    CMatrix3x3 xmatrix(CMathGen::X_AXIS_3D, angles.getX(), handedness);
+    CMatrix3x3 ymatrix(CMathGen::Y_AXIS_3D, angles.getY(), handedness);
+    CMatrix3x3 zmatrix(CMathGen::Z_AXIS_3D, angles.getZ(), handedness);
 
     *this = xmatrix*ymatrix*zmatrix;
   }
 
-  void setGenRotation(T x1, T y1, T z1, T x2, T y2, T z2, T angle,
-                      CMathGen::Handedness handedness =
-                       CMathGen::RIGHT_HANDEDNESS) {
-    CMatrix3x3T matrix1, matrix2, matrix3, matrix4, matrix5, matrix6, matrix7;
+  void setGenRotation(double x1, double y1, double z1,
+                      double x2, double y2, double z2, double angle,
+                      CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
+    CMatrix3x3 matrix1, matrix2, matrix3, matrix4, matrix5, matrix6, matrix7;
 
     matrix1.setTranslation(-x1, -y1, -z1);
     matrix2.setTranslation( x1,  y1,  z1);
 
-    T theta = CMathGen::atan2(x2 - x1, y2 - y1);
+    double theta = CMathGen::atan2(x2 - x1, y2 - y1);
 
     matrix3.setRotation(CMathGen::Z_AXIS_3D,  theta, handedness);
     matrix4.setRotation(CMathGen::Z_AXIS_3D, -theta, handedness);
 
-    T v = ::sqrt((x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1));
+    double v = ::sqrt((x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1));
 
-    T beta = CMathGen::atan2(z2 - z1, v);
+    double beta = CMathGen::atan2(z2 - z1, v);
 
     matrix5.setRotation(CMathGen::Y_AXIS_3D,  beta, handedness);
     matrix6.setRotation(CMathGen::Y_AXIS_3D, -beta, handedness);
@@ -147,26 +144,25 @@ class CMatrix3x3T {
     *this = matrix2*(matrix4*(matrix6*(matrix7*(matrix5*(matrix3*matrix1)))));
   }
 
-  void setGenRotation(const Vector &axis, T angle,
-                      CMathGen::Handedness handedness =
-                       CMathGen::RIGHT_HANDEDNESS) {
+  void setGenRotation(const Vector &axis, double angle,
+                      CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     Vector a = axis.normalized();
 
-    T c = ::cos(angle);
-    T s = ::sin(angle);
+    double c = ::cos(angle);
+    double s = ::sin(angle);
 
-    T c1 = 1.0 - c;
+    double c1 = 1.0 - c;
 
-    T axx = a.x*a.x;
-    T axy = a.x*a.y;
-    T axz = a.x*a.z;
-    T ayy = a.y*a.y;
-    T ayz = a.y*a.z;
-    T azz = a.z*a.z;
+    double axx = a.getX()*a.getX();
+    double axy = a.getX()*a.getY();
+    double axz = a.getX()*a.getZ();
+    double ayy = a.getY()*a.getY();
+    double ayz = a.getY()*a.getZ();
+    double azz = a.getZ()*a.getZ();
 
-    T axs = a.x*s;
-    T ays = a.y*s;
-    T azs = a.z*s;
+    double axs = a.getX()*s;
+    double ays = a.getY()*s;
+    double azs = a.getZ()*s;
 
     if (handedness == CMathGen::RIGHT_HANDEDNESS) {
       m00_ = axx*c1 + c;
@@ -196,69 +192,14 @@ class CMatrix3x3T {
     }
   }
 
-  void setLookAt(const Point &eye, const Point &center, const Vector &up) {
-    Vector dir = (center - eye).normalize();
-
-    CVector3D right = dir.crossProduct(up.normalize());
-    CVector3D newUp = right.crossProduct(dir);
-
-    dir = -dir;
-
-    setColumn(0, right);
-    setColumn(1, newUp);
-    setColumn(2, dir  );
-
-    setOuterTranslate(eye, eye, eye);
-  }
-
-  void setEye(T x1, T y1, T z1, T x2, T y2, T z2,
-              CMathGen::Handedness handedness =
-               CMathGen::RIGHT_HANDEDNESS) {
-    T angle1, angle2, angle3;
-
-    calcEye(x1, y1, z1, x2, y2, z2, &angle1, &angle2, &angle3);
-
-    CMatrix3x3T matrix1, matrix2, matrix3, matrix4;
-
-    matrix1.setTranslation(-x1, -y1, -z1);
-
-    matrix2.setRotation(CMathGen::Z_AXIS_3D,  angle1, handedness);
-    matrix3.setRotation(CMathGen::Y_AXIS_3D,  angle2, handedness);
-    matrix4.setRotation(CMathGen::Z_AXIS_3D, -angle3, handedness);
-
-    *this = matrix4*(matrix3*(matrix2*matrix1));
-  }
-
-  static void calcEye(T x1, T y1, T z1, T x2, T y2, T z2,
-                      T *angle1, T *angle2, T *angle3) {
-    T dx = x2 - x1;
-    T dy = y2 - y1;
-    T dz = z2 - z1;
-
-    *angle1 = CMathGen::atan2(-dx, -dy);
-
-    T v = ::sqrt(dx*dx + dy*dy);
-
-    *angle2 = CMathGen::atan2(-dz, v);
-
-    T w = ::sqrt(v*v + dz*dz);
-
-    *angle3 = CMathGen::atan2(-dx*w, dy*dz);
-  }
-
-  void setValues(T a, T b, T c, T d, T e, T f, T g, T h, T i) {
-    m00_ = a, m01_ = b, m02_ = c;
-    m10_ = d, m11_ = e, m12_ = f;
-    m20_ = g, m21_ = h, m22_ = i;
-  }
-
-  void getValues(T *a, T *b, T *c, T *d, T *e, T *f, T *g, T *h, T *i) const {
+  void getValues(double *a, double *b, double *c, double *d, double *e, double *f,
+                 double *g, double *h, double *i) const {
     if (a) *a = m00_; if (b) *b = m01_; if (c) *c = m02_;
     if (d) *d = m10_; if (e) *e = m11_; if (f) *f = m12_;
     if (g) *g = m20_; if (h) *h = m21_; if (i) *i = m22_;
   }
 
-  void getValues(T *v, int n) const {
+  void getValues(double *v, int n) const {
     if      (n == 9) {
       v[0] = m00_; v[1] = m01_; v[2] = m02_;
       v[3] = m10_; v[4] = m11_; v[5] = m12_;
@@ -268,43 +209,60 @@ class CMatrix3x3T {
       CTHROW("Invalid size");
   }
 
-  void setColumn(int c, T x, T y, T z) {
-    m2_[0][c] = x, m2_[1][c] = y; m2_[2][c] = z;
+  void setColumn(int c, double x, double y, double z) {
+    assert(c < 3);
+
+    double *m = &(&m00_)[c];
+
+    m[0] = x, m[3] = y; m[6] = z;
   }
 
   void setColumn(int c, const Point &point) {
-    m2_[0][c] = point.x, m2_[1][c] = point.y, m2_[2][c] = point.z;
+    setColumn(c, point.x, point.y, point.z);
   }
 
   void setColumn(int c, const Vector &vector) {
-    vector.getXYZ(&m2_[0][c], &m2_[1][c], &m2_[2][c]);
+    setColumn(c, vector.getX(), vector.getY(), vector.getZ());
   }
 
-  void getColumn(int c, T *x, T *y, T *z) {
-    if (x) *x = m2_[0][c];
-    if (y) *y = m2_[1][c];
-    if (z) *z = m2_[2][c];
+  void getColumn(int c, double *x, double *y, double *z) {
+    assert(c < 3);
+
+    double *m = &(&m00_)[c];
+
+    if (x) *x = m[0];
+    if (y) *y = m[3];
+    if (z) *z = m[6];
   }
 
-  void setRow(int r, T x, T y, T z) {
-    m2_[r][0] = x, m2_[r][1] = y; m2_[r][2] = z;
+  void setRow(int r, double x, double y, double z) {
+    assert(r < 3);
+
+    double *m = &(&m00_)[r*3];
+
+    m[0] = x, m[1] = y; m[2] = z;
   }
 
   void setRow(int r, const Point &point) {
-    m2_[r][0] = point.x, m2_[r][1] = point.y, m2_[r][2] = point.z;
+    setRow(r, point.x, point.y, point.z);
   }
 
   void setRow(int r, const Vector &vector) {
-    vector.getXYZ(&m2_[r][0], &m2_[r][1], &m2_[r][2]);
+    setRow(r, vector.getX(), vector.getY(), vector.getZ());
   }
 
-  void getRow(int r, T *x, T *y, T *z) {
-    if (x) *x = m2_[r][0];
-    if (y) *y = m2_[r][1];
-    if (z) *z = m2_[r][2];
+  void getRow(int r, double *x, double *y, double *z) {
+    assert(r < 3);
+
+    double *m = &(&m00_)[r*3];
+
+    if (x) *x = m[0];
+    if (y) *y = m[1];
+    if (z) *z = m[2];
   }
 
-  void multiplyPoint(T  xi, T  yi, T  zi, T *xo, T *yo, T *zo) const {
+  void multiplyPoint(double  xi, double  yi, double  zi,
+                     double *xo, double *yo, double *zo) const {
     *xo = m00_*xi + m01_*yi + m02_*zi;
     *yo = m10_*xi + m11_*yi + m12_*zi;
     *zo = m20_*xi + m21_*yi + m22_*zi;
@@ -317,18 +275,19 @@ class CMatrix3x3T {
   }
 
   void multiplyVector(const Vector &ivector, Vector &ovector) const {
-    T ix, iy, iz;
+    double ix, iy, iz;
 
     ivector.getXYZ(&ix, &iy, &iz);
 
-    T ox = m00_*ix + m01_*iy + m02_*iz;
-    T oy = m10_*ix + m11_*iy + m12_*iz;
-    T oz = m20_*ix + m21_*iy + m22_*iz;
+    double ox = m00_*ix + m01_*iy + m02_*iz;
+    double oy = m10_*ix + m11_*iy + m12_*iz;
+    double oz = m20_*ix + m21_*iy + m22_*iz;
 
     ovector.setXYZ(ox, oy, oz);
   }
 
-  void preMultiplyPoint(T xi, T yi, T zi, T *xo, T *yo, T *zo) const {
+  void preMultiplyPoint(double xi, double yi, double zi,
+                        double *xo, double *yo, double *zo) const {
     *xo = m00_*xi + m10_*yi + m20_*zi;
     *yo = m01_*xi + m11_*yi + m21_*zi;
     *zo = m02_*xi + m12_*yi + m22_*zi;
@@ -341,36 +300,36 @@ class CMatrix3x3T {
   }
 
   void preMultiplyVector(const Vector &ivector, Vector &ovector) const {
-    T ix, iy, iz;
+    double ix, iy, iz;
 
     ivector.getXYZ(&ix, &iy, &iz);
 
-    T ox = m00_*ix + m10_*iy + m20_*iz;
-    T oy = m01_*ix + m11_*iy + m21_*iz;
-    T oz = m02_*ix + m12_*iy + m22_*iz;
+    double ox = m00_*ix + m10_*iy + m20_*iz;
+    double oy = m01_*ix + m11_*iy + m21_*iz;
+    double oz = m02_*ix + m12_*iy + m22_*iz;
 
     ovector.setXYZ(ox, oy, oz);
   }
 
   void transpose() {
-    swap(m10_, m01_);
-    swap(m20_, m02_);
-    swap(m21_, m12_);
+    std::swap(m10_, m01_);
+    std::swap(m20_, m02_);
+    std::swap(m21_, m12_);
   }
 
-  CMatrix3x3T transposed() const {
-    return CMatrix3x3T(m00_, m10_, m20_,
+  CMatrix3x3 transposed() const {
+    return CMatrix3x3(m00_, m10_, m20_,
                        m01_, m11_, m21_,
                        m02_, m12_, m22_);
   }
 
-  bool invert(CMatrix3x3T &imatrix) const {
-    T d = determinant();
+  bool invert(CMatrix3x3 &imatrix) const {
+    double d = determinant();
 
     if (::fabs(d) == 0.0)
       return false;
 
-    T id = 1.0/d;
+    double id = 1.0/d;
 
     imatrix.m00_ =  id*calcDeterminant(m11_, m12_, m21_, m22_);
     imatrix.m10_ = -id*calcDeterminant(m10_, m12_, m20_, m22_);
@@ -387,8 +346,8 @@ class CMatrix3x3T {
     return true;
   }
 
-  CMatrix3x3T inverse() const {
-    CMatrix3x3T imatrix;
+  CMatrix3x3 inverse() const {
+    CMatrix3x3 imatrix;
 
     if (! invert(imatrix))
       CTHROW("Divide by 0.0");
@@ -396,42 +355,42 @@ class CMatrix3x3T {
     return imatrix;
   }
 
-  T determinant() const {
+  double determinant() const {
     return (m00_*calcDeterminant(m11_, m12_, m21_, m22_) -
             m01_*calcDeterminant(m10_, m12_, m20_, m22_) +
             m02_*calcDeterminant(m10_, m11_, m20_, m21_));
   }
 
   void normalize() {
-    T d = determinant();
+    double d = determinant();
 
-    T id = 1.0/d;
+    double id = 1.0/d;
 
     for (int i = 0; i < 9; ++i)
-      m1_[i] *= id;
+      (&m00_)[i] *= id;
   }
 
-  static CMatrix3x3T *newIdentityMatrix() {
-    CMatrix3x3T *m = new CMatrix3x3T();
+  static CMatrix3x3 *newIdentityMatrix() {
+    CMatrix3x3 *m = new CMatrix3x3();
 
     m->setIdentity();
 
     return m;
   }
 
-  static bool solveAXeqB(const CMatrix3x3T &a, Point &x, const Point &b) {
-    T det_a = a.determinant();
+  static bool solveAXeqB(const CMatrix3x3 &a, Point &x, const Point &b) {
+    double det_a = a.determinant();
 
     if (::abs(det_a) < 0.0)
       return false;
 
-    T idet_a = 1.0/det_a;
+    double idet_a = 1.0/det_a;
 
-    CMatrix3x3T t(a);
+    CMatrix3x3 t(a);
 
     t.setColumn(0, b.x, b.y, b.z);
 
-    T det_t = t.determinant();
+    double det_t = t.determinant();
 
     x.x = det_t*idet_a;
 
@@ -454,15 +413,15 @@ class CMatrix3x3T {
     return true;
   }
 
-  void zero() { memset(m1_, 0, sizeof(m1_)); }
+  void zero() { memset(&m00_, 0, 9*sizeof(double)); }
 
-  CMatrix3x3T &operator=(const CMatrix3x3T &a) {
-    memcpy(m1_, a.m1_, sizeof(m1_));
+  CMatrix3x3 &operator=(const CMatrix3x3 &a) {
+    memcpy(&m00_, &a.m00_, 9*sizeof(double));
 
     return *this;
   }
 
-  CMatrix3x3T &operator+=(const CMatrix3x3T &b) {
+  CMatrix3x3 &operator+=(const CMatrix3x3 &b) {
     m00_ += b.m00_; m01_ += b.m01_; m02_ += b.m02_;
     m10_ += b.m10_; m11_ += b.m11_; m12_ += b.m12_;
     m20_ += b.m20_; m21_ += b.m21_; m22_ += b.m22_;
@@ -470,15 +429,15 @@ class CMatrix3x3T {
     return *this;
   }
 
-  CMatrix3x3T operator+(const CMatrix3x3T &b) {
-    CMatrix3x3T c = *this;
+  CMatrix3x3 operator+(const CMatrix3x3 &b) {
+    CMatrix3x3 c = *this;
 
     c += b;
 
     return c;
   }
 
-  CMatrix3x3T &operator-=(const CMatrix3x3T &b) {
+  CMatrix3x3 &operator-=(const CMatrix3x3 &b) {
     m00_ -= b.m00_; m01_ -= b.m01_, m02_ -= b.m02_;
     m10_ -= b.m10_; m11_ -= b.m11_; m12_ -= b.m12_;
     m20_ -= b.m20_; m21_ -= b.m21_; m22_ -= b.m22_;
@@ -486,16 +445,16 @@ class CMatrix3x3T {
     return *this;
   }
 
-  CMatrix3x3T operator-(const CMatrix3x3T &b) {
-    CMatrix3x3T c = *this;
+  CMatrix3x3 operator-(const CMatrix3x3 &b) {
+    CMatrix3x3 c = *this;
 
     c -= b;
 
     return c;
   }
 
-  CMatrix3x3T &operator*=(const CMatrix3x3T &b) {
-    CMatrix3x3T a = *this;
+  CMatrix3x3 &operator*=(const CMatrix3x3 &b) {
+    CMatrix3x3 a = *this;
 
     m00_ = a.m00_*b.m00_ + a.m01_*b.m10_ + a.m02_*b.m20_;
     m01_ = a.m00_*b.m01_ + a.m01_*b.m11_ + a.m02_*b.m21_;
@@ -512,16 +471,16 @@ class CMatrix3x3T {
     return *this;
   }
 
-  CMatrix3x3T operator*(const CMatrix3x3T &b) const {
-    CMatrix3x3T c = *this;
+  CMatrix3x3 operator*(const CMatrix3x3 &b) const {
+    CMatrix3x3 c = *this;
 
     c *= b;
 
     return c;
   }
 
-  CMatrix3x3T &operator*=(T s) {
-    CMatrix3x3T a = *this;
+  CMatrix3x3 &operator*=(double s) {
+    CMatrix3x3 a = *this;
 
     m00_ = a.m00_*s; m01_ = a.m01_*s; m02_ = a.m02_*s;
     m10_ = a.m10_*s; m11_ = a.m11_*s; m12_ = a.m12_*s;
@@ -530,15 +489,15 @@ class CMatrix3x3T {
     return *this;
   }
 
-  CMatrix3x3T operator*(T s) {
-    CMatrix3x3T c = *this;
+  CMatrix3x3 operator*(double s) {
+    CMatrix3x3 c = *this;
 
     c *= s;
 
     return c;
   }
 
-  friend Point operator*(const CMatrix3x3T &m, const Point &p) {
+  friend Point operator*(const CMatrix3x3 &m, const Point &p) {
     Point p1;
 
     m.multiplyPoint(p, p1);
@@ -546,7 +505,7 @@ class CMatrix3x3T {
     return p1;
   }
 
-  friend Point operator*(const Point &p, const CMatrix3x3T &m) {
+  friend Point operator*(const Point &p, const CMatrix3x3 &m) {
     Point p1;
 
     m.preMultiplyPoint(p, p1);
@@ -554,7 +513,7 @@ class CMatrix3x3T {
     return p1;
   }
 
-  friend Vector operator*(const CMatrix3x3T &m, const Vector &v) {
+  friend Vector operator*(const CMatrix3x3 &m, const Vector &v) {
     Vector v1;
 
     m.multiplyVector(v, v1);
@@ -562,7 +521,7 @@ class CMatrix3x3T {
     return v1;
   }
 
-  friend Vector operator*(const Vector &v, const CMatrix3x3T &m) {
+  friend Vector operator*(const Vector &v, const CMatrix3x3 &m) {
     Vector v1;
 
     m.preMultiplyVector(v, v1);
@@ -570,8 +529,8 @@ class CMatrix3x3T {
     return v1;
   }
 
-  CMatrix3x3T &operator/=(const CMatrix3x3T &b) {
-    CMatrix3x3T bi;
+  CMatrix3x3 &operator/=(const CMatrix3x3 &b) {
+    CMatrix3x3 bi;
 
     if (! b.invert(bi)) {
       CTHROW("Divide by 0.0");
@@ -581,52 +540,110 @@ class CMatrix3x3T {
     return (*this) *= bi;
   }
 
-  CMatrix3x3T operator/(const CMatrix3x3T &b) {
-    CMatrix3x3T c = *this;
+  CMatrix3x3 operator/(const CMatrix3x3 &b) {
+    CMatrix3x3 c = *this;
 
     c /= b;
 
     return c;
   }
 
-  void setValue(unsigned int i, T value) {
-    m1_[i] = value;
+  void setValue(unsigned int i, double value) {
+    (&m00_)[i] = value;
   }
 
-  void setValue(unsigned int i, unsigned int j, T value) {
-    m2_[i][j] = value;
+  void setValue(unsigned int i, unsigned int j, double value) {
+    assert(i < 3 && j < 3);
+
+    double &m = (&m00_)[3*j + i];
+
+    m = value;
   }
 
-  T getValue(unsigned int i) const {
-    return m1_[i];
+  double getValue(unsigned int i) const {
+    return (&m00_)[i];
   }
 
-  T getValue(unsigned int i, unsigned int j) const {
-    return m2_[i][j];
+  double getValue(unsigned int i, unsigned int j) const {
+    assert(i < 3 && j < 3);
+
+    const double &m = (&m00_)[3*j + i];
+
+    return m;
   }
 
-  T operator[](unsigned int i) { return m1_[i]; }
+  double operator[](unsigned int i) { return (&m00_)[i]; }
 
-  const T &operator[](unsigned int i) const { return m1_[i]; }
+  const double &operator[](unsigned int i) const { return (&m00_)[i]; }
 
-  void print(ostream &os) const {
-    os << "(" << m00_ << "," << m01_ << "," << m02_ << ")" << endl;
-    os << "(" << m10_ << "," << m11_ << "," << m12_ << ")" << endl;
-    os << "(" << m20_ << "," << m21_ << "," << m22_ << ")" << endl;
+  //------
+
+  void print(std::ostream &os) const {
+    os << "(" << m00_ << "," << m01_ << "," << m02_ << ")" << std::endl;
+    os << "(" << m10_ << "," << m11_ << "," << m12_ << ")" << std::endl;
+    os << "(" << m20_ << "," << m21_ << "," << m22_ << ")" << std::endl;
   }
 
-  friend ostream &operator<<(ostream &os, const CMatrix3x3T &matrix) {
+  friend std::ostream &operator<<(std::ostream &os, const CMatrix3x3 &matrix) {
     matrix.print(os);
 
     return os;
   }
 
+  //------
+
  private:
-  static T calcDeterminant(T m00, T m01, T m10, T m11) {
+  void setInnerRotationRHS(CMathGen::AxisType3D axis, double angle) {
+    double c = ::cos(angle);
+    double s = ::sin(angle);
+
+    if      (axis == CMathGen::X_AXIS_3D) {
+      m00_ = 1.0; m01_ = 0.0; m02_ = 0.0;
+      m10_ = 0.0; m11_ =   c; m12_ =   s;
+      m20_ = 0.0; m21_ =  -s; m22_ =   c;
+    }
+    else if (axis == CMathGen::Y_AXIS_3D) {
+      m00_ =   c; m01_ = 0.0; m02_ =  -s;
+      m10_ = 0.0; m11_ = 1.0; m12_ = 0.0;
+      m20_ =   s; m21_ = 0.0; m22_ =   c;
+    }
+    else {
+      m00_ =   c; m01_ =   s; m02_ = 0.0;
+      m10_ =  -s; m11_ =   c; m12_ = 0.0;
+      m20_ = 0.0; m21_ = 0.0; m22_ = 1.0;
+    }
+  }
+
+  void setInnerRotationLHS(CMathGen::AxisType3D axis, double angle) {
+    double c = ::cos(angle);
+    double s = ::sin(angle);
+
+    if      (axis == CMathGen::X_AXIS_3D) {
+      m00_ = 1.0; m01_ = 0.0; m02_ = 0.0;
+      m10_ = 1.0; m11_ =   c; m12_ =  -s;
+      m20_ = 0.0; m21_ =   s; m22_ =   c;
+    }
+    else if (axis == CMathGen::Y_AXIS_3D) {
+      m00_ =   c; m01_ = 0.0; m02_ =   s;
+      m10_ = 0.0; m11_ = 1.0; m12_ = 0.0;
+      m20_ =  -s; m21_ = 0.0; m22_ =   c;
+    }
+    else {
+      m00_ =   c; m01_ =  -s; m02_ = 0.0;
+      m10_ =   s; m11_ =   c; m12_ = 0.0;
+      m20_ = 0.0; m21_ = 0.0; m22_ = 1.0;
+    }
+  }
+
+ private:
+  static double calcDeterminant(double m00, double m01, double m10, double m11) {
     return m00*m11 - m01*m10;
   }
-};
 
-typedef CMatrix3x3T<double> CMatrix3x3;
+ private:
+  double m00_ { 0 }, m01_ { 0 }, m02_ { 0 };
+  double m10_ { 0 }, m11_ { 0 }, m12_ { 0 };
+  double m20_ { 0 }, m21_ { 0 }, m22_ { 0 };
+};
 
 #endif

@@ -3,6 +3,7 @@
 
 #include <CThrow.h>
 
+// Unsigned fixed point float
 // Need operator< ...
 
 template<uint W, uint D>

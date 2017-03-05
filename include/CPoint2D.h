@@ -1,50 +1,32 @@
 #ifndef CPOINT_2D_H
 #define CPOINT_2D_H
 
-#include <CIPoint2D.h>
-
 #include <cassert>
 #include <cmath>
+#include <iostream>
 
-template<typename T>
-class CPoint2DT {
- private:
-  typedef CPoint2DT<T>    Point;
-  typedef CIPoint2DT<int> IPoint;
-
+class CPoint2D {
  public:
-   T x, y;
-
-  CPoint2DT() :
-   x(0), y(0) {
-  }
-
-  CPoint2DT(T x1, T y1) :
+  explicit CPoint2D(double x1=0, double y1=0) :
    x(x1), y(y1) {
   }
 
-  CPoint2DT(const CPoint2DT &point) :
+  CPoint2D(const CPoint2D &point) :
    x(point.x), y(point.y) {
   }
 
-  CPoint2DT(const IPoint &point) :
-   x(point.x), y(point.y) {
-  }
+  double getX() const { return x; }
+  double getY() const { return y; }
 
-  IPoint toIPoint() const { return IPoint(int(x), int(y)); }
-
-  T getX() const { return x; }
-  T getY() const { return y; }
-
-  void getXY(T *x1, T *y1) const {
+  void getXY(double *x1, double *y1) const {
     *x1 = x; *y1 = y;
   }
 
-  void getXY(T xy[2]) const {
+  void getXY(double xy[2]) const {
     xy[0] = x; xy[1] = y;
   }
 
-  T operator[](int i) const {
+  double operator[](int i) const {
     switch (i) {
       case 0 : return x;
       case 1 : return y;
@@ -52,27 +34,27 @@ class CPoint2DT {
     }
   }
 
-  T &operator[](int i) {
+  double &operator[](int i) {
     switch (i) {
       case 0 : return x;
       case 1 : return y;
       default: assert(false); }
   }
 
-  void setX(T x1) { x = x1; }
-  void setY(T y1) { y = y1; }
+  void setX(double x1) { x = x1; }
+  void setY(double y1) { y = y1; }
 
-  void setXY(T x1, T y1) {
+  void setXY(double x1, double y1) {
     x = x1; y = y1;
   }
 
-  void setXY(T xy[2]) {
+  void setXY(double xy[2]) {
     x = xy[0]; y = xy[1];
   }
 
   //------
 
-  Point &zero() {
+  CPoint2D &zero() {
     x = 0.0; y = 0.0;
 
     return *this;
@@ -80,30 +62,30 @@ class CPoint2DT {
 
   //-----
 
-  Point operator+() const {
-    return Point(x, y);
+  CPoint2D operator+() const {
+    return CPoint2D(x, y);
   }
 
-  Point operator-() const {
-    return Point(-x, -y);
+  CPoint2D operator-() const {
+    return CPoint2D(-x, -y);
   }
 
   //-----
 
-  bool equal(const Point &rhs, double tol=1E-6) const {
-    T dx = fabs(x - rhs.x);
-    T dy = fabs(y - rhs.y);
+  bool equal(const CPoint2D &rhs, double tol=1E-6) const {
+    double dx = fabs(x - rhs.x);
+    double dy = fabs(y - rhs.y);
 
     return (dx < tol && dy < tol);
   }
 
   //-----
 
-  friend bool operator==(const Point &lhs, const Point &rhs) {
+  friend bool operator==(const CPoint2D &lhs, const CPoint2D &rhs) {
     return lhs.equal(rhs, 1E-6);
   }
 
-  friend bool operator!=(const Point &lhs, const Point &rhs) {
+  friend bool operator!=(const CPoint2D &lhs, const CPoint2D &rhs) {
     return ! (lhs == rhs);
   }
 
@@ -112,149 +94,149 @@ class CPoint2DT {
   // Addition of points makes no mathematical sense but
   // is useful for weighted sum
 
-  Point &operator+=(const Point &rhs) {
+  CPoint2D &operator+=(const CPoint2D &rhs) {
     x += rhs.x; y += rhs.y;
 
     return *this;
   }
 
-  Point &operator+=(T rhs) {
+  CPoint2D &operator+=(double rhs) {
     x += rhs; y += rhs;
 
     return *this;
   }
 
-  Point operator+(const Point &rhs) const {
-    return Point(x + rhs.x, y + rhs.y);
+  CPoint2D operator+(const CPoint2D &rhs) const {
+    return CPoint2D(x + rhs.x, y + rhs.y);
   }
 
-  friend Point operator+(const Point &lhs, T rhs) {
-    return Point(lhs.x + rhs, lhs.y + rhs);
+  friend CPoint2D operator+(const CPoint2D &lhs, double rhs) {
+    return CPoint2D(lhs.x + rhs, lhs.y + rhs);
   }
 
-  friend Point operator+(T lhs, const Point &rhs) {
-    return Point(rhs.x + lhs, rhs.y + lhs);
+  friend CPoint2D operator+(double lhs, const CPoint2D &rhs) {
+    return CPoint2D(rhs.x + lhs, rhs.y + lhs);
   }
 
   //------
 
-  // Subtraction of points makes no mathematical sense but
-  // is useful for weighted sum
-
-  Point &operator-=(const Point &rhs) {
+  // Subtraction of points makes no mathematical sense but is useful for weighted sum
+  CPoint2D &operator-=(const CPoint2D &rhs) {
     x -= rhs.x; y -= rhs.y;
 
     return *this;
   }
 
-  Point operator-(const Point &rhs) const {
-    return Point(x - rhs.x, y - rhs.y);
+  CPoint2D &operator-=(double rhs) {
+    x -= rhs; y -= rhs;
+
+    return *this;
+  }
+
+  CPoint2D operator-(const CPoint2D &rhs) const {
+    return CPoint2D(x - rhs.x, y - rhs.y);
   }
 
   //------
 
-  // Multiplication of points makes no mathematical sense but
-  // is useful for weighted sum
-
-  Point &operator*=(T rhs) {
+  // Multiplication of points makes no mathematical sense but is useful for weighted sum
+  CPoint2D &operator*=(double rhs) {
     x *= rhs; y *= rhs;
 
     return *this;
   }
 
-  Point &operator*=(const Point &rhs) {
+  CPoint2D &operator*=(const CPoint2D &rhs) {
     x *= rhs.x; y *= rhs.y;
 
     return *this;
   }
 
-  Point operator*(const Point &rhs) const {
-    return Point(x*rhs.x, y*rhs.y);
+  CPoint2D operator*(const CPoint2D &rhs) const {
+    return CPoint2D(x*rhs.x, y*rhs.y);
   }
 
-  friend Point operator*(const Point &lhs, T rhs) {
-    return Point(lhs.x*rhs, lhs.y*rhs);
+  friend CPoint2D operator*(const CPoint2D &lhs, double rhs) {
+    return CPoint2D(lhs.x*rhs, lhs.y*rhs);
   }
 
-  friend Point operator*(T lhs, const Point &rhs) {
-    return Point(rhs.x*lhs, rhs.y*lhs);
+  friend CPoint2D operator*(double lhs, const CPoint2D &rhs) {
+    return CPoint2D(rhs.x*lhs, rhs.y*lhs);
   }
 
   //------
 
-  // Division of points makes no mathematical sense but
-  // is useful for weighted sum
-
-  Point &operator/=(T rhs) {
-    T irhs = 1.0/rhs;
+  // Division of points makes no mathematical sense but is useful for weighted sum
+  CPoint2D &operator/=(double rhs) {
+    double irhs = 1.0/rhs;
 
     x *= irhs; y *= irhs;
 
     return *this;
   }
 
-  Point &operator/=(const Point &rhs) {
+  CPoint2D &operator/=(const CPoint2D &rhs) {
     x /= rhs.x; y /= rhs.y;
 
     return *this;
   }
 
-  Point operator/(const Point &rhs) const {
-    return Point(x/rhs.x, y/rhs.y);
+  CPoint2D operator/(const CPoint2D &rhs) const {
+    return CPoint2D(x/rhs.x, y/rhs.y);
   }
 
-  friend Point operator/(const Point &lhs, T rhs) {
-    T irhs = 1.0/rhs;
+  friend CPoint2D operator/(const CPoint2D &lhs, double rhs) {
+    double irhs = 1.0/rhs;
 
-    return Point(lhs.x*irhs, lhs.y*irhs);
+    return CPoint2D(lhs.x*irhs, lhs.y*irhs);
   }
 
-  friend Point operator/(T lhs, const Point &rhs) {
-    return Point(lhs/rhs.x, lhs/rhs.y);
+  friend CPoint2D operator/(double lhs, const CPoint2D &rhs) {
+    return CPoint2D(lhs/rhs.x, lhs/rhs.y);
   }
 
   //------
 
-  T minComponent() const {
+  double minComponent() const {
     return std::min(x, y);
   }
 
-  T maxComponent() const {
+  double maxComponent() const {
     return std::max(x, y);
   }
 
   //-----
 
-  T distanceSqrTo(const Point &rhs) const {
-    T dx = x - rhs.x;
-    T dy = y - rhs.y;
+  double distanceSqrTo(const CPoint2D &rhs) const {
+    double dx = x - rhs.x;
+    double dy = y - rhs.y;
 
     return (dx*dx + dy*dy);
   }
 
-  T distanceTo(const Point &rhs) const {
+  double distanceTo(const CPoint2D &rhs) const {
     return sqrt(distanceSqrTo(rhs));
   }
 
   //-----
 
-  Point rotate(const Point &center, T da) const {
-    T s = sin(da);
-    T c = cos(da);
+  CPoint2D rotate(const CPoint2D &center, double da) const {
+    double s = sin(da);
+    double c = cos(da);
 
-    T x1 = x - center.x;
-    T y1 = y - center.y;
+    double x1 = x - center.x;
+    double y1 = y - center.y;
 
-    T x2 = x1*c - y1*s;
-    T y2 = x1*s + y1*c;
+    double x2 = x1*c - y1*s;
+    double y2 = x1*s + y1*c;
 
-    return Point(x2 + center.x, y2 + center.y);
+    return CPoint2D(x2 + center.x, y2 + center.y);
   }
 
   //-----
 
-  Point flip(const Point &c, bool x_axis=true) const {
-    Point p = *this;
+  CPoint2D flip(const CPoint2D &c, bool x_axis=true) const {
+    CPoint2D p = *this;
 
     if (x_axis)
       p.x = 2*c.x - p.x;
@@ -266,12 +248,12 @@ class CPoint2DT {
 
   //-----
 
-  static Point min(const Point &lhs, const Point &rhs) {
-    return Point(std::min(lhs.x, rhs.x), std::min(lhs.y, rhs.y));
+  static CPoint2D min(const CPoint2D &lhs, const CPoint2D &rhs) {
+    return CPoint2D(std::min(lhs.x, rhs.x), std::min(lhs.y, rhs.y));
   }
 
-  static Point max(const Point &lhs, const Point &rhs) {
-    return Point(std::max(lhs.x, rhs.x), std::max(lhs.y, rhs.y));
+  static CPoint2D max(const CPoint2D &lhs, const CPoint2D &rhs) {
+    return CPoint2D(std::max(lhs.x, rhs.x), std::max(lhs.y, rhs.y));
   }
 
   //-----
@@ -280,13 +262,15 @@ class CPoint2DT {
     os << "(" << x << "," << y << ")";
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const Point &point) {
+  friend std::ostream &operator<<(std::ostream &os, const CPoint2D &point) {
     point.print(os);
 
     return os;
   }
-};
 
-typedef CPoint2DT<double> CPoint2D;
+ public:
+  double x { 0 };
+  double y { 0 };
+};
 
 #endif

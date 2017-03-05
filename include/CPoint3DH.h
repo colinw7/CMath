@@ -1,40 +1,30 @@
-#ifndef CPOINT_3D_H
-#define CPOINT_3D_H
+#ifndef CPOINT_3DH_H
+#define CPOINT_3DH_H
 
 // 3D Homogeneous point
 
 #include <CPoint3D.h>
 
-template<typename T>
-class CPoint3DHT {
-  typedef CPoint3DT<T> Point;
+class CPoint3DH {
+  typedef CPoint3D Point;
 
  public:
-  union {
-    T m[4];
+  CPoint3DH() { }
 
-    struct {
-      T x, y, z, w;
-    };
-  };
-
- public:
-  CPoint3DHT() { }
-
-  CPoint3DHT(T x1, T y1, T z1, T w1) :
+  CPoint3DH(double x1, double y1, double z1, double w1=1) :
    x(x1), y(y1), z(z1), w(w1) {
   }
 
-  CPoint3DHT(const CPoint3DHT &point) :
+  CPoint3DH(const CPoint3DH &point) :
    x(point.x), y(point.y), z(point.z), w(point.w) {
   }
 
-  T getX() const { return x; }
-  T getY() const { return y; }
-  T getZ() const { return z; }
-  T getW() const { return w; }
+  double getX() const { return x; }
+  double getY() const { return y; }
+  double getZ() const { return z; }
+  double getW() const { return w; }
 
-  void getXYZW(T *x1, T *y1, T *z1, T *w1) const {
+  void getXYZW(double *x1, double *y1, double *z1, double *w1) const {
     *x1 = x; *y1 = y; *z1 = z; *w1 = w;
   }
 
@@ -42,40 +32,40 @@ class CPoint3DHT {
     return Point(x/w, y/w, z/w);
   }
 
-  T operator[](int i) const { return m[i]; }
+  double operator[](int i) const { return (&x)[i]; }
 
-  T &operator[](int i) { return m[i]; }
+  double &operator[](int i) { return (&x)[i]; }
 
-  void setX(T x1) { x = x1; }
-  void setY(T y1) { y = y1; }
-  void setZ(T z1) { z = z1; }
-  void setW(T w1) { w = w1; }
+  void setX(double x1) { x = x1; }
+  void setY(double y1) { y = y1; }
+  void setZ(double z1) { z = z1; }
+  void setW(double w1) { w = w1; }
 
-  void setXYZW(T x1, T y1, T z1, T w1) {
+  void setXYZW(double x1, double y1, double z1, double w1) {
     x = x1; y = y1; z = z1; w = w1;
   }
 
-  T modulus() const {
+  double modulus() const {
     return ::sqrt(x*x + y*y + z*z + w*w);
   }
 
-  T modulusSquared() const {
+  double modulusSquared() const {
     return (x*x + y*y + z*z + w*w);
   }
 
-  T getDistance(const CPoint3DHT &point) const {
-    CPoint3DHT diff = *this - point;
+  double getDistance(const CPoint3DH &point) const {
+    CPoint3DH diff = *this - point;
 
     return diff.modulus();
   }
 
-  T getDistanceSquared(const CPoint3DHT &point) const {
-    CPoint3DHT diff = *this - point;
+  double getDistanceSquared(const CPoint3DH &point) const {
+    CPoint3DH diff = *this - point;
 
     return diff.modulusSquared();
   }
 
-  CPoint3DHT &zero() {
+  CPoint3DH &zero() {
     x = 0.0; y = 0.0; z = 0.0; w = 0.0;
 
     return *this;
@@ -83,36 +73,36 @@ class CPoint3DHT {
 
   //-----
 
-  CPoint3DHT operator+() {
-    return CPoint3DHT(x, y, z);
+  CPoint3DH operator+() {
+    return CPoint3DH(x, y, z);
   }
 
-  CPoint3DHT operator-() {
-    return CPoint3DHT(-x, -y, -z);
+  CPoint3DH operator-() {
+    return CPoint3DH(-x, -y, -z);
   }
 
   //-----
 
-  friend bool operator==(const CPoint3DHT &lhs, const CPoint3DHT &rhs) {
+  friend bool operator==(const CPoint3DH &lhs, const CPoint3DH &rhs) {
     return (lhs.x == rhs.x && lhs.y == rhs.y &&
             lhs.z == rhs.z && lhs.w == rhs.w);
   }
 
-  friend bool operator!=(const CPoint3DHT &lhs, const CPoint3DHT &rhs) {
+  friend bool operator!=(const CPoint3DH &lhs, const CPoint3DH &rhs) {
     return (lhs.x != rhs.x || lhs.y != rhs.y ||
             lhs.z != rhs.z || lhs.w != rhs.w);
   }
 
   //------
 
-  CPoint3DHT &operator+=(const CPoint3DHT &rhs) {
+  CPoint3DH &operator+=(const CPoint3DH &rhs) {
     x += rhs.x; y += rhs.y; z += rhs.z; w += rhs.w;
 
     return *this;
   }
 
-  CPoint3DHT operator+(const CPoint3DHT &rhs) const {
-    CPoint3DHT t = *this;
+  CPoint3DH operator+(const CPoint3DH &rhs) const {
+    CPoint3DH t = *this;
 
     t += rhs;
 
@@ -121,14 +111,14 @@ class CPoint3DHT {
 
   //------
 
-  CPoint3DHT &operator-=(const CPoint3DHT &rhs) {
+  CPoint3DH &operator-=(const CPoint3DH &rhs) {
     x -= rhs.x; y -= rhs.y; z -= rhs.z; w -= rhs.w;
 
     return *this;
   }
 
-  CPoint3DHT operator-(const CPoint3DHT &rhs) const {
-    CPoint3DHT t = *this;
+  CPoint3DH operator-(const CPoint3DH &rhs) const {
+    CPoint3DH t = *this;
 
     t -= rhs;
 
@@ -137,14 +127,14 @@ class CPoint3DHT {
 
   //------
 
-  CPoint3DHT &operator*=(T rhs) {
+  CPoint3DH &operator*=(double rhs) {
     x *= rhs; y *= rhs; z *= rhs; w *= rhs;
 
     return *this;
   }
 
-  CPoint3DHT operator*(T rhs) const {
-    CPoint3DHT t = *this;
+  CPoint3DH operator*(double rhs) const {
+    CPoint3DH t = *this;
 
     t *= rhs;
 
@@ -153,33 +143,34 @@ class CPoint3DHT {
 
   //------
 
-  CPoint3DHT &operator/=(T rhs) {
-    T irhs = 1.0/rhs;
+  CPoint3DH &operator/=(double rhs) {
+    double irhs = 1.0/rhs;
 
     x *= irhs; y *= irhs; z *= irhs; w *= irhs;
 
     return *this;
   }
 
-  CPoint3DHT operator/(T rhs) const {
-    CPoint3DHT t = *this;
+  CPoint3DH operator/(double rhs) const {
+    CPoint3DH t = *this;
 
     t /= rhs;
 
     return t;
   }
 
-  void print(ostream &os) const {
-    return os << "(" << x << "," << y << "," << z << "," << w << ")";
+  void print(std::ostream &os) const {
+    os << "(" << x << "," << y << "," << z << "," << w << ")";
   }
 
-  friend ostream &operator<<(ostream &os, const CPoint3DHT &point) {
+  friend std::ostream &operator<<(std::ostream &os, const CPoint3DH &point) {
     point.print(os);
 
     return os;
   }
-};
 
-typedef CPoint3DHT<double> CPoint3DH;
+ public:
+  double x { 0 }, y { 0 }, z { 0 }, w { 1 };
+};
 
 #endif

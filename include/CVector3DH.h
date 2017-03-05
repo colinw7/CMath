@@ -4,21 +4,12 @@
 // TODO: use CMath::sqrt() and CMath::isqrt() to allow replacement
 
 #include <CMathGen.h>
-#include <CPoint3D.h>
+#include <CPoint3DH.h>
 
-template<typename T>
-class CPoint3DT;
-
-template<typename T>
-class CVector3DHT {
+class CVector3DH {
  private:
-  typedef CPoint3DT<T>   Point;
-  typedef CVector3DHT<T> Vector;
-
- private:
-  T x_, y_, z_, w_;
-
-  bool normalized_;
+  typedef CPoint3DH  Point;
+  typedef CVector3DH Vector;
 
  public:
   enum Type {
@@ -32,18 +23,18 @@ class CVector3DHT {
 
  public:
   // constructor/destructor
-  CVector3DHT() { }
+  CVector3DH() { }
 
-  CVector3DHT(T x, T y, T z, T w=1.0) :
+  CVector3DH(double x, double y, double z, double w=1.0) :
    x_(x), y_(y), z_(z), w_(w), normalized_(false) {
   }
 
- ~CVector3DHT() { }
+ ~CVector3DH() { }
 
   //------
 
   // copy operations
-  CVector3DHT(const Vector &vector) :
+  CVector3DH(const Vector &vector) :
     x_(vector.x_), y_(vector.y_), z_(vector.z_), w_(vector.w_),
     normalized_(vector.normalized_) {
   }
@@ -59,11 +50,11 @@ class CVector3DHT {
   //------
 
   // output
-  void print(ostream &os) const {
+  void print(std::ostream &os) const {
     os << "(" << x_ << "," << y_ << "," << z_ << "," << w_ << ")";
   }
 
-  friend ostream &operator<<(ostream &os, const Vector &vector) {
+  friend std::ostream &operator<<(std::ostream &os, const Vector &vector) {
     vector.print(os);
 
     return os;
@@ -74,70 +65,70 @@ class CVector3DHT {
   // accessors
 
   // get
-  T x() const { return x_; }
-  T y() const { return y_; }
-  T z() const { return z_; }
-  T w() const { return w_; }
+  double x() const { return x_; }
+  double y() const { return y_; }
+  double z() const { return z_; }
+  double w() const { return w_; }
 
-  T getX() const { return x_; }
-  T getY() const { return y_; }
-  T getZ() const { return z_; }
-  T getW() const { return w_; }
+  double getX() const { return x_; }
+  double getY() const { return y_; }
+  double getZ() const { return z_; }
+  double getW() const { return w_; }
 
-  void getXYZ(T *x, T *y, T *z) const {
-    T w1 = 1.0/w_;
+  void getXYZ(double *x, double *y, double *z) const {
+    double w1 = 1.0/w_;
 
     *x = x_*w1; *y = y_*w1; *z = z_*w1;
   }
 
-  void getXYZW(T *x, T *y, T *z, T *w) const {
+  void getXYZW(double *x, double *y, double *z, double *w) const {
     *x = x_; *y = y_; *z = z_; *w = w_;
   }
 
   // Reference routine would break encapsulation
-  // T &getX() const { return x_; }
-  // T &getY() const { return y_; }
-  // T &getZ() const { return z_; }
-  // T &getW() const { return w_; }
+  // double &getX() const { return x_; }
+  // double &getY() const { return y_; }
+  // double &getZ() const { return z_; }
+  // double &getW() const { return w_; }
 
-  T operator[](uint i) const {
+  double operator[](uint i) const {
     assert(i < 3);
 
     return (&x_)[i];
   }
 
   // set
-  void setX(T x) {
+  void setX(double x) {
     x_ = x;
 
     normalized_ = false;
   }
 
-  void setY(T y) {
+  void setY(double y) {
     y_ = y;
 
     normalized_ = false;
   }
 
-  void setZ(T z) {
+  void setZ(double z) {
     z_ = z;
 
     normalized_ = false;
   }
 
-  void setW(T w) {
+  void setW(double w) {
     w_ = w;
 
     normalized_ = false;
   }
 
-  void setXYZ(T x, T y, T z) {
+  void setXYZ(double x, double y, double z) {
     x_ = x; y_ = y; z_ = z; w_ = 1.0;
 
     normalized_ = false;
   }
 
-  void setXYZW(T x, T y, T z, T w) {
+  void setXYZW(double x, double y, double z, double w) {
     x_ = x; y_ = y; z_ = z; w_ = w;
 
     normalized_ = false;
@@ -145,13 +136,13 @@ class CVector3DHT {
 
   // Reference routine would break encapsulation
 
-//T &operator[](uint i) {
+//double &operator[](uint i) {
 //  assert(i < 3);
 //
 //  return (&x_)[i];
 //}
 
-  void iset(uint i, T v) {
+  void iset(uint i, double v) {
     assert(i < 3);
 
     (&x_)[i] = v;
@@ -164,18 +155,18 @@ class CVector3DHT {
     return normalized_;
   }
 
-  T length() const {
+  double length() const {
     if (normalized_)
       return 1.0;
 
     return ::sqrt(x_*x_ + y_*y_ + z_*z_ + w_*w_);
   }
 
-  T modulus() const {
+  double modulus() const {
     return length();
   }
 
-  T lengthSqr() const {
+  double lengthSqr() const {
     if (normalized_)
       return 1.0;
 
@@ -226,23 +217,23 @@ class CVector3DHT {
 
   //------
 
-  explicit CVector3DHT(const Point &point) :
+  explicit CVector3DH(const Point &point) :
     x_(point.x), y_(point.y), z_(point.z), w_(1.0), normalized_(false) {
   }
 
-  CVector3DHT(const Point &point1, const Point &point2) :
+  CVector3DH(const Point &point1, const Point &point2) :
    x_(point2.x - point1.x), y_(point2.y - point1.y),
    z_(point2.z - point1.z), w_(1.0), normalized_(false) {
   }
 
-  CVector3DHT(const Vector &vector1, const Vector &vector2) :
+  CVector3DH(const Vector &vector1, const Vector &vector2) :
    x_(vector2.x_ - vector1.x_), y_(vector2.y_ - vector1.y_),
-   x_(vector2.z_ - vector1.z_), w_(1.0), normalized_(false) {
+   z_(vector2.z_ - vector1.z_), w_(1.0), normalized_(false) {
   }
 
   //------
 
-  CVector3DHT(Type type) {
+  CVector3DH(Type type) {
     if      (type == ZERO  ) {
       x_ = 0.0; y_ = 0.0; z_ = 0.0; w_ = 0.0;
     }
@@ -266,7 +257,7 @@ class CVector3DHT {
   //------
 
   Point point() const {
-    T w1 = 1.0/w_;
+    double w1 = 1.0/w_;
 
     return Point(x_*w1, y_*w1, z_*w1);
   }
@@ -287,9 +278,9 @@ class CVector3DHT {
     if (normalized_)
       return *this;
 
-    T len = length();
+    double len = length();
 
-    T factor = 0.0;
+    double factor = 0.0;
 
     if (len > 0.0)
       factor = 1.0/len;
@@ -308,9 +299,9 @@ class CVector3DHT {
     if (normalized_)
       return *this;
 
-    T len = length();
+    double len = length();
 
-    T factor = 0.0;
+    double factor = 0.0;
 
     if (len > 0.0)
       factor = 1.0/len;
@@ -324,13 +315,13 @@ class CVector3DHT {
 
   //------
 
-  Vector &setMagnitude(T magnitude) {
-    T factor = 0.0;
+  Vector &setMagnitude(double magnitude) {
+    double factor = 0.0;
 
     if (normalized_)
       factor = magnitude;
     else {
-      T len = length();
+      double len = length();
 
       if (len > 0.0)
         factor = magnitude/len;
@@ -345,13 +336,13 @@ class CVector3DHT {
 
   //------
 
-  T getDistance(const Vector &vector) {
+  double getDistance(const Vector &vector) {
     Vector diff = *this - vector;
 
     return diff.length();
   }
 
-   T getDistanceSqr(const Vector &vector) {
+   double getDistanceSqr(const Vector &vector) {
     Vector diff = *this - vector;
 
     return diff.lengthSqr();
@@ -359,55 +350,55 @@ class CVector3DHT {
 
   //------
 
-  void incX(T x = 1.0) {
+  void incX(double x = 1.0) {
     x_ += x;
 
     normalized_ = false;
   }
 
-  void incY(T y = 1.0) {
+  void incY(double y = 1.0) {
     y_ += y;
 
     normalized_ = false;
   }
 
-  void incZ(T z = 1.0) {
+  void incZ(double z = 1.0) {
     z_ += z;
 
     normalized_ = false;
   }
 
-  void decX(T x = 1.0) {
+  void decX(double x = 1.0) {
     x_ -= x;
 
     normalized_ = false;
   }
 
-  void decY(T y = 1.0) {
+  void decY(double y = 1.0) {
     y_ -= y;
 
     normalized_ = false;
   }
 
-  void decZ(T z = 1.0) {
+  void decZ(double z = 1.0) {
     z_ -= z;
 
     normalized_ = false;
   }
 
-  void scaleX(T x = 1.0) {
+  void scaleX(double x = 1.0) {
     x_ *= x;
 
     normalized_ = false;
   }
 
-  void scaleY(T y = 1.0) {
+  void scaleY(double y = 1.0) {
     y_ *= y;
 
     normalized_ = false;
   }
 
-  void scaleZ(T z = 1.0) {
+  void scaleZ(double z = 1.0) {
     z_ *= z;
 
     normalized_ = false;
@@ -415,36 +406,36 @@ class CVector3DHT {
 
   //------
 
-  T minComponent() {
-    return min(min(min(x_, y_), z_), w_);
+  double minComponent() {
+    return std::min(std::min(std::min(x_, y_), z_), w_);
   }
 
-  T maxComponent() {
-    return max(max(max(x_, y_), z_), w_);
+  double maxComponent() {
+    return std::max(std::max(std::max(x_, y_), z_), w_);
   }
 
-  T minAbsComponent() {
-    return min(min(min(::fabs(x_), ::fabs(y_)), ::fabs(z_)), ::fabs(w_));
+  double minAbsComponent() {
+    return std::min(std::min(std::min(::fabs(x_), ::fabs(y_)), ::fabs(z_)), ::fabs(w_));
   }
 
-  T maxAbsComponent() {
-    return max(max(max(::fabs(x_), ::fabs(y_)), ::fabs(z_)), ::fabs(w_));
+  double maxAbsComponent() {
+    return std::max(std::max(std::max(::fabs(x_), ::fabs(y_)), ::fabs(z_)), ::fabs(w_));
   }
 
   //------
 
   static Vector min(const Vector &lhs, const Vector &rhs) {
-    return Vector(min(lhs.x_, rhs.x_),
-                  min(lhs.y_, rhs.y_),
-                  min(lhs.z_, rhs.z_),
-                  min(lhs.w_, rhs.w_));
+    return Vector(std::min(lhs.x_, rhs.x_),
+                  std::min(lhs.y_, rhs.y_),
+                  std::min(lhs.z_, rhs.z_),
+                  std::min(lhs.w_, rhs.w_));
   }
 
   static Vector max(const Vector &lhs, const Vector &rhs) {
-    return Vector(max(lhs.x_, rhs.x_),
-                  max(lhs.y_, rhs.y_),
-                  max(lhs.z_, rhs.z_),
-                  max(lhs.w_, rhs.w_));
+    return Vector(std::max(lhs.x_, rhs.x_),
+                  std::max(lhs.y_, rhs.y_),
+                  std::max(lhs.z_, rhs.z_),
+                  std::max(lhs.w_, rhs.w_));
   }
 
   //------
@@ -505,7 +496,7 @@ class CVector3DHT {
   //------
 
   // scalar multiplication/division
-  Vector &operator*=(T rhs) {
+  Vector &operator*=(double rhs) {
     x_ *= rhs; y_ *= rhs; z_ *= rhs; w_ *= rhs;
 
     normalized_ = false;
@@ -513,16 +504,16 @@ class CVector3DHT {
     return *this;
   }
 
-  friend Vector operator*(const Vector &lhs, T rhs) {
+  friend Vector operator*(const Vector &lhs, double rhs) {
     return Vector(lhs.x_*rhs, lhs.y_*rhs, lhs.z_*rhs, lhs.w_*rhs);
   }
 
-  friend Vector operator*(T lhs, const Vector &rhs) {
+  friend Vector operator*(double lhs, const Vector &rhs) {
     return Vector(lhs*rhs.x_, lhs*rhs.y_, lhs*rhs.z_, lhs*rhs.w_);
   }
 
-  Vector &operator/=(T rhs) {
-    T irhs = 1.0/rhs;
+  Vector &operator/=(double rhs) {
+    double irhs = 1.0/rhs;
 
     x_ *= irhs; y_ *= irhs; z_ *= irhs; w_ *= irhs;
 
@@ -531,8 +522,8 @@ class CVector3DHT {
     return *this;
   }
 
-  Vector operator/(T rhs) const {
-    T irhs = 1.0/rhs;
+  Vector operator/(double rhs) const {
+    double irhs = 1.0/rhs;
 
     return Vector(x_*irhs, y_*irhs, z_*irhs, w_*irhs);
   }
@@ -540,31 +531,31 @@ class CVector3DHT {
   //------
 
   // dot product
-  T dotProduct(const Vector &v) const {
+  double dotProduct(const Vector &v) const {
     return (x_*v.x_ + y_*v.y_ + z_*v.z_ + w_*v.w_);
   }
 
-//T dotProduct(const Normal &normal) const {
+//double dotProduct(const Normal &normal) const {
 //  return (x_*normal.getX() + y_*normal.getY() + z_*normal.getZ());
 //}
 
-  static T dotProduct(const Vector &v1, const Vector &v2) {
+  static double dotProduct(const Vector &v1, const Vector &v2) {
     return (v1.x_*v2.x_ + v1.y_*v2.y_ + v1.z_*v2.z_ + v1.w_*v2.w_);
   }
 
-  T dotProduct(T x, T y, T z, T w) const {
+  double dotProduct(double x, double y, double z, double w) const {
     return (x_*x + y_*y + z_*z + w_*w);
   }
 
-  static T dotProduct(const Vector &v1, T x2, T y2, T z2, T w2) {
-    return (v1.x_*x2 + v1.y_*y2 + v1.z_*z2, v1.w_*w2);
+  static double dotProduct(const Vector &v1, double x2, double y2, double z2, double w2) {
+    return (v1.x_*x2 + v1.y_*y2 + v1.z_*z2 + v1.w_*w2);
   }
 
-  T dotProductSelf() const {
+  double dotProductSelf() const {
     return (x_*x_ + y_*y_ + z_*z_ + w_*w_);
   }
 
-  static T absDotProduct(const Vector &v1, const Vector &v2) {
+  static double absDotProduct(const Vector &v1, const Vector &v2) {
     return ::fabs(dotProduct(v1, v2));
   }
 
@@ -594,7 +585,7 @@ class CVector3DHT {
                   x_*point.y - y_*point.x);
   }
 
-  Vector crossProduct(T x, T y, T z, T w) const {
+  Vector crossProduct(double x, double y, double z, double w) const {
     return Vector(y_*z - z_*y,
                   z_*w - w_*z,
                   w_*x - x_*w,
@@ -612,7 +603,7 @@ class CVector3DHT {
   //------
 
   friend Point operator+(const Point &lhs, const Vector &rhs) {
-    T x, y, z;
+    double x, y, z;
 
     rhs.getXYZ(&x, &y, &z);
 
@@ -620,7 +611,7 @@ class CVector3DHT {
   }
 
   friend Point operator+=(Point &lhs, const Vector &rhs) {
-    T x, y, z;
+    double x, y, z;
 
     rhs.getXYZ(&x, &y, &z);
 
@@ -630,7 +621,7 @@ class CVector3DHT {
   }
 
   friend Point operator-(const Point &lhs, const Vector &rhs) {
-    T x, y, z;
+    double x, y, z;
 
     rhs.getXYZ(&x, &y, &z);
 
@@ -638,7 +629,7 @@ class CVector3DHT {
   }
 
   friend Point operator-=(Point &lhs, const Vector &rhs) {
-    T x, y, z;
+    double x, y, z;
 
     rhs.getXYZ(&x, &y, &z);
 
@@ -663,8 +654,8 @@ class CVector3DHT {
 
   //------
 
-  T cosIncluded(const Vector &vector1) const {
-    T dot = dotProduct(vector1);
+  double cosIncluded(const Vector &vector1) const {
+    double dot = dotProduct(vector1);
 
     if (! normalized_)
       dot /= length();
@@ -675,8 +666,8 @@ class CVector3DHT {
     return dot;
   }
 
-  static T cosIncluded(const Vector &vector1, const Vector &vector2) {
-    T dot = vector1.dotProduct(vector2);
+  static double cosIncluded(const Vector &vector1, const Vector &vector2) {
+    double dot = vector1.dotProduct(vector2);
 
     if (! vector1.normalized_)
       dot /= vector1.length();
@@ -689,12 +680,12 @@ class CVector3DHT {
 
   //------
 
-  void directionCosines(T *x, T *y, T *z) {
+  void directionCosines(double *x, double *y, double *z) {
     Vector vector1 = normalized();
 
-    *x = vector1.x;
-    *y = vector1.y;
-    *z = vector1.z;
+    *x = vector1.getX();
+    *y = vector1.getY();
+    *z = vector1.getZ();
    }
 
   //------
@@ -707,17 +698,17 @@ class CVector3DHT {
     }
 
     if      (::fabs(vector1.x_) > ::fabs(vector1.y_)) {
-      T ilen = 1.0/::sqrt(vector1.x_*vector1.x_ + vector1.z_*vector1.z_);
+      double ilen = 1.0/::sqrt(vector1.x_*vector1.x_ + vector1.z_*vector1.z_);
 
       *vector2 = Vector(-vector1.z_*ilen, 0.0, vector1.x_*ilen, 0.0);
     }
     else if (::fabs(vector1.y_) > ::fabs(vector1.z_)) {
-      T ilen = 1.0/::sqrt(vector1.y_*vector1.y_ + vector1.z_*vector1.z_);
+      double ilen = 1.0/::sqrt(vector1.y_*vector1.y_ + vector1.z_*vector1.z_);
 
       *vector2 = Vector(0.0, vector1.z_*ilen, -vector1.y_*ilen, 0.0);
     }
     else {
-      T ilen = 1.0/::sqrt(vector1.z_*vector1.z_ + vector1.w_*vector1.w_);
+      double ilen = 1.0/::sqrt(vector1.z_*vector1.z_ + vector1.w_*vector1.w_);
 
       *vector2 = Vector(0.0, 0.0, vector1.w_*ilen, -vector1.z_*ilen);
     }
@@ -730,7 +721,7 @@ class CVector3DHT {
 #if 0
   void getBarycentrics(const Vector &vector1, const Vector &vector2,
                        const Vector &vector3, const Vector &vector4,
-                       T barycentric[4]) const {
+                       double barycentric[4]) const {
     // compute the vectors relative to V3 of the tetrahedron
     Vector diff[4] = {
       vector1 - vector4,
@@ -743,7 +734,7 @@ class CVector3DHT {
     // for computing barycentric coordinates can be ill-conditioned.  To avoid
     // this, uniformly scale the tetrahedron edges to be of order 1.  The
     // scaling of all differences does not change the barycentric coordinates.
-    T maxval = 0.0;
+    double maxval = 0.0;
 
     for (int i = 0; i < 3; ++i)
       for (int j = 0; j < 3; ++j)
@@ -751,20 +742,20 @@ class CVector3DHT {
 
     // scale down only large data
     if (maxval > 1.0) {
-      T imaxval = 1.0/maxval;
+      double imaxval = 1.0/maxval;
 
       for (int i = 0; i < 4; i++)
         diff[i] *= imaxval;
     }
 
-    T det = diff[0].dotProduct(diff[1].crossProduct(diff[2]));
+    double det = diff[0].dotProduct(diff[1].crossProduct(diff[2]));
 
     Vector c12 = diff[1].crossProduct(diff[2]);
     Vector c20 = diff[2].crossProduct(diff[0]);
     Vector c01 = diff[0].crossProduct(diff[1]);
 
     if (::fabs(det) > 1E-6 ) {
-      T idet = 1.0/det;
+      double idet = 1.0/det;
 
       barycentric[0] = diff[3].dotProduct(c12)*idet;
       barycentric[1] = diff[3].dotProduct(c20)*idet;
@@ -780,11 +771,11 @@ class CVector3DHT {
       Vector d23     = vector2 - vector3;
       Vector d13cd23 = d13.crossProduct(d23);
 
-      T max_length = d13cd23.lengthSqr();
+      double max_length = d13cd23.lengthSqr();
 
       int max_ind = 3;
 
-      T length2 = c01.lengthSqr();
+      double length2 = c01.lengthSqr();
 
       if (length2 > max_length) {
         max_ind    = 0;
@@ -806,7 +797,7 @@ class CVector3DHT {
       }
 
       if (max_length > 1E-6) {
-        T imax_length = 1.0/max_length;
+        double imax_length = 1.0/max_length;
 
         Vector tmp;
 
@@ -862,11 +853,11 @@ class CVector3DHT {
         // The tetrahedron is potentially a sliver.  Determine the edge of
         // maximum length and compute barycentric coordinates with respect
         // to that edge.
-        T max_length2 = diff[0].lengthSqr();
+        double max_length2 = diff[0].lengthSqr();
 
         max_ind = 0;  // <V0,V3>
 
-        T length2 = diff[1].lengthSqr();
+        double length2 = diff[1].lengthSqr();
 
         if (length2 > max_length2) {
           max_ind     = 1;  // <V1,V3>
@@ -904,7 +895,7 @@ class CVector3DHT {
         }
 
         if ( max_length2 > 1E-6 ) {
-          T imax_length2 = 1.0/max_length2;
+          double imax_length2 = 1.0/max_length2;
 
           if ( max_ind == 0 ) {
             // P-V3 = t*(V0-V3)
@@ -970,12 +961,14 @@ class CVector3DHT {
   //------
 
  private:
-  CVector3DHT(T x, T y, T z, T w, bool normalized) :
+  CVector3DH(double x, double y, double z, double w, bool normalized) :
    x_(x), y_(y), z_(z), w_(w), normalized_(normalized) {
   }
-};
 
-typedef CVector3DHT<double> CVector3D;
-typedef CVector3DHT<float>  CVector3DF;
+ private:
+  double x_ { 0 }, y_ { 0 }, z_ { 0 }, w_ { 1 };
+
+  bool normalized_ { false };
+};
 
 #endif

@@ -67,7 +67,7 @@ namespace CMathGeom3D {
   void orthogonalize(const std::vector<CVector3D> &ivectors, std::vector<CVector3D> &ovectors);
 }
 
-#include <CPlane3D.h>
+class CPlane3D;
 
 namespace CMathGeom3D {
   bool LinePlaneIntersect(const CLine3D &line, const CPlane3D &plane,
@@ -80,7 +80,7 @@ namespace CMathGeom3D {
   bool PointPlaneDistance(const CPoint3D &point, const CPlane3D &plane, double *dist);
 }
 
-#include <CNPlane3D.h>
+class CNPlane3D;
 
 namespace CMathGeom3D {
   bool LinePlaneIntersect(const CPoint3D &point1, const CPoint3D &point2,

@@ -1,15 +1,20 @@
 #ifndef CLargestRect_H
 #define CLargestRect_H
 
+// Template class to extract largest rectange from array of values DATA of type VALUE
+//
+// DATA must support the getValue(int ix, int iy) method.
 template<typename DATA, typename VALUE>
 class CLargestRect {
  public:
   struct Rect {
-    int left, top, width, height;
+    int left { 0 }, top { 0 }, width { -1 }, height { -1 };
 
-    Rect(int l, int t, int w, int h) :
+    Rect(int l=0, int t=0, int w=-1, int h=-1) :
      left(l), top(t), width(w), height(h) {
     }
+
+    bool isValid() const { return (width > 0 && height > 0); }
 
     int area() const {
       return width*height;
@@ -124,7 +129,7 @@ class CLargestRect {
 
  private:
   const DATA &data_;
-  int         width_, height_;
+  int         width_ { 0 }, height_ { 0 };
 };
 
 #endif

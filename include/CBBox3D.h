@@ -5,38 +5,33 @@
 #include <CPoint3D.h>
 #include <CVector3D.h>
 
-template<typename T>
-class CBBox3DT {
- private:
-  typedef CPoint3DT<T>  Point;
-  typedef CVector3DT<T> Vector;
-
+class CBBox3D {
  public:
-  CBBox3DT() :
+  CBBox3D() :
    pmin_(), pmax_(), set_(false) {
   }
 
-  CBBox3DT(const CBBox3DT &bbox) :
+  CBBox3D(const CBBox3D &bbox) :
    pmin_(bbox.pmin_), pmax_(bbox.pmax_), set_(bbox.set_) {
   }
 
-  CBBox3DT(const Point &point) {
+  CBBox3D(const CPoint3D &point) {
     pmin_ = point;
     pmax_ = point;
 
     set_ = true;
   }
 
-  CBBox3DT(const Point &point1, const Point &point2) {
-    pmin_ = Point::min(point1, point2);
-    pmax_ = Point::max(point1, point2);
+  CBBox3D(const CPoint3D &point1, const CPoint3D &point2) {
+    pmin_ = CPoint3D::min(point1, point2);
+    pmax_ = CPoint3D::max(point1, point2);
 
     set_ = true;
   }
 
-  CBBox3DT(T x1, T y1, T z1, T x2, T y2, T z2) {
-    pmin_ = Point(std::min(x1,x2),std::min(y1,y2),std::min(z1,z2));
-    pmax_ = Point(std::max(x1,x2),std::max(y1,y2),std::max(z1,z2));
+  CBBox3D(double x1, double y1, double z1, double x2, double y2, double z2) {
+    pmin_ = CPoint3D(std::min(x1,x2),std::min(y1,y2),std::min(z1,z2));
+    pmax_ = CPoint3D(std::max(x1,x2),std::max(y1,y2),std::max(z1,z2));
 
     set_ = true;
   }
@@ -45,84 +40,84 @@ class CBBox3DT {
 
   bool isSet() const { return set_; }
 
-  const Point &getMin() const { return pmin_; }
-  const Point &getMax() const { return pmax_; }
+  const CPoint3D &getMin() const { return pmin_; }
+  const CPoint3D &getMax() const { return pmax_; }
 
-  void setMin(const Point &pmin) { pmin_ = pmin; }
-  void setMax(const Point &pmax) { pmax_ = pmax; }
+  void setMin(const CPoint3D &pmin) { pmin_ = pmin; }
+  void setMax(const CPoint3D &pmax) { pmax_ = pmax; }
 
-  void setXMin(T x) { pmin_.x = x; }
-  void setYMin(T y) { pmin_.y = y; }
-  void setZMin(T z) { pmin_.z = z; }
+  void setXMin(double x) { pmin_.x = x; }
+  void setYMin(double y) { pmin_.y = y; }
+  void setZMin(double z) { pmin_.z = z; }
 
-  void setXMax(T x) { pmax_.x = x; }
-  void setYMax(T y) { pmax_.y = y; }
-  void setZMax(T z) { pmax_.z = z; }
+  void setXMax(double x) { pmax_.x = x; }
+  void setYMax(double y) { pmax_.y = y; }
+  void setZMax(double z) { pmax_.z = z; }
 
-  T getXMin() const { return pmin_.x; }
-  T getYMin() const { return pmin_.y; }
-  T getZMin() const { return pmin_.z; }
+  double getXMin() const { return pmin_.x; }
+  double getYMin() const { return pmin_.y; }
+  double getZMin() const { return pmin_.z; }
 
-  T getXMax() const { return pmax_.x; }
-  T getYMax() const { return pmax_.y; }
-  T getZMax() const { return pmax_.z; }
+  double getXMax() const { return pmax_.x; }
+  double getYMax() const { return pmax_.y; }
+  double getZMax() const { return pmax_.z; }
 
-  Point getBottomMax() const { return Point(pmax_.x, pmax_.y, pmin_.z); }
-  Point getTopMin   () const { return Point(pmin_.x, pmin_.y, pmax_.z); }
+  CPoint3D getBottomMax() const { return CPoint3D(pmax_.x, pmax_.y, pmin_.z); }
+  CPoint3D getTopMin   () const { return CPoint3D(pmin_.x, pmin_.y, pmax_.z); }
 
-  CBBox3DT operator+(const Point &rhs) const {
-    CBBox3DT t(*this);
-
-    t += rhs;
-
-    return t;
-  }
-
-  CBBox3DT &operator+=(const Point &rhs) {
-    add(rhs);
-
-    return *this;
-  }
-
-  CBBox3DT operator+(const Vector &rhs) const {
-    CBBox3DT t(*this);
+  CBBox3D operator+(const CPoint3D &rhs) const {
+    CBBox3D t(*this);
 
     t += rhs;
 
     return t;
   }
 
-  CBBox3DT &operator+=(const Vector &rhs) {
+  CBBox3D &operator+=(const CPoint3D &rhs) {
     add(rhs);
 
     return *this;
   }
 
-  CBBox3DT operator+(const CBBox3DT &rhs) const {
-    CBBox3DT t(*this);
+  CBBox3D operator+(const CVector3D &rhs) const {
+    CBBox3D t(*this);
 
     t += rhs;
 
     return t;
   }
 
-  CBBox3DT &operator+=(const CBBox3DT &rhs) {
+  CBBox3D &operator+=(const CVector3D &rhs) {
     add(rhs);
 
     return *this;
   }
 
-  CBBox3DT &operator*=(T rhs) {
+  CBBox3D operator+(const CBBox3D &rhs) const {
+    CBBox3D t(*this);
+
+    t += rhs;
+
+    return t;
+  }
+
+  CBBox3D &operator+=(const CBBox3D &rhs) {
+    add(rhs);
+
+    return *this;
+  }
+
+  CBBox3D &operator*=(double rhs) {
     scale(rhs);
 
     return *this;
   }
 
-  void add(T x, T y, T z) {
-    add(Point(x, y, z));
+  void add(double x, double y, double z) {
+    add(CPoint3D(x, y, z));
   }
 
-  void add(const Point &point) {
+  void add(const CPoint3D &point) {
     if (! set_) {
       pmin_ = point;
       pmax_ = point;
@@ -130,16 +125,16 @@ class CBBox3DT {
       set_ = true;
     }
     else {
-      pmin_ = Point::min(pmin_, point);
-      pmax_ = Point::max(pmax_, point);
+      pmin_ = CPoint3D::min(pmin_, point);
+      pmax_ = CPoint3D::max(pmax_, point);
     }
   }
 
-  void add(const Vector &vector)  {
+  void add(const CVector3D &vector)  {
     add(vector.point());
   }
 
-  void add(const CBBox3DT &bbox) {
+  void add(const CBBox3D &bbox) {
     if (! bbox.set_) return;
 
     if (! set_) {
@@ -149,18 +144,18 @@ class CBBox3DT {
       set_ = true;
     }
     else {
-      pmin_ = Point::min(pmin_, bbox.pmin_);
-      pmax_ = Point::max(pmax_, bbox.pmax_);
+      pmin_ = CPoint3D::min(pmin_, bbox.pmin_);
+      pmax_ = CPoint3D::max(pmax_, bbox.pmax_);
     }
   }
 
-  bool overlaps(const CBBox3DT &bbox) {
+  bool overlaps(const CBBox3D &bbox) {
     return ((pmax_.x >= bbox.pmin_.x && pmin_.x <= bbox.pmax_.x) &&
             (pmax_.y >= bbox.pmin_.y && pmin_.y <= bbox.pmax_.y) &&
             (pmax_.z >= bbox.pmin_.z && pmin_.z <= bbox.pmax_.z));
   }
 
-  bool inside(const CBBox3DT &bbox) {
+  bool inside(const CBBox3D &bbox) {
     if ((pmin_.x > bbox.pmax_.x || pmax_.x < bbox.pmax_.x) ||
         (pmin_.y > bbox.pmax_.y || pmax_.y < bbox.pmax_.y) ||
         (pmin_.z > bbox.pmax_.z || pmax_.z < bbox.pmax_.z))
@@ -169,25 +164,25 @@ class CBBox3DT {
     return true;
   }
 
-  bool inside(const Point &point) {
+  bool inside(const CPoint3D &point) {
     return ((point.x >= pmin_.x && point.x <= pmax_.x) &&
             (point.y >= pmin_.y && point.y <= pmax_.y) &&
             (point.z >= pmin_.z && point.z <= pmax_.z));
   }
 
-  void expand(T delta) {
+  void expand(double delta) {
     pmin_ += delta;
     pmax_ += delta;
   }
 
-  T volume() const {
-    Vector diag = getSize();
+  double volume() const {
+    CVector3D diag = getSize();
 
     return diag.getX()*diag.getY()*diag.getZ();
   }
 
   CMathGen::AxisType3D maxAxis() const {
-    Vector diag = getSize();
+    CVector3D diag = getSize();
 
     if      (diag.getX() > diag.getY() && diag.getX() > diag.getZ())
       return CMathGen::X_AXIS_3D;
@@ -197,41 +192,41 @@ class CBBox3DT {
       return CMathGen::Z_AXIS_3D;
   }
 
-  Point getCenter() const {
+  CPoint3D getCenter() const {
     return 0.5*(pmin_ + pmax_);
   }
 
-  Vector getSize() const {
-    return Vector(pmin_, pmax_);
+  CVector3D getSize() const {
+    return CVector3D(pmin_, pmax_);
   }
 
-  T getXSize() const {
+  double getXSize() const {
     return (pmax_.x - pmin_.x);
   }
 
-  T getYSize() const {
+  double getYSize() const {
     return (pmax_.y - pmin_.y);
   }
 
-  T getZSize() const {
+  double getZSize() const {
     return (pmax_.z - pmin_.z);
   }
 
-  T getRadius() const {
-    Vector radius = 0.5*getSize();
+  double getRadius() const {
+    CVector3D radius = 0.5*getSize();
 
     return radius.length();
   }
 
-  void scale(T factor) {
-    Point center = getCenter();
+  void scale(double factor) {
+    CPoint3D center = getCenter();
 
-    pmin_ = center + Vector(center, pmin_)*factor;
-    pmax_ = center + Vector(center, pmax_)*factor;
+    pmin_ = center + CVector3D(center, pmin_)*factor;
+    pmax_ = center + CVector3D(center, pmax_)*factor;
   }
 
  public:
-  bool lineInteracts(const Point &l1, const Point &l2) const {
+  bool lineInteracts(const CPoint3D &l1, const CPoint3D &l2) const {
     // while line outside (no overlap)
     if (l1.x < pmin_.x && l2.x < pmin_.x) return false;
     if (l1.x > pmax_.x && l2.x > pmax_.x) return false;
@@ -245,7 +240,7 @@ class CBBox3DT {
 
   // returns true if line (l1, l2) intersects with the box (pmin_, pmax_)
   // returns intersection point in pi
-  bool lineIntersect(const Point &l1, const Point &l2, Point &pi) const {
+  bool lineIntersect(const CPoint3D &l1, const CPoint3D &l2, CPoint3D &pi) const {
     // while line outside (no overlap)
     if (l1.x < pmin_.x && l2.x < pmin_.x) return false;
     if (l1.x > pmax_.x && l2.x > pmax_.x) return false;
@@ -288,7 +283,8 @@ class CBBox3DT {
   }
 
  private:
-  int getIntersect(T d1, T d2, const Point &p1, const Point &p2, Point &pi) const {
+  int getIntersect(double d1, double d2, const CPoint3D &p1, const CPoint3D &p2,
+                   CPoint3D &pi) const {
     if ((d1*d2) >= 0.0) return 0;
 
     if (d1 == d2) return 0;
@@ -298,7 +294,7 @@ class CBBox3DT {
     return 1;
   }
 
-  bool inBox(const Point &pi, int axis) const {
+  bool inBox(const CPoint3D &pi, int axis) const {
     if      (axis == 1) {
       if (pi.z > pmin_.z && pi.z < pmax_.z && pi.y > pmin_.y && pi.y < pmax_.y) return true;
     }
@@ -320,18 +316,16 @@ class CBBox3DT {
       os << "(" << pmin_ << ") (" << pmax_ << ")";
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const CBBox3DT &bbox) {
+  friend std::ostream &operator<<(std::ostream &os, const CBBox3D &bbox) {
     bbox.print(os);
 
     return os;
   }
 
  protected:
-  Point pmin_;
-  Point pmax_;
-  bool  set_;
+  CPoint3D pmin_;
+  CPoint3D pmax_;
+  bool     set_ { false };
 };
-
-typedef CBBox3DT<double> CBBox3D;
 
 #endif

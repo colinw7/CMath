@@ -4,100 +4,87 @@
 #include <CVector2D.h>
 #include <CMatrix2D.h>
 
-template<typename T>
-class COrthonormalBasis2DT {
- private:
-  typedef CVector2DT<T> Vector;
-  typedef CPoint2DT<T>  Point;
-  typedef CMatrix2DT<T> Matrix;
-
-  /// Basis Vectors
-  Vector u_, v_;
-
-  /// Matrix containing Basis Vectors as columns
-  Matrix m_;
-
+class COrthonormalBasis2D {
  public:
-  COrthonormalBasis2DT() :
+  COrthonormalBasis2D() :
    u_(1,0), v_(0,1), m_(u_,v_) {
   }
 
-  COrthonormalBasis2DT(const Vector &u, const Vector &v) :
+  COrthonormalBasis2D(const CVector2D &u, const CVector2D &v) :
    u_(u), v_(v), m_(u_, v_) {
     if (! validate()) { std::cerr << "Invalid Basis" << std::endl; assert(false); }
   }
 
-  const Vector &getU() const { return u_; }
-  const Vector &getV() const { return v_; }
+  const CVector2D &getU() const { return u_; }
+  const CVector2D &getV() const { return v_; }
 
-  const Matrix &getMatrix() const { return m_; }
+  const CMatrix2D &getMatrix() const { return m_; }
 
   void reset() {
-    setUV(Vector(1,0),Vector(0,1));
+    setUV(CVector2D(1,0),CVector2D(0,1));
   }
 
-  void setUV(const Vector &u, const Vector &v) {
+  void setUV(const CVector2D &u, const CVector2D &v) {
     if (validate(u, v)) {
       u_ = u; v_ = v;
 
-      m_ = Matrix(u_, v_);
+      m_ = CMatrix2D(u_, v_);
     }
     else {
       std::cerr << "Invalid Basis" << std::endl; assert(false);
     }
   }
 
-  void getUV(Vector &u, Vector &v) {
+  void getUV(CVector2D &u, CVector2D &v) {
     u = u_; v = v_;
   }
 
-  void initFromU(const Vector &u) {
-    Vector u1 = u.unit();
+  void initFromU(const CVector2D &u) {
+    CVector2D u1 = u.unit();
 
-    Vector v1(u1.getY(), -u1.getX());
-
-    setUV(u1, v1);
-  }
-
-  void initFromV(const Vector &v) {
-    Vector v1 = v.unit();
-
-    Vector u1(v1.getY(), -v1.getX());
+    CVector2D v1(u1.getY(), -u1.getX());
 
     setUV(u1, v1);
   }
 
-  Vector fromBasis(const Vector &a) const {
-    return Vector(a.dotProduct(u_), a.dotProduct(v_));
+  void initFromV(const CVector2D &v) {
+    CVector2D v1 = v.unit();
+
+    CVector2D u1(v1.getY(), -v1.getX());
+
+    setUV(u1, v1);
   }
 
-  Point fromBasis(const Point &p) const {
-    return fromBasis(Vector(p.x, p.y)).point();
+  CVector2D fromBasis(const CVector2D &a) const {
+    return CVector2D(a.dotProduct(u_), a.dotProduct(v_));
   }
 
-  Vector fromBasis(T x, T y) const {
-    return fromBasis(Vector(x, y));
+  CPoint2D fromBasis(const CPoint2D &p) const {
+    return fromBasis(CVector2D(p.x, p.y)).point();
   }
 
-  Vector toBasis(const Vector &a) const {
-    return Vector(a.getX()*u_ + a.getY()*v_);
+  CVector2D fromBasis(double x, double y) const {
+    return fromBasis(CVector2D(x, y));
   }
 
-  Point toBasis(const Point &p) const {
-    return toBasis(Vector(p.x, p.y)).point();
+  CVector2D toBasis(const CVector2D &a) const {
+    return CVector2D(a.getX()*u_ + a.getY()*v_);
   }
 
-  Vector toBasis(T x, T y) const {
-    return toBasis(Vector(x, y));
+  CPoint2D toBasis(const CPoint2D &p) const {
+    return toBasis(CVector2D(p.x, p.y)).point();
   }
 
-  friend bool operator==(const COrthonormalBasis2DT &lhs,
-                         const COrthonormalBasis2DT &rhs) {
+  CVector2D toBasis(double x, double y) const {
+    return toBasis(CVector2D(x, y));
+  }
+
+  friend bool operator==(const COrthonormalBasis2D &lhs, const COrthonormalBasis2D &rhs) {
     return (lhs.u_ == rhs.u_ && lhs.v_ == rhs.v_);
   }
 
   // Right-Handed Rotations
-  void rotate(T a) {
+  void rotate(double a) {
     CMatrix2D r;
 
     r.setRotation(a);
@@ -117,11 +104,11 @@ class COrthonormalBasis2DT {
     return validate(u_, v_);
   }
 
-  static bool validate(const Vector &u, const Vector &v) {
+  static bool validate(const CVector2D &u, const CVector2D &v) {
     if (u.isZero() || v.isZero())
       return false;
 
-    T uv = u.dotProduct(v);
+    double uv = u.dotProduct(v);
 
     if (! REAL_EQ(uv, 0))
       return false;
@@ -135,13 +122,18 @@ class COrthonormalBasis2DT {
     os << "(" << u_ << ", " << v_ << ") : [" << m_ << "]";
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const COrthonormalBasis2DT &basis) {
+  friend std::ostream &operator<<(std::ostream &os, const COrthonormalBasis2D &basis) {
     basis.print(os);
 
     return os;
   }
-};
 
-typedef COrthonormalBasis2DT<double> COrthonormalBasis2D;
+ private:
+  /// Basis Vectors
+  CVector2D u_, v_;
+
+  /// CMatrix2D containing Basis Vectors as columns
+  CMatrix2D m_;
+};
 
 #endif

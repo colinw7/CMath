@@ -7,57 +7,45 @@
 /* Cube of specified size centered at origin
 */
 
-template<typename T>
-class CCube3DT : public CShape3DT<T> {
- private:
-  typedef typename CShape3DT<T>::BBox BBox;
-  typedef CPlane3DT<T>                Plane;
-  typedef CVector3DT<T>               Vector;
-  typedef CLine3DT<T>                 Line;
-  typedef CPoint3DT<T>                Point;
-
-  T     size_, radius_;
-  Point pmin_, pmax_;
-  Plane plane1_, plane2_, plane3_, plane4_, plane5_, plane6_;
-
+class CCube3D : public CShape3D {
  public:
-  CCube3DT(T size=T(1)) :
+  CCube3D(double size=double(1)) :
    size_(size) {
     radius_ = 0.5*size_;
 
-    pmin_ = Point(-radius_, -radius_, -radius_);
-    pmax_ = Point( radius_,  radius_,  radius_);
+    pmin_ = CPoint3D(-radius_, -radius_, -radius_);
+    pmax_ = CPoint3D( radius_,  radius_,  radius_);
 
-    plane1_ = createPlane(Vector(-1,  0,  0));
-    plane2_ = createPlane(Vector( 1,  0,  0));
-    plane3_ = createPlane(Vector( 0, -1,  0));
-    plane4_ = createPlane(Vector( 0,  1,  0));
-    plane5_ = createPlane(Vector( 0,  0, -1));
-    plane6_ = createPlane(Vector( 0,  0,  1));
+    plane1_ = createPlane(CVector3D(-1,  0,  0));
+    plane2_ = createPlane(CVector3D( 1,  0,  0));
+    plane3_ = createPlane(CVector3D( 0, -1,  0));
+    plane4_ = createPlane(CVector3D( 0,  1,  0));
+    plane5_ = createPlane(CVector3D( 0,  0, -1));
+    plane6_ = createPlane(CVector3D( 0,  0,  1));
   }
 
-  T getSize() const { return size_; }
+  double getSize() const { return size_; }
 
-  BBox getBBox() const {
-    return BBox(CShape3D::transformFrom(pmin_), CShape3D::transformFrom(pmax_));
+  CBBox3D getBBox() const {
+    return CBBox3D(CShape3D::transformFrom(pmin_), CShape3D::transformFrom(pmax_));
   }
 
-  bool intersect(const Line &line, T *tmin, T *tmax) const {
-    Point p1 = CShape3D::transformTo(line.start());
-    Point p2 = CShape3D::transformTo(line.end  ());
+  bool intersect(const CLine3D &line, double *tmin, double *tmax) const {
+    CPoint3D p1 = CShape3D::transformTo(line.start());
+    CPoint3D p2 = CShape3D::transformTo(line.end  ());
 
-    Line l(p1, p2);
+    CLine3D l(p1, p2);
 
-    typename CShape3DT<T>::TRange trange;
+    typename CShape3D::TRange trange;
 
-    T t;
+    double t;
 
     CBBox2D bbox_xy(pmin_.x, pmin_.y, pmax_.x, pmax_.y);
     CBBox2D bbox_xz(pmin_.x, pmin_.z, pmax_.x, pmax_.z);
     CBBox2D bbox_yz(pmin_.y, pmin_.z, pmax_.y, pmax_.z);
 
     if (plane1_.intersect(l, &t) && trange.isOutside(t)) {
-      Point p = l.point(t);
+      CPoint3D p = l.point(t);
 
       CPoint2D p1(p.y, p.z);
 
@@ -66,7 +54,7 @@ class CCube3DT : public CShape3DT<T> {
     }
 
     if (plane2_.intersect(l, &t) && trange.isOutside(t)) {
-      Point p = l.point(t);
+      CPoint3D p = l.point(t);
 
       CPoint2D p1(p.y, p.z);
 
@@ -75,7 +63,7 @@ class CCube3DT : public CShape3DT<T> {
     }
 
     if (plane3_.intersect(l, &t) && trange.isOutside(t)) {
-      Point p = l.point(t);
+      CPoint3D p = l.point(t);
 
       CPoint2D p1(p.x, p.z);
 
@@ -84,7 +72,7 @@ class CCube3DT : public CShape3DT<T> {
     }
 
     if (plane4_.intersect(l, &t) && trange.isOutside(t)) {
-      Point p = l.point(t);
+      CPoint3D p = l.point(t);
 
       CPoint2D p1(p.x, p.z);
 
@@ -93,7 +81,7 @@ class CCube3DT : public CShape3DT<T> {
     }
 
     if (plane5_.intersect(l, &t) && trange.isOutside(t)) {
-      Point p = l.point(t);
+      CPoint3D p = l.point(t);
 
       CPoint2D p1(p.x, p.y);
 
@@ -102,7 +90,7 @@ class CCube3DT : public CShape3DT<T> {
     }
 
     if (plane6_.intersect(l, &t) && trange.isOutside(t)) {
-      Point p = l.point(t);
+      CPoint3D p = l.point(t);
 
       CPoint2D p1(p.x, p.y);
 
@@ -119,10 +107,10 @@ class CCube3DT : public CShape3DT<T> {
     return true;
   }
 
-  Vector pointNormal(const Point &point) const {
-    Point p = CShape3D::transformTo(point);
+  CVector3D pointNormal(const CPoint3D &point) const {
+    CPoint3D p = CShape3D::transformTo(point);
 
-    Vector n;
+    CVector3D n;
 
     if      (fabs(plane1_.value(p)) <= 1E-6) n = plane1_.getNormal();
     else if (fabs(plane2_.value(p)) <= 1E-6) n = plane2_.getNormal();
@@ -130,13 +118,13 @@ class CCube3DT : public CShape3DT<T> {
     else if (fabs(plane4_.value(p)) <= 1E-6) n = plane4_.getNormal();
     else if (fabs(plane5_.value(p)) <= 1E-6) n = plane5_.getNormal();
     else if (fabs(plane6_.value(p)) <= 1E-6) n = plane6_.getNormal();
-    else                                     n = Vector(1,0,0);
+    else                                     n = CVector3D(1,0,0);
 
     return CShape3D::transformFrom(n);
   }
 
-  CVector2D pointToSurfaceVector(const Point &point) const {
-    Point p = CShape3D::transformTo(point);
+  CVector2D pointToSurfaceVector(const CPoint3D &point) const {
+    CPoint3D p = CShape3D::transformTo(point);
 
     if (fabs(plane1_.value(p)) <= 1E-6)
       return CVector2D((p.y - pmin_.y)/(pmax_.y - pmin_.y), (p.z - pmin_.z)/(pmax_.z - pmin_.z));
@@ -155,13 +143,16 @@ class CCube3DT : public CShape3DT<T> {
   }
 
  private:
-  Plane createPlane(const Vector &vector) {
-    T r = radius_;
+  CPlane3D createPlane(const CVector3D &vector) {
+    double r = radius_;
 
-    return Plane((vector*r).point(), vector);
+    return CPlane3D((vector*r).point(), vector);
   }
-};
 
-typedef CCube3DT<double> CCube3D;
+ private:
+  double   size_, radius_;
+  CPoint3D pmin_, pmax_;
+  CPlane3D plane1_, plane2_, plane3_, plane4_, plane5_, plane6_;
+};
 
 #endif

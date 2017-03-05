@@ -2,10 +2,7 @@
 #define CGEN_SHAPE_H
 
 #include <boost/shared_ptr.hpp>
-
-namespace gui { namespace led {
-
-namespace wire_edit {
+#include <iostream>
 
 // point class (integer values)
 class IPoint {
@@ -208,10 +205,10 @@ class IRect {
   void setBottom(int b) { ymin_ = b; set_ = true; }
   void setTop   (int t) { ymax_ = t; set_ = true; }
 
-  void offsetLeft  (int dl) { dvuAssert(set_); xmin_ += dl; }
-  void offsetRight (int dr) { dvuAssert(set_); xmax_ += dr; }
-  void offsetBottom(int db) { dvuAssert(set_); ymin_ += db; }
-  void offsetTop   (int dt) { dvuAssert(set_); ymax_ += dt; }
+  void offsetLeft  (int dl) { assert(set_); xmin_ += dl; }
+  void offsetRight (int dr) { assert(set_); xmax_ += dr; }
+  void offsetBottom(int db) { assert(set_); ymin_ += db; }
+  void offsetTop   (int dt) { assert(set_); ymax_ += dt; }
 
   int width () const { return abs(xmax_ - xmin_); }
   int height() const { return abs(ymax_ - ymin_); }
@@ -238,21 +235,21 @@ class IRect {
   }
 
   void moveBy(int dx, int dy) {
-    dvuAssert(set_);
+    assert(set_);
 
     xmin_ += dx; ymin_ += dy;
     xmax_ += dx; ymax_ += dy;
   }
 
   void expandBy(int dx, int dy) {
-    dvuAssert(set_);
+    assert(set_);
 
     xmin_ -= dx; ymin_ -= dy;
     xmax_ += dx; ymax_ += dy;
   }
 
   void expandBy(int dxl, int dyb, int dxr, int dyt) {
-    dvuAssert(set_);
+    assert(set_);
 
     xmin_ -= dxl; ymin_ -= dyb;
     xmax_ += dxr; ymax_ += dyt;
@@ -260,28 +257,28 @@ class IRect {
 
   // is point (p) inside this rectangle
   bool contains(const IPoint &p) const {
-    dvuAssert(set_);
+    assert(set_);
 
     return (p.x() >= xmin_ && p.x() <= xmax_ && p.y() >= ymin_ && p.y() <= ymax_);
   }
 
   // is x value inside the bounds of this rectangle
   bool containsX(int x) const {
-    dvuAssert(set_);
+    assert(set_);
 
     return (x >= xmin_ && x <= xmax_);
   }
 
   // is y value inside the bounds of this rectangle
   bool containsY(int y) const {
-    dvuAssert(set_);
+    assert(set_);
 
     return (y >= ymin_ && y <= ymax_);
   }
 
   // is rectangle (ir) inside this rectangle
   bool contains(const IRect &ir) const {
-    dvuAssert(set_ && ir.set_);
+    assert(set_ && ir.set_);
 
     return (ir.xmin_ >= xmin_ && ir.xmax_ <= xmax_ &&
             ir.ymin_ >= ymin_ && ir.ymax_ <= ymax_);
@@ -308,7 +305,7 @@ class IRect {
       set_  = r.set_;
     }
     else {
-      dvuAssert(r.set_);
+      assert(r.set_);
 
       xmin_ = std::min(xmin_, r.xmin_); ymin_ = std::min(ymin_, r.ymin_);
       xmax_ = std::max(xmax_, r.xmax_); ymax_ = std::max(ymax_, r.ymax_);
@@ -318,8 +315,8 @@ class IRect {
   }
 
   static IRect combine(const IRect &rect1, const IRect &rect2) {
-    dvuAssert(rect1.set_);
-    dvuAssert(rect2.set_);
+    assert(rect1.set_);
+    assert(rect2.set_);
 
     int l = std::min(rect1.xmin_, rect2.xmin_); int b = std::min(rect1.ymin_, rect2.ymin_);
     int r = std::max(rect1.xmax_, rect2.xmax_); int t = std::max(rect1.ymax_, rect2.ymax_);
@@ -332,7 +329,7 @@ class IRect {
   }
 
   static bool overlaps(const IRect &rect1, const IRect &rect2) {
-    dvuAssert(rect1.set_ && rect2.set_);
+    assert(rect1.set_ && rect2.set_);
 
     if (rect1.xmax_ < rect2.xmin_ || rect1.xmin_ > rect2.xmax_ ||
         rect1.ymax_ < rect2.ymin_ || rect1.ymin_ > rect2.ymax_)
@@ -342,7 +339,7 @@ class IRect {
   }
 
   static bool intersect(const IRect &rect1, const IRect &rect2, IRect &irect) {
-    dvuAssert(rect1.set_ && rect2.set_);
+    assert(rect1.set_ && rect2.set_);
 
     if (rect1.xmax_ < rect2.xmin_ || rect1.xmin_ > rect2.xmax_ ||
         rect1.ymax_ < rect2.ymin_ || rect1.ymin_ > rect2.ymax_)
@@ -361,7 +358,7 @@ class IRect {
     IRect irect;
 
     bool rc = intersect(rect1, rect2, irect);
-    dvuAssert(rc);
+    assert(rc);
 
     return irect;
   }
@@ -466,7 +463,7 @@ class RRect {
 
   // is point (p) inside this rectangle
   bool contains(const RPoint &p) const {
-    dvuAssert(set_);
+    assert(set_);
 
     return (p.x() >= xmin_ && p.x() <= xmax_ &&
             p.y() >= ymin_ && p.y() <= ymax_);
@@ -960,7 +957,7 @@ class Polygon {
 
   //! Orientation on polygon - clockwise/anti-clockwise
   static int PolygonOrientation(const Points &points) {
-    dvuAssert(points.size() >= 3);
+    assert(points.size() >= 3);
 
     const RPoint &point1 = points[0];
     const RPoint &point2 = points[1];
@@ -1336,7 +1333,7 @@ class BoundaryList {
   uint size() const { return boundaries_.size(); }
 
   BoundaryP getBoundary(int i) const {
-    dvuAssert(i >= 0 && i < int(size()));
+    assert(i >= 0 && i < int(size()));
 
     return boundaries_[i];
   }

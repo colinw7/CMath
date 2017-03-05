@@ -5,25 +5,8 @@
 #include <CMathGen.h>
 
 #include <cassert>
-#include <cmath>
 
-template<typename T>
-class CPoint2DT;
-
-template<typename T>
-class CNormal2DT;
-
-template<typename T>
-class CVector2DT {
- private:
-  typedef CVector2DT<T> Vector;
-  typedef CPoint2DT<T>  Point;
-  typedef CNormal2DT<T> Normal;
-
- private:
-  T    x_, y_;
-  bool normalized_;
-
+class CVector2D {
  public:
   enum Type {
     ZERO,
@@ -34,25 +17,18 @@ class CVector2DT {
 
  public:
   // constructor/destructor
-  CVector2DT() :
-   x_(0), y_(0), normalized_(false) {
-  }
+  explicit CVector2D(double x=0, double y=0) : x_(x), y_(y) { }
 
-  CVector2DT(T x, T y) :
-   x_(x), y_(y), normalized_(false) {
-  }
-
- ~CVector2DT() { }
+ ~CVector2D() { }
 
   //------
 
   // copy operations
-  CVector2DT(const Vector &vector) :
-   x_(vector.x_), y_(vector.y_),
-   normalized_(vector.normalized_) {
+  CVector2D(const CVector2D &vector) :
+   x_(vector.x_), y_(vector.y_), normalized_(vector.normalized_) {
   }
 
-  Vector &operator=(const Vector &vector) {
+  CVector2D &operator=(const CVector2D &vector) {
     x_ = vector.x_; y_ = vector.y_;
 
     normalized_ = false;
@@ -67,7 +43,7 @@ class CVector2DT {
     os << "(" << x_ << "," << y_ << ")";
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const Vector &vector) {
+  friend std::ostream &operator<<(std::ostream &os, const CVector2D &vector) {
     vector.print(os);
 
     return os;
@@ -78,46 +54,42 @@ class CVector2DT {
   // accessors
 
   // get
-  T x() const { return x_; }
-  T y() const { return y_; }
+  double x() const { return x_; }
+  double y() const { return y_; }
 
-  T getX() const { return x_; }
-  T getY() const { return y_; }
+  double getX() const { return x_; }
+  double getY() const { return y_; }
 
-  void getXY(T *x, T *y) const {
-    *x = x_; *y = y_;
-  }
+  void getXY(double *x, double *y) const { *x = x_; *y = y_; }
 
-  const T *getValues() const { return &x_; }
+  const double *getValues() const { return &x_; }
 
   // Reference routine would break encapsulation
 
-  T operator[](uint i) const {
+  double operator[](uint i) const {
     assert(i < 2);
 
     return (&x_)[i];
   }
 
   // set
-  void setX(T x) {
-    x_ = x;
-
+  void setX(double x) {
+    x_          = x;
     normalized_ = false;
   }
 
-  void setY(T y) {
-    y_ = y;
-
+  void setY(double y) {
+    y_          = y;
     normalized_ = false;
   }
 
-  void setXY(T x, T y) {
-    x_ = x; y_ = y;
-
+  void setXY(double x, double y) {
+    x_          = x;
+    y_          = y;
     normalized_ = false;
   }
 
-  void iset(uint i, T v) {
+  void iset(uint i, double v) {
     assert(i < 2);
 
     (&x_)[i] = v;
@@ -126,24 +98,29 @@ class CVector2DT {
   }
 
   // more get accessors
-  bool getNormalized() const {
-    return normalized_;
-  }
+  bool getNormalized() const { return normalized_; }
 
   //------
 
-  T length() const {
+  double length() const {
     if (normalized_)
       return 1.0;
 
     return ::sqrt(lengthSqr());
   }
 
-  T modulus() const {
+  double fastLength() const {
+    if (normalized_)
+      return 1.0;
+
+    return CMathGen::fastDistance(int(x_), int(y_));
+  }
+
+  double modulus() const {
     return length();
   }
 
-  T lengthSqr() const {
+  double lengthSqr() const {
     if (normalized_)
       return 1.0;
 
@@ -153,7 +130,6 @@ class CVector2DT {
   //------
 
   // angle
-
   double angle() const {
     return atan2(y_, x_);
   }
@@ -161,7 +137,7 @@ class CVector2DT {
   //------
 
   // comparison
-  int cmp(const Vector &v) const {
+  int cmp(const CVector2D &v) const {
     if      (x_ < v.x_) return -1;
     else if (x_ > v.x_) return 1;
     else if (y_ < v.y_) return -1;
@@ -169,54 +145,54 @@ class CVector2DT {
     else                return 0;
   }
 
-  friend bool operator==(const Vector &lhs, const Vector &rhs) {
+  friend bool operator==(const CVector2D &lhs, const CVector2D &rhs) {
     return lhs.cmp(rhs) == 0;
   }
 
-  friend bool operator!=(const Vector &lhs, const Vector &rhs) {
+  friend bool operator!=(const CVector2D &lhs, const CVector2D &rhs) {
     return lhs.cmp(rhs) != 0;
   }
 
-  friend bool operator< (const Vector &lhs, const Vector &rhs) {
+  friend bool operator< (const CVector2D &lhs, const CVector2D &rhs) {
     return lhs.cmp(rhs) < 0;
   }
 
-  friend bool operator<=(const Vector &lhs, const Vector &rhs) {
+  friend bool operator<=(const CVector2D &lhs, const CVector2D &rhs) {
     return lhs.cmp(rhs) <= 0;
   }
 
-  friend bool operator> (const Vector &lhs, const Vector &rhs) {
+  friend bool operator> (const CVector2D &lhs, const CVector2D &rhs) {
     return lhs.cmp(rhs) > 0;
   }
 
-  friend bool operator>=(const Vector &lhs, const Vector &rhs) {
+  friend bool operator>=(const CVector2D &lhs, const CVector2D &rhs) {
     return lhs.cmp(rhs) >= 0;
   }
 
-  bool eq(const Vector &rhs) const {
+  bool eq(const CVector2D &rhs) const {
     return fabs(x_ - rhs.x_) < 1E-6 &&
            fabs(y_ - rhs.y_) < 1E-6;
   }
 
   //------
 
-  explicit CVector2DT(const Point &point) :
+  explicit CVector2D(const CPoint2D &point) :
    x_(point.x), y_(point.y), normalized_(false) {
   }
 
-  CVector2DT(const Point &point1, const Point &point2) :
+  CVector2D(const CPoint2D &point1, const CPoint2D &point2) :
    x_(point2.x - point1.x), y_(point2.y - point1.y),
    normalized_(false) {
   }
 
-  CVector2DT(const Vector &vector1, const Vector &vector2) :
+  CVector2D(const CVector2D &vector1, const CVector2D &vector2) :
    x_(vector2.x_ - vector1.x_), y_(vector2.y_ - vector1.y_),
    normalized_(false) {
   }
 
   //------
 
-  CVector2DT(Type type) {
+  CVector2D(Type type) {
     if      (type == ZERO  ) { x_ = 0.0; y_ = 0.0; }
     else if (type == UNIT  ) { x_ = 1.0; y_ = 1.0; }
     else if (type == UNIT_X) { x_ = 1.0; y_ = 0.0; }
@@ -225,13 +201,13 @@ class CVector2DT {
 
   //------
 
-  Point point() const {
-    return Point(x_, y_);
+  CPoint2D point() const {
+    return CPoint2D(x_, y_);
   }
 
   //------
 
-  Vector &zero() {
+  CVector2D &zero() {
     x_ = 0.0; y_ = 0.0;
 
     normalized_ = false;
@@ -240,22 +216,22 @@ class CVector2DT {
   }
 
   bool isZero() const {
-    return REAL_EQ(lengthSqr(), 0);
+    return realEq(lengthSqr(), 0);
   }
 
   bool isUnit() const {
-    return REAL_EQ(lengthSqr(), 1);
+    return realEq(lengthSqr(), 1);
   }
 
   //------
 
-  Vector &normalize() {
+  CVector2D &normalize() {
     if (normalized_)
       return *this;
 
-    T len = length();
+    double len = length();
 
-    T factor = 0.0;
+    double factor = 0.0;
 
     if (len > 0.0)
       factor = 1.0/len;
@@ -268,47 +244,47 @@ class CVector2DT {
     return *this;
   }
 
-  Vector normalized() const {
+  CVector2D normalized() const {
     if (normalized_)
       return *this;
 
-    T len = length();
+    double len = length();
 
-    T factor = 0.0;
+    double factor = 0.0;
 
     if (len > 0.0)
       factor = 1.0/len;
 
-    return Vector(x_*factor, y_*factor, true);
+    return CVector2D(x_*factor, y_*factor, true);
   }
 
-  Vector unit() const {
+  CVector2D unit() const {
     return normalized();
   }
 
   //------
 
-  Vector perpendicular() const {
-    return Vector(y_, -x_, normalized_);
+  CVector2D perpendicular() const {
+    return CVector2D(y_, -x_, normalized_);
   }
 
-  Vector unitPerpendicular() const {
+  CVector2D unitPerpendicular() const {
     return perpendicular().normalize();
   }
 
-  T dotPerpendicular(const Vector &v) const {
+  double dotPerpendicular(const CVector2D &v) const {
     return x_*v.y_ - y_*v.x_;
   }
 
   //------
 
-  Vector & setMagnitude(T magnitude) {
-    T factor = 0.0;
+  CVector2D & setMagnitude(double magnitude) {
+    double factor = 0.0;
 
     if (normalized_)
       factor = magnitude;
     else {
-      T len = length();
+      double len = length();
 
       if (len > 0.0)
         factor = magnitude/len;
@@ -323,39 +299,39 @@ class CVector2DT {
 
   //------
 
-  T getDistance(const Vector &vector) {
-    Vector diff = *this - vector;
+  double getDistance(const CVector2D &vector) {
+    CVector2D diff = *this - vector;
 
     return diff.length();
   }
 
-  T getDistanceSqr(const Vector &vector) {
-    Vector diff = *this - vector;
+  double getDistanceSqr(const CVector2D &vector) {
+    CVector2D diff = *this - vector;
 
     return diff.lengthSqr();
   }
 
   //------
 
-  void incX(T x = 1.0) {
+  void incX(double x = 1.0) {
     x_ += x;
 
     normalized_ = false;
   }
 
-  void incY(T y = 1.0) {
+  void incY(double y = 1.0) {
     y_ += y;
 
     normalized_ = false;
   }
 
-  void decX(T x = 1.0) {
+  void decX(double x = 1.0) {
     x_ -= x;
 
     normalized_ = false;
   }
 
-  void decY(T y = 1.0) {
+  void decY(double y = 1.0) {
     y_ -= y;
 
     normalized_ = false;
@@ -363,35 +339,35 @@ class CVector2DT {
 
   //------
 
-  T minComponent() {
+  double minComponent() {
     return std::min(x_, y_);
   }
 
-  T maxComponent() {
+  double maxComponent() {
     return std::max(x_, y_);
   }
 
-  T minAbsComponent() {
+  double minAbsComponent() {
     return std::min(::fabs(x_), ::fabs(y_));
   }
 
-  T maxAbsComponent() {
+  double maxAbsComponent() {
     return std::max(::fabs(x_), ::fabs(y_));
   }
 
   //------
 
-  static Vector min(const Vector &lhs, const Vector &rhs) {
-    return Vector(min(lhs.x_, rhs.x_), min(lhs.y_, rhs.y_));
+  static CVector2D min(const CVector2D &lhs, const CVector2D &rhs) {
+    return CVector2D(std::min(lhs.x_, rhs.x_), std::min(lhs.y_, rhs.y_));
   }
 
-  static Vector max(const Vector &lhs, const Vector &rhs) {
-    return Vector(max(lhs.x_, rhs.x_), max(lhs.y_, rhs.y_));
+  static CVector2D max(const CVector2D &lhs, const CVector2D &rhs) {
+    return CVector2D(std::max(lhs.x_, rhs.x_), std::max(lhs.y_, rhs.y_));
   }
 
   //------
 
-  Vector &operator=(const Point &point) {
+  CVector2D &operator=(const CPoint2D &point) {
     x_ = point.x; y_ = point.y;
 
     normalized_ = false;
@@ -404,16 +380,16 @@ class CVector2DT {
   // operators
 
   // unary +/-
-  Vector operator+() const {
-    return Vector(x_, y_, normalized_);
+  CVector2D operator+() const {
+    return CVector2D(x_, y_, normalized_);
   }
 
-  Vector operator-() const {
-    return Vector(-x_, -y_, normalized_);
+  CVector2D operator-() const {
+    return CVector2D(-x_, -y_, normalized_);
   }
 
   // addition
-  Vector &operator+=(const Vector &rhs) {
+  CVector2D &operator+=(const CVector2D &rhs) {
     x_ += rhs.x_; y_ += rhs.y_;
 
     normalized_ = false;
@@ -421,12 +397,12 @@ class CVector2DT {
     return *this;
   }
 
-  Vector operator+(const Vector &rhs) const {
-    return Vector(x_ + rhs.x_, y_ + rhs.y_);
+  CVector2D operator+(const CVector2D &rhs) const {
+    return CVector2D(x_ + rhs.x_, y_ + rhs.y_);
   }
 
   // subtraction
-  Vector &operator-=(const Vector &rhs) {
+  CVector2D &operator-=(const CVector2D &rhs) {
     x_ -= rhs.x_; y_ -= rhs.y_;
 
     normalized_ = false;
@@ -434,12 +410,20 @@ class CVector2DT {
     return *this;
   }
 
-  Vector operator-(const Vector &rhs) const {
-    return Vector(x_ - rhs.x_, y_ - rhs.y_);
+  CVector2D operator-(const CVector2D &rhs) const {
+    return CVector2D(x_ - rhs.x_, y_ - rhs.y_);
   }
 
   // scalar multiplication/division
-  Vector &operator*=(T rhs) {
+  CVector2D &operator*=(const CVector2D &rhs) {
+    x_ *= rhs.x_; y_ *= rhs.y_;
+
+    normalized_ = false;
+
+    return *this;
+  }
+
+  CVector2D &operator*=(double rhs) {
     x_ *= rhs; y_ *= rhs;
 
     normalized_ = false;
@@ -447,24 +431,24 @@ class CVector2DT {
     return *this;
   }
 
-  Vector operator*(const Vector &rhs) {
-    Vector t(*this);
+  CVector2D operator*(const CVector2D &rhs) {
+    CVector2D t(*this);
 
     t *= rhs;
 
     return t;
   }
 
-  friend Vector operator*(const Vector &lhs, T rhs) {
-    return Vector(lhs.x_*rhs, lhs.y_*rhs);
+  friend CVector2D operator*(const CVector2D &lhs, double rhs) {
+    return CVector2D(lhs.x_*rhs, lhs.y_*rhs);
   }
 
-  friend Vector operator*(T lhs, const Vector &rhs) {
-    return Vector(lhs*rhs.x_, lhs*rhs.y_);
+  friend CVector2D operator*(double lhs, const CVector2D &rhs) {
+    return CVector2D(lhs*rhs.x_, lhs*rhs.y_);
   }
 
-  Vector &operator/=(T rhs) {
-    T irhs = 1.0/rhs;
+  CVector2D &operator/=(double rhs) {
+    double irhs = 1.0/rhs;
 
     x_ *= irhs; y_ *= irhs;
 
@@ -473,65 +457,65 @@ class CVector2DT {
     return *this;
   }
 
-  Vector operator/(T rhs) const {
-    T irhs = 1.0/rhs;
+  CVector2D operator/(double rhs) const {
+    double irhs = 1.0/rhs;
 
-    return Vector(x_*irhs, y_*irhs);
+    return CVector2D(x_*irhs, y_*irhs);
   }
 
   //------
 
   // dot product
-  T dotProduct(const Vector &vector) const {
+  double dotProduct(const CVector2D &vector) const {
     return (x_*vector.x_ + y_*vector.y_);
   }
 
-  T dotProduct(const Point &point) const {
-    return dotProduct(Vector(point.x, point.y));
+  double dotProduct(const CPoint2D &point) const {
+    return dotProduct(CVector2D(point.x, point.y));
   }
 
-  T dotProduct(T x, T y) const {
-    return dotProduct(Vector(x, y));
+  double dotProduct(double x, double y) const {
+    return dotProduct(CVector2D(x, y));
   }
 
-  static T dotProduct(const Vector &vector1, const Vector &vector2) {
+  static double dotProduct(const CVector2D &vector1, const CVector2D &vector2) {
     return vector1.dotProduct(vector2);
   }
 
-  static T dotProduct(const Vector &vector1, T x2, T y2) {
-    return vector1.dotProduct(Vector(x2, y2));
+  static double dotProduct(const CVector2D &vector1, double x2, double y2) {
+    return vector1.dotProduct(CVector2D(x2, y2));
   }
 
-  T dotProductSelf() const {
+  double dotProductSelf() const {
     return dotProduct(*this);
   }
 
-  static T absDotProduct(const Vector &vector1, const Vector &vector2) {
+  static double absDotProduct(const CVector2D &vector1, const CVector2D &vector2) {
     return ::fabs(dotProduct(vector1, vector2));
   }
 
   //------
 
   // cross product
-  Vector crossProduct(const Vector &vector) const {
-    return Vector(y_*vector.x_ - x_*vector.y_,
-                  x_*vector.y_ - y_*vector.x_,
-                  normalized_ && vector.normalized_);
+  CVector2D crossProduct(const CVector2D &vector) const {
+    return CVector2D(y_*vector.x_ - x_*vector.y_,
+                     x_*vector.y_ - y_*vector.x_,
+                     normalized_ && vector.normalized_);
   }
 
-  Vector crossProduct(const Point &point) const {
-    return crossProduct(Vector(point.x, point.y));
+  CVector2D crossProduct(const CPoint2D &point) const {
+    return crossProduct(CVector2D(point.x, point.y));
   }
 
-  Vector crossProduct(T x, T y) const {
-    return crossProduct(Vector(x, y));
+  CVector2D crossProduct(double x, double y) const {
+    return crossProduct(CVector2D(x, y));
   }
 
-  static Vector crossProduct(const Vector &vector1, const Vector &vector2) {
+  static CVector2D crossProduct(const CVector2D &vector1, const CVector2D &vector2) {
     return vector1.crossProduct(vector2);
   }
 
-  Vector unitCrossProduct(const Vector &vector) const {
+  CVector2D unitCrossProduct(const CVector2D &vector) const {
     return crossProduct(vector).normalize();
   }
 
@@ -541,46 +525,46 @@ class CVector2DT {
 
   //------
 
-  friend Point operator+(const Point &lhs, const Vector &rhs) {
-    return Point(lhs.x + rhs.x_, lhs.y + rhs.y_);
+  friend CPoint2D operator+(const CPoint2D &lhs, const CVector2D &rhs) {
+    return CPoint2D(lhs.x + rhs.x_, lhs.y + rhs.y_);
   }
 
-  friend Point operator+=(Point &lhs, const Vector &rhs) {
+  friend CPoint2D operator+=(CPoint2D &lhs, const CVector2D &rhs) {
     lhs.x += rhs.x_; lhs.y += rhs.y_;
 
     return lhs;
   }
 
-  friend Point operator-(const Point &lhs, const Vector &rhs) {
-    return Point(lhs.x - rhs.x_, lhs.y - rhs.y_);
+  friend CPoint2D operator-(const CPoint2D &lhs, const CVector2D &rhs) {
+    return CPoint2D(lhs.x - rhs.x_, lhs.y - rhs.y_);
   }
 
-  friend Point operator-=(Point &lhs, const Vector &rhs) {
+  friend CPoint2D operator-=(CPoint2D &lhs, const CVector2D &rhs) {
     lhs.x -= rhs.x_; lhs.y -= rhs.y_;
 
     return lhs;
   }
 
 /*
-  friend Vector operator-(const Point &lhs, const Point &rhs) {
-    return Vector(lhs.x - rhs.x, lhs.y - rhs.y);
+  friend CVector2D operator-(const CPoint2D &lhs, const CPoint2D &rhs) {
+    return CVector2D(lhs.x - rhs.x, lhs.y - rhs.y);
   }
 */
 
   //------
 
-  Vector normal(const Vector &vector2) {
+  CVector2D normal(const CVector2D &vector2) const {
     return unitCrossProduct(vector2);
   }
 
-  static Vector normal(const Vector &vector1, const Vector &vector2) {
+  static CVector2D normal(const CVector2D &vector1, const CVector2D &vector2) {
     return vector1.normal(vector2);
   }
 
   //------
 
-  T cosIncluded(const Vector &vector1) const {
-    T dot = dotProduct(vector1);
+  double cosIncluded(const CVector2D &vector1) const {
+    double dot = dotProduct(vector1);
 
     if (! normalized_)
       dot /= length();
@@ -591,16 +575,16 @@ class CVector2DT {
     return dot;
   }
 
-  static T cosIncluded(const Vector &vector1, const Vector &vector2) {
+  static double cosIncluded(const CVector2D &vector1, const CVector2D &vector2) {
     return vector1.cosIncluded(vector2);
   }
 
   //------
 
-  void getBarycentrics(const Vector &vector1, const Vector &vector2,
-                       const Vector &vector3, T barycentrics[3]) const {
+  void getBarycentrics(const CVector2D &vector1, const CVector2D &vector2,
+                       const CVector2D &vector3, double barycentrics[3]) const {
     // compute the vectors relative to V2 of the triangle
-    Vector diff[3] = {
+    CVector2D diff[3] = {
       vector1 - vector3,
       vector2 - vector3,
       *this   - vector3
@@ -610,38 +594,38 @@ class CVector2DT {
     // for computing barycentric coordinates can be ill-conditioned.  To avoid
     // this, uniformly scale the triangle edges to be of order 1.  The scaling
     // of all differences does not change the barycentric coordinates.
-    T maxval = 0.0;
+    double maxval = 0.0;
 
     for (int i = 0; i < 2; ++i)
       for (int j = 0; j < 2; ++j)
-        maxval = max(maxval, ::fabs(diff[i][j]));
+        maxval = std::max(maxval, std::fabs(diff[i][j]));
 
     // scale down only large data
     if (maxval > 1.0) {
-      T imaxval = 1.0/maxval;
+      double imaxval = 1.0/maxval;
 
       for (int i = 0; i < 3; i++)
         diff[i] *= imaxval;
     }
 
-    T det = diff[0].dotPerp(diff[1]);
+    double det = diff[0].dotPerpendicular(diff[1]);
     if (::fabs(det) > 1E-6 ) {
-      T idet = 1.0/det;
+      double idet = 1.0/det;
 
-      barycentrics[0] = diff[2].DotPerp(diff[1])*idet;
-      barycentrics[1] = diff[0].DotPerp(diff[2])*idet;
+      barycentrics[0] = diff[2].dotPerpendicular(diff[1])*idet;
+      barycentrics[1] = diff[0].dotPerpendicular(diff[2])*idet;
       barycentrics[2] = 1.0 - barycentrics[0] - barycentrics[1];
     }
     else {
       // The triangle is a sliver. Determine the longest edge and
       // compute barycentric coordinates with respect to that edge.
-      Vector v12 = vector1 - vector2;
+      CVector2D v12 = vector1 - vector2;
 
-      T max_length = v12.lengthSqr();
+      double max_length = v12.lengthSqr();
 
       int max_ind = 2;
 
-      T fSqrLength = diff[1].lengthSqr();
+      double fSqrLength = diff[1].lengthSqr();
 
       if (fSqrLength > max_length ) {
         max_ind    = 1;
@@ -656,24 +640,24 @@ class CVector2DT {
       }
 
       if (max_length > 1E-6) {
-        T imax_length = 1.0/max_length;
+        double imax_length = 1.0/max_length;
 
         if      (max_ind == 0) {
           // P-V2 = t(V0-V2)
-          barycentrics[0] = diff[2].Dot(diff[0])*imax_length;
+          barycentrics[0] = diff[2].dotProduct(diff[0])*imax_length;
           barycentrics[1] = 0.0;
           barycentrics[2] = 1.0 - barycentrics[0];
         }
         else if (max_ind == 1) {
           // P-V2 = t(V1-V2)
           barycentrics[0] = 0.0;
-          barycentrics[1] = diff[2].Dot(diff[1])*imax_length;
+          barycentrics[1] = diff[2].dotProduct(diff[1])*imax_length;
           barycentrics[2] = 1.0 - barycentrics[1];
         }
         else {
           // P-V1 = t(V0-V1)
           diff[2] = *this - vector2;
-          barycentrics[0] = diff[2].Dot(v12)*imax_length;
+          barycentrics[0] = diff[2].dotProduct(v12)*imax_length;
           barycentrics[1] = 1.0 - barycentrics[0];
           barycentrics[2] = 0.0;
         }
@@ -689,7 +673,7 @@ class CVector2DT {
 
   //------
 
-  void orthonormalize(Vector &u, Vector &v) {
+  void orthonormalize(CVector2D &u, CVector2D &v) {
     // If the input vectors are v0 and v1, then the Gram-Schmidt
     // orthonormalization produces vectors u0 and u1 as follows,
     //
@@ -703,7 +687,7 @@ class CVector2DT {
     u.normalize();
 
     // compute u1
-    T d = u.dotProduc(v);
+    double d = u.dotProduct(v);
 
     v -= u*d;
 
@@ -712,7 +696,7 @@ class CVector2DT {
 
   //------
 
-  void generateOrthonormalBasis(Vector &u, Vector &v) {
+  void generateOrthonormalBasis(CVector2D &u, CVector2D &v) {
     v.normalize();
 
     u = v.perpendicular();
@@ -721,12 +705,19 @@ class CVector2DT {
   //------
 
  private:
-  CVector2DT(T x, T y, bool normalized) :
+  static bool realEq(double r1, double r2, double tol=1E-6) {
+    return (std::fabs(r1 - r2) < tol);
+  }
+
+ private:
+  CVector2D(double x, double y, bool normalized) :
    x_(x), y_(y), normalized_(normalized) {
   }
-};
 
-typedef CVector2DT<double> CVector2D;
-typedef CVector2DT<float>  CVector2DF;
+ private:
+  double x_          { 0 };
+  double y_          { 0 };
+  bool   normalized_ { false };
+};
 
 #endif

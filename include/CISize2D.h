@@ -4,77 +4,73 @@
 #include <iostream>
 #include <sys/types.h>
 
-template<typename T>
-class CISize2DT {
+class CISize2D {
  public:
-  T width, height;
+  int width, height;
 
-  CISize2DT() { }
+  CISize2D() { }
 
-  CISize2DT(T w, T h) :
+  CISize2D(int w, int h) :
    width(w), height(h) {
   }
 
-  CISize2DT(const CISize2DT &size) :
+  CISize2D(const CISize2D &size) :
    width(size.width), height(size.height) {
   }
 
-  void set(T w, T h) {
+  void set(int w, int h) {
     width  = w;
     height = h;
   }
 
-  void get(T *w, T *h) const {
+  void get(int *w, int *h) const {
     *w = width;
     *h = height;
   }
 
-  T getWidth () const { return width ; }
-  T getHeight() const { return height; }
+  int getWidth () const { return width ; }
+  int getHeight() const { return height; }
 
-  void setWidth (T w) { width  = w; }
-  void setHeight(T h) { height = h; }
+  void setWidth (int w) { width  = w; }
+  void setHeight(int h) { height = h; }
 
-  T area() const { return width*height; }
+  int area() const { return width*height; }
 
-  friend CISize2DT operator*(T m, const CISize2DT &size) {
-    return CISize2DT(m*size.width, m*size.height);
+  friend CISize2D operator*(int m, const CISize2D &size) {
+    return CISize2D(m*size.width, m*size.height);
   }
 
-  friend CISize2DT operator*(const CISize2DT &size, T m) {
-    return CISize2DT(m*size.width, m*size.height);
+  friend CISize2D operator*(const CISize2D &size, int m) {
+    return CISize2D(m*size.width, m*size.height);
   }
 
-  friend CISize2DT operator/(const CISize2DT &size, T m) {
-    return CISize2DT(size.width/m, size.height/m);
+  friend CISize2D operator/(const CISize2D &size, int m) {
+    return CISize2D(size.width/m, size.height/m);
   }
 
-  friend CISize2DT operator*(double m, const CISize2DT &size) {
-    return CISize2DT(int(m*size.width), int(m*size.height));
+  friend CISize2D operator*(double m, const CISize2D &size) {
+    return CISize2D(int(m*size.width), int(m*size.height));
   }
 
-  friend CISize2DT operator*(const CISize2DT &size, double m) {
-    return CISize2DT(int(m*size.width), int(m*size.height));
+  friend CISize2D operator*(const CISize2D &size, double m) {
+    return CISize2D(int(m*size.width), int(m*size.height));
   }
 
-  friend CISize2DT operator/(const CISize2DT &size, double m) {
-    return CISize2DT(int(size.width/m), int(size.height/m));
+  friend CISize2D operator/(const CISize2D &size, double m) {
+    return CISize2D(int(size.width/m), int(size.height/m));
   }
 
-  bool operator==(const CISize2DT &size) const {
+  bool operator==(const CISize2D &size) const {
     return (width == size.width && height == size.height);
   }
 
-  bool operator!=(const CISize2DT &size) const {
+  bool operator!=(const CISize2D &size) const {
     return (width != size.width || height != size.height);
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const CISize2DT &size) {
+  friend std::ostream &operator<<(std::ostream &os, const CISize2D &size) {
     return os << "(" << size.width << "," << size.height << ")";
   }
 };
-
-typedef CISize2DT<int>  CISize2D;
-typedef CISize2DT<uint> CUISize2D;
 
 #endif

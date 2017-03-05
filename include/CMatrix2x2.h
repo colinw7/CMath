@@ -5,151 +5,151 @@
 #include <CPoint2D.h>
 #include <CVector2D.h>
 #include <CThrow.h>
+#include <iostream>
+#include <cstring>
 
-/* / a b \ */
-/* \ c d / */
+/* / m00 m01 \ */
+/* \ m10 m11 / */
 
-template<typename T>
-class CMatrix2x2T {
+class CMatrix2x2 {
  private:
   enum Type {
     CMATRIX_2x2_IDENTITY
   };
 
  private:
-  typedef CPoint2DT<T>  Point;
-  typedef CVector2DT<T> Vector;
-
- private:
-  union {
-    T m1_[4];
-    T m2_[2][2];
-
-    struct {
-      T m00_, m01_;
-      T m10_, m11_;
-    };
-
-    struct {
-      T a_, b_;
-      T c_, d_;
-    };
-  };
+  typedef CPoint2D  Point;
+  typedef CVector2D Vector;
 
  public:
-  CMatrix2x2T() { }
+  CMatrix2x2() { }
 
-  explicit CMatrix2x2T(typename CMatrix2x2T::Type type) {
+  explicit CMatrix2x2(Type type) {
     if (type == CMATRIX_2x2_IDENTITY)
       setIdentity();
     else
       CTHROW("Bad Matrix Type");
   }
 
-  CMatrix2x2T(T a, T b, T c, T d) :
+  CMatrix2x2(double a, double b, double c, double d) :
     m00_(a), m01_(b), m10_(c), m11_(d) {
   }
 
-  CMatrix2x2T(const T *m, int n) {
+  CMatrix2x2(const double *m, int n) {
     if (n == 4)
-      setValues(m[0], m[1],
-                m[2], m[3]);
+      setValues(m[0], m[1], m[2], m[3]);
     else
      CTHROW("Invalid size");
   }
 
-  CMatrix2x2T(const CMatrix2x2T &a) {
-    memcpy(m1_, a.m1_, sizeof(m1_));
+  CMatrix2x2(const CMatrix2x2 &a) {
+    memcpy(&m00_, &a.m00_, 4*sizeof(double));
   }
 
- ~CMatrix2x2T() { }
+ ~CMatrix2x2() { }
 
   void setIdentity() {
     m00_ = 1.0, m01_ = 0.0;
     m10_ = 0.0, m11_ = 1.0;
   }
 
-  void setScale(T sx, T sy) {
+  void setScale(double sx, double sy) {
     m00_ = sx , m01_ = 0.0;
     m10_ = 0.0, m11_ = sy ;
   }
 
-  void setRotation(T a) {
-    T c = ::cos(a);
-    T s = ::sin(s);
+  void setRotation(double a) {
+    double c = ::cos(a);
+    double s = ::sin(s);
 
     m00_ =  c , m01_ =  s;
     m10_ = -s , m11_ =  c;
   }
 
-  void setValues(T a, T b, T c, T d) {
+  void setValues(double a, double b, double c, double d) {
     m00_ = a, m01_ = b;
     m10_ = c, m11_ = d;
   }
 
-  void getValues(T *a, T *b, T *c, T *d) const {
+  void getValues(double *a, double *b, double *c, double *d) const {
     if (a ) *a = m00_;
     if (b ) *b = m01_;
     if (c ) *c = m10_;
     if (d ) *d = m11_;
   }
 
-  void setColumn(int c, T x, T y) {
-    m2_[0][c] = x, m2_[1][c] = y;
+  void setColumn(int c, double x, double y) {
+    assert(c < 2);
+
+    double *m = &(&m00_)[c];
+
+    m[0] = x, m[2] = y;
   }
 
   void setColumn(int c, const Point &point) {
-    m2_[0][c] = point.x, m2_[1][c] = point.y;
+    setColumn(c, point.x, point.y);
   }
 
   void setColumn(int c, const Vector &vector) {
-    vector.getXY(&m2_[0][c], &m2_[1][c]);
+    setColumn(c, vector.getX(), vector.getY());
   }
 
-  void getColumn(int c, T *x, T *y) {
-    if (x) *x = m2_[0][c];
-    if (y) *y = m2_[1][c];
+  void getColumn(int c, double *x, double *y) {
+    assert(c < 2);
+
+    double *m = &(&m00_)[c];
+
+    if (x) *x = m[0];
+    if (y) *y = m[2];
   }
 
-  void setRow(int r, T x, T y) {
-    m2_[r][0] = x, m2_[r][1] = y;
+  void setRow(int r, double x, double y) {
+    assert(r < 2);
+
+    double *m = &(&m00_)[r*2];
+
+    m[0] = x, m[1] = y;
   }
 
   void setRow(int r, const Point &point) {
-    m2_[r][0] = point.x, m2_[r][1] = point.y;
+    setRow(r, point.x, point.y);
   }
 
   void setRow(int r, const Vector &vector) {
-    vector.getXY(&m2_[r][0], &m2_[r][1]);
+    setRow(r, vector.getX(), vector.getY());
   }
 
-  void getRow(int r, T *x, T *y) {
-    if (x) *x = m2_[r][0];
-    if (y) *y = m2_[r][1];
+  void getRow(int r, double *x, double *y) {
+    assert(r < 2);
+
+    double *m = &(&m00_)[r*2];
+
+    if (x) *x = m[0];
+    if (y) *y = m[1];
   }
 
-  void multiplyPoint(T xi, T yi, T *xo, T *yo) const {
+  void multiplyPoint(double xi, double yi, double *xo, double *yo) const {
     *xo = m00_*xi + m01_*yi;
     *yo = m10_*xi + m11_*yi;
   }
 
-  void multiplyPoint(const CPoint2DT<T> &point1, CPoint2DT<T> &point2) const {
+  void multiplyPoint(const CPoint2D &point1, CPoint2D &point2) const {
     point2.x = m00_*point1.x + m01_*point1.y;
     point2.y = m10_*point1.x + m11_*point1.y;
   }
 
   void multiplyVector(const Vector &ivector, Vector &ovector) const {
-    T ix, iy;
+    double ix, iy;
 
     ivector.getXY(&ix, &iy);
 
-    T ox = m00_*ix + m01_*iy;
-    T oy = m10_*ix + m11_*iy;
+    double ox = m00_*ix + m01_*iy;
+    double oy = m10_*ix + m11_*iy;
 
-    ovector.setXYZ(ox, oy);
+    ovector.setXY(ox, oy);
   }
 
-  void preMultiplyPoint(T xi, T yi, T *xo, T *yo) const {
+  void preMultiplyPoint(double xi, double yi, double *xo, double *yo) const {
     *xo = m00_*xi + m10_*yi;
     *yo = m01_*xi + m11_*yi;
   }
@@ -160,32 +160,31 @@ class CMatrix2x2T {
   }
 
   void preMultiplyVector(const Vector &ivector, Vector &ovector) const {
-    T ix, iy;
+    double ix, iy;
 
     ivector.getXY(&ix, &iy);
 
-    T ox = m00_*ix + m10_*iy;
-    T oy = m01_*ix + m11_*iy;
+    double ox = m00_*ix + m10_*iy;
+    double oy = m01_*ix + m11_*iy;
 
-    ovector.setXYZ(ox, oy);
+    ovector.setXY(ox, oy);
   }
 
   void transpose() {
-    swap(m10_, m01_);
+    std::swap(m10_, m01_);
   }
 
-  CMatrix2x2T transposed() const {
-    return CMatrix2x2T(m00_, m10_,
-                       m01_, m11_);
+  CMatrix2x2 transposed() const {
+    return CMatrix2x2(m00_, m10_, m01_, m11_);
   }
 
-  bool invert(CMatrix2x2T &imatrix) const {
-    T d = determinant();
+  bool invert(CMatrix2x2 &imatrix) const {
+    double d = determinant();
 
     if (::fabs(d) < 1E-6)
       return false;
 
-    T id = 1.0/d;
+    double id = 1.0/d;
 
     imatrix.m00_ =  m11_*id;
     imatrix.m01_ = -m01_*id;
@@ -195,8 +194,8 @@ class CMatrix2x2T {
     return true;
   }
 
-  CMatrix2x2T inverse() const {
-    CMatrix2x2T imatrix;
+  CMatrix2x2 inverse() const {
+    CMatrix2x2 imatrix;
 
     if (! invert(imatrix))
       CTHROW("Divide by zero");
@@ -204,41 +203,40 @@ class CMatrix2x2T {
     return imatrix;
   }
 
-  T determinant() const {
+  double determinant() const {
     return (m00_*m11_ - m01_*m10_);
   }
 
   void normalize() {
-    T d = determinant();
+    double d = determinant();
 
-    T id = 1.0/d;
+    double id = 1.0/d;
 
     for (int i = 0; i < 4; ++i)
-      m1_[i] *= id;
+      (&m00_)[i] *= id;
   }
 
-  static CMatrix2x2T *newIdentityMatrix() {
-    CMatrix2x2T *m = new CMatrix2x2T();
+  static CMatrix2x2 *newIdentityMatrix() {
+    CMatrix2x2 *m = new CMatrix2x2();
 
     m->setIdentity();
 
     return m;
   }
 
-  static bool solveAXeqB(const CMatrix2x2T &a, CPoint2DT<T> &x,
-                         const CPoint2DT<T> &b) {
-    T det_a = a.determinant();
+  static bool solveAXeqB(const CMatrix2x2 &a, CPoint2D &x, const CPoint2D &b) {
+    double det_a = a.determinant();
 
     if (::fabs(det_a) < 1E-6)
       return false;
 
-    T idet_a = 1.0/det_a;
+    double idet_a = 1.0/det_a;
 
-    CMatrix2x2T t(a);
+    CMatrix2x2 t(a);
 
     t.setColumn(0, b.x, b.y);
 
-    T det_t = t.determinant();
+    double det_t = t.determinant();
 
     x.x = det_t*idet_a;
 
@@ -253,48 +251,48 @@ class CMatrix2x2T {
     return true;
   }
 
-  void zero() { memset(m1_, 0, sizeof(m1_)); }
+  void zero() { memset(&m00_, 0, 4*sizeof(double)); }
 
-  CMatrix2x2T &operator=(const CMatrix2x2T &a) {
-    memcpy(m1_, a.m1_, sizeof(m1_));
+  CMatrix2x2 &operator=(const CMatrix2x2 &a) {
+    memcpy(&m00_, &a.m00_, 4*sizeof(double));
 
     return *this;
   }
 
-  CMatrix2x2T &operator+=(const CMatrix2x2T &b) {
+  CMatrix2x2 &operator+=(const CMatrix2x2 &b) {
     m00_ += b.m00_; m01_ += b.m01_,
     m10_ += b.m10_; m11_ += b.m11_;
 
     return *this;
   }
 
-  CMatrix2x2T operator+(const CMatrix2x2T &b) {
-    CMatrix2x2T c = *this;
+  CMatrix2x2 operator+(const CMatrix2x2 &b) {
+    CMatrix2x2 c = *this;
 
     c += b;
 
     return c;
   }
 
-  CMatrix2x2T &operator-=(const CMatrix2x2T &b) {
+  CMatrix2x2 &operator-=(const CMatrix2x2 &b) {
     m00_ -= b.m00_; m01_ -= b.m01_,
     m10_ -= b.m10_; m11_ -= b.m11_;
 
     return *this;
   }
 
-  CMatrix2x2T operator-(const CMatrix2x2T &b) {
-    CMatrix2x2T c = *this;
+  CMatrix2x2 operator-(const CMatrix2x2 &b) {
+    CMatrix2x2 c = *this;
 
     c -= b;
 
     return c;
   }
 
-  CMatrix2x2T &operator*=(const CMatrix2x2T &b) {
-    CMatrix2x2T a;
+  CMatrix2x2 &operator*=(const CMatrix2x2 &b) {
+    CMatrix2x2 a;
 
-    memcpy(a.m1_, m1_, sizeof(m1_));
+    memcpy(&a.m00_, &m00_, 4*sizeof(double));
 
     m00_ = a.m00_*b.m00_ + a.m01_*b.m10_;
     m01_ = a.m00_*b.m01_ + a.m01_*b.m11_;
@@ -305,16 +303,16 @@ class CMatrix2x2T {
     return *this;
   }
 
-  CMatrix2x2T operator*(const CMatrix2x2T &b) {
-    CMatrix2x2T c = *this;
+  CMatrix2x2 operator*(const CMatrix2x2 &b) {
+    CMatrix2x2 c = *this;
 
     c *= b;
 
     return c;
   }
 
-  CMatrix2x2T &operator*=(T s) {
-    CMatrix2x2T a = *this;
+  CMatrix2x2 &operator*=(double s) {
+    CMatrix2x2 a = *this;
 
     m00_ = a.m00_*s; m01_ = a.m01_*s;
     m10_ = a.m10_*s; m11_ = a.m11_*s;
@@ -322,15 +320,15 @@ class CMatrix2x2T {
     return *this;
   }
 
-  CMatrix2x2T operator*(T s) {
-    CMatrix2x2T c = *this;
+  CMatrix2x2 operator*(double s) {
+    CMatrix2x2 c = *this;
 
     c *= s;
 
     return c;
   }
 
-  friend Point operator*(const CMatrix2x2T &m, const Point &p) {
+  friend Point operator*(const CMatrix2x2 &m, const Point &p) {
     Point p1;
 
     m.multiplyPoint(p, p1);
@@ -338,7 +336,7 @@ class CMatrix2x2T {
     return p1;
   }
 
-  friend Point operator*(const Point &p, const CMatrix2x2T &m) {
+  friend Point operator*(const Point &p, const CMatrix2x2 &m) {
     Point p1;
 
     m.preMultiplyPoint(p, p1);
@@ -346,7 +344,7 @@ class CMatrix2x2T {
     return p1;
   }
 
-  friend Vector operator*(const CMatrix2x2T &m, const Vector &v) {
+  friend Vector operator*(const CMatrix2x2 &m, const Vector &v) {
     Vector v1;
 
     m.multiplyVector(v, v1);
@@ -354,7 +352,7 @@ class CMatrix2x2T {
     return v1;
   }
 
-  friend Vector operator*(const Vector &v, const CMatrix2x2T &m) {
+  friend Vector operator*(const Vector &v, const CMatrix2x2 &m) {
     Vector v1;
 
     m.preMultiplyVector(v, v1);
@@ -362,8 +360,8 @@ class CMatrix2x2T {
     return v1;
   }
 
-  CMatrix2x2T &operator/=(const CMatrix2x2T &b) {
-    CMatrix2x2T bi;
+  CMatrix2x2 &operator/=(const CMatrix2x2 &b) {
+    CMatrix2x2 bi;
 
     if (! b.invert(bi)) {
       CTHROW("Divide by zero");
@@ -373,49 +371,59 @@ class CMatrix2x2T {
     return (*this) *= bi;
   }
 
-  CMatrix2x2T operator/(const CMatrix2x2T &b) {
-    CMatrix2x2T c = *this;
+  CMatrix2x2 operator/(const CMatrix2x2 &b) {
+    CMatrix2x2 c = *this;
 
     c /= b;
 
     return c;
   }
 
-  void setValue(unsigned int i, T value) {
-    m1_[i] = value;
+  void setValue(unsigned int i, double value) {
+    (&m00_)[i] = value;
   }
 
-  void setValue(unsigned int i, unsigned int j, T value) {
-    m2_[i][j] = value;
+  void setValue(unsigned int i, unsigned int j, double value) {
+    assert(i < 2 && j < 2);
+
+    double &m = (&m00_)[2*j + i];
+
+    m = value;
   }
 
-  T getValue(unsigned int i) { return m1_[i]; }
+  double getValue(unsigned int i) { return (&m00_)[i]; }
 
-  T getValue(unsigned int i, unsigned int j) const {
-    return m2_[i][j];
+  double getValue(unsigned int i, unsigned int j) const {
+    assert(i < 2 && j < 2);
+
+    const double &m = (&m00_)[2*j + i];
+
+    return m;
   }
 
-  T operator[](unsigned int i) { return m1_[i]; }
+  double operator[](unsigned int i) { return (&m00_)[i]; }
 
-  const T &operator[](unsigned int i) const { return m1_[i]; }
+  const double &operator[](unsigned int i) const { return (&m00_)[i]; }
 
-  void print(ostream &os) const {
-    os << "(" << m00_ << "," << m01_ << ")" << endl;
-    os << "(" << m10_ << "," << m11_ << ")" << endl;
+  void print(std::ostream &os) const {
+    os << "(" << m00_ << "," << m01_ << ")" << std::endl;
+    os << "(" << m10_ << "," << m11_ << ")" << std::endl;
   }
 
-  friend ostream &operator<<(ostream &os, const CMatrix2x2T &matrix) {
+  friend std::ostream &operator<<(std::ostream &os, const CMatrix2x2 &matrix) {
     matrix.print(os);
 
     return os;
   }
 
  private:
-  static T calcDeterminant(T m00, T m01, T m10, T m11) {
+  static double calcDeterminant(double m00, double m01, double m10, double m11) {
     return m00*m11 - m01*m10;
   }
-};
 
-typedef CMatrix2x2T<double> CMatrix2x2;
+ private:
+  double m00_ { 0 }, m01_ { 0 };
+  double m10_ { 0 }, m11_ { 0 };
+};
 
 #endif

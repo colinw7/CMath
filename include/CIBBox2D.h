@@ -1,52 +1,45 @@
 #ifndef CIBBOX_2D_H
 #define CIBBOX_2D_H
 
+#include <iostream>
+#include <CMathGen.h>
 #include <CIPoint2D.h>
 #include <CISize2D.h>
 #include <CIVector2D.h>
-#include <cmath>
-#include <iostream>
 
-template<typename T>
-class CIBBox2DT {
- private:
-  typedef CIPoint2DT<T>  Point;
-  typedef CIBBox2DT<T>   BBox;
-  typedef CISize2DT<T>   Size;
-  typedef CIVector2DT<T> Vector;
-
+class CIBBox2D {
  public:
-  CIBBox2DT() : pmin_(), pmax_(), set_(false) { }
+  CIBBox2D() : pmin_(), pmax_(), set_(false) { }
 
-  CIBBox2DT(const CIBBox2DT &bbox) :
+  CIBBox2D(const CIBBox2D &bbox) :
    pmin_(bbox.pmin_), pmax_(bbox.pmax_), set_(bbox.set_) {
   }
 
-  CIBBox2DT(const Point &point) :
+  explicit CIBBox2D(const CIPoint2D &point) :
    pmin_(point), pmax_(point), set_(true) {
   }
 
-  CIBBox2DT(const Point &point1, const Point &point2) :
+  CIBBox2D(const CIPoint2D &point1, const CIPoint2D &point2) :
    pmin_(), pmax_(), set_(true) {
-    pmin_ = Point::min(point1, point2);
-    pmax_ = Point::max(point1, point2);
+    pmin_ = CIPoint2D::min(point1, point2);
+    pmax_ = CIPoint2D::max(point1, point2);
   }
 
-  CIBBox2DT(const Point &point1, const Size &size) :
+  CIBBox2D(const CIPoint2D &point1, const CISize2D &size) :
    pmin_(), pmax_(), set_(true) {
-    Point point2 = point1 + Point(size.getWidth(), size.getHeight());
+    CIPoint2D point2 = point1 + CIPoint2D(size.getWidth(), size.getHeight());
 
-    pmin_ = Point::min(point1, point2);
-    pmax_ = Point::max(point1, point2);
+    pmin_ = CIPoint2D::min(point1, point2);
+    pmax_ = CIPoint2D::max(point1, point2);
   }
 
-  CIBBox2DT(T x1, T y1, T x2, T y2) :
+  CIBBox2D(int x1, int y1, int x2, int y2) :
    pmin_(), pmax_(), set_(true) {
-    pmin_ = Point::min(Point(x1, y1), Point(x2, y2));
-    pmax_ = Point::max(Point(x1, y1), Point(x2, y2));
+    pmin_ = CIPoint2D::min(CIPoint2D(x1, y1), CIPoint2D(x2, y2));
+    pmax_ = CIPoint2D::max(CIPoint2D(x1, y1), CIPoint2D(x2, y2));
   }
 
-  CIBBox2DT &operator=(const CIBBox2DT &bbox) {
+  CIBBox2D &operator=(const CIBBox2D &bbox) {
     pmin_ = bbox.pmin_;
     pmax_ = bbox.pmax_;
     set_  = bbox.set_;
@@ -58,53 +51,53 @@ class CIBBox2DT {
 
   bool isSet() const { return set_; }
 
-  void set(const CIBBox2DT &bbox) {
+  void set(const CIBBox2D &bbox) {
     pmin_ = bbox.pmin_;
     pmax_ = bbox.pmax_;
     set_  = bbox.set_;
   }
 
-  void set(const Point &point1, const Point &point2) {
-    pmin_ = Point::min(point1, point2);
-    pmax_ = Point::max(point1, point2);
+  void set(const CIPoint2D &point1, const CIPoint2D &point2) {
+    pmin_ = CIPoint2D::min(point1, point2);
+    pmax_ = CIPoint2D::max(point1, point2);
 
     set_ = true;
   }
 
-  void set(T x1, T y1, T x2, T y2) {
-    pmin_ = Point::min(Point(x1, y1), Point(x2, y2));
-    pmax_ = Point::max(Point(x1, y1), Point(x2, y2));
+  void set(int x1, int y1, int x2, int y2) {
+    pmin_ = CIPoint2D::min(CIPoint2D(x1, y1), CIPoint2D(x2, y2));
+    pmax_ = CIPoint2D::max(CIPoint2D(x1, y1), CIPoint2D(x2, y2));
 
     set_ = true;
   }
 
-  void get(T *x1, T *y1, T *x2, T *y2) const {
+  void get(int *x1, int *y1, int *x2, int *y2) const {
     *x1 = getXMin();
     *y1 = getYMin();
     *x2 = getXMax();
     *y2 = getYMax();
   }
 
-  const Point &getMin() const { return pmin_; }
-  const Point &getMax() const { return pmax_; }
+  const CIPoint2D &getMin() const { return pmin_; }
+  const CIPoint2D &getMax() const { return pmax_; }
 
-  Point getMin() { return set_ ? pmin_ : Point(0,0); }
-  Point getMax() { return set_ ? pmax_ : Point(0,0); }
+  CIPoint2D getMin() { return set_ ? pmin_ : CIPoint2D(0,0); }
+  CIPoint2D getMax() { return set_ ? pmax_ : CIPoint2D(0,0); }
 
-  T getLeft  () const { return set_ ? pmin_.x : 0; }
-  T getBottom() const { return set_ ? pmin_.y : 0; }
-  T getRight () const { return set_ ? pmax_.x : 0; }
-  T getTop   () const { return set_ ? pmax_.y : 0; }
+  int getLeft  () const { return set_ ? pmin_.x : 0; }
+  int getBottom() const { return set_ ? pmin_.y : 0; }
+  int getRight () const { return set_ ? pmax_.x : 0; }
+  int getTop   () const { return set_ ? pmax_.y : 0; }
 
-  T getXMin() const { return set_ ? pmin_.x : 0; }
-  T getYMin() const { return set_ ? pmin_.y : 0; }
-  T getXMax() const { return set_ ? pmax_.x : 0; }
-  T getYMax() const { return set_ ? pmax_.y : 0; }
+  int getXMin() const { return set_ ? pmin_.x : 0; }
+  int getYMin() const { return set_ ? pmin_.y : 0; }
+  int getXMax() const { return set_ ? pmax_.x : 0; }
+  int getYMax() const { return set_ ? pmax_.y : 0; }
 
-  T getXMid() const { return set_ ? (pmin_.x + pmax_.x)/2 : 0; }
-  T getYMid() const { return set_ ? (pmin_.y + pmax_.y)/2 : 0; }
+  int getXMid() const { return set_ ? (pmin_.x + pmax_.x)/2 : 0; }
+  int getYMid() const { return set_ ? (pmin_.y + pmax_.y)/2 : 0; }
 
-  void setMin(const Point &point) {
+  void setMin(const CIPoint2D &point) {
     pmin_ = point;
 
     if (! set_){
@@ -113,7 +106,7 @@ class CIBBox2DT {
     }
   }
 
-  void setMax(const Point &point) {
+  void setMax(const CIPoint2D &point) {
     pmax_ = point;
 
     if (! set_) {
@@ -122,7 +115,7 @@ class CIBBox2DT {
     }
   }
 
-  void setMin(T x, T y) {
+  void setMin(int x, int y) {
     pmin_.x = x;
     pmin_.y = y;
 
@@ -132,7 +125,7 @@ class CIBBox2DT {
     }
   }
 
-  void setMax(T x, T y) {
+  void setMax(int x, int y) {
     pmax_.x = x;
     pmax_.y = y;
 
@@ -142,7 +135,7 @@ class CIBBox2DT {
     }
   }
 
-  void setXMin(T x) {
+  void setXMin(int x) {
     pmin_.x = x;
 
     if (! set_) {
@@ -153,7 +146,7 @@ class CIBBox2DT {
     }
   }
 
-  void setYMin(T y) {
+  void setYMin(int y) {
     pmin_.y = y;
 
     if (! set_) {
@@ -164,7 +157,7 @@ class CIBBox2DT {
     }
   }
 
-  void setXMax(T x) {
+  void setXMax(int x) {
     pmax_.x = x;
 
     if (! set_) {
@@ -175,7 +168,7 @@ class CIBBox2DT {
     }
   }
 
-  void setYMax(T y) {
+  void setYMax(int y) {
     pmax_.y = y;
 
     if (! set_) {
@@ -186,23 +179,23 @@ class CIBBox2DT {
     }
   }
 
-  void setWidth(T width) {
+  void setWidth(int width) {
     pmax_.x = pmin_.x + width;
   }
 
-  void setHeight(T height) {
+  void setHeight(int height) {
     pmax_.y = pmin_.y + height;
   }
 
-  void setPosition(const Point &pos) {
-    Size size = getSize();
+  void setPosition(const CIPoint2D &pos) {
+    CISize2D size = getSize();
 
     pmin_ = pos;
 
     setSize(size);
   }
 
-  void setSize(const Size &size) {
+  void setSize(const CISize2D &size) {
     if (! set_) {
       pmin_.x = 0;
       pmin_.y = 0;
@@ -214,74 +207,74 @@ class CIBBox2DT {
     pmax_.y = pmin_.y + size.height;
   }
 
-  Size getSize() const {
-    return Size(getWidth(), getHeight());
+  CISize2D getSize() const {
+    return CISize2D(getWidth(), getHeight());
   }
 
-  T getRadius() const {
-    Vector radius = Vector(getMin(), getMax())/2;
+  int getRadius() const {
+    CIVector2D radius = CIVector2D(getMin(), getMax())/2;
 
     return radius.length();
   }
 
-  T getWidth() const {
-    return std::abs((T) (getXMax() - getXMin()));
+  int getWidth() const {
+    return std::abs((int) (getXMax() - getXMin()));
   }
 
-  T getHeight() const {
-    return std::abs((T) (getYMax() - getYMin()));
+  int getHeight() const {
+    return std::abs((int) (getYMax() - getYMin()));
   }
 
-  T getMinDim() const {
+  int getMinDim() const {
     return std::min(getWidth(), getHeight());
   }
 
-  T getMaxDim() const {
+  int getMaxDim() const {
     return std::max(getWidth(), getHeight());
   }
 
-  void moveBy(const Vector &delta) {
-    pmin_ = (Vector(pmin_) + delta).point();
-    pmax_ = (Vector(pmax_) + delta).point();
+  void moveBy(const CIVector2D &delta) {
+    pmin_ = (CIVector2D(pmin_) + delta).point();
+    pmax_ = (CIVector2D(pmax_) + delta).point();
   }
 
   bool isPoint() const {
     return (pmin_.x == pmax_.x && pmin_.y == pmax_.y);
   }
 
-  CIBBox2DT operator+(const Point &rhs) const {
-    CIBBox2DT t(*this);
+  CIBBox2D operator+(const CIPoint2D &rhs) const {
+    CIBBox2D t(*this);
 
     t += rhs;
 
     return t;
   }
 
-  CIBBox2DT &operator+=(const Point &rhs) {
+  CIBBox2D &operator+=(const CIPoint2D &rhs) {
     add(rhs);
 
     return *this;
   }
 
-  CIBBox2DT operator+(const CIBBox2DT &rhs) const {
-    CIBBox2DT t(*this);
+  CIBBox2D operator+(const CIBBox2D &rhs) const {
+    CIBBox2D t(*this);
 
     t += rhs;
 
     return t;
   }
 
-  CIBBox2DT &operator+=(const CIBBox2DT &rhs) {
+  CIBBox2D &operator+=(const CIBBox2D &rhs) {
     add(rhs);
 
     return *this;
   }
 
-  void add(T x, T y) {
-    add(Point(x, y));
+  void add(int x, int y) {
+    add(CIPoint2D(x, y));
   }
 
-  void add(const Point &point) {
+  void add(const CIPoint2D &point) {
     if (! set_) {
       pmin_ = point;
       pmax_ = point;
@@ -289,12 +282,12 @@ class CIBBox2DT {
       set_ = true;
     }
     else {
-      pmin_ = Point::min(pmin_, point);
-      pmax_ = Point::max(pmax_, point);
+      pmin_ = CIPoint2D::min(pmin_, point);
+      pmax_ = CIPoint2D::max(pmax_, point);
     }
   }
 
-  void add(const CIBBox2DT &bbox) {
+  void add(const CIBBox2D &bbox) {
     if (! bbox.set_) return;
 
     if (! set_) {
@@ -304,29 +297,29 @@ class CIBBox2DT {
       set_ = true;
     }
     else {
-      pmin_ = Point::min(pmin_, bbox.pmin_);
-      pmax_ = Point::max(pmax_, bbox.pmax_);
+      pmin_ = CIPoint2D::min(pmin_, bbox.pmin_);
+      pmax_ = CIPoint2D::max(pmax_, bbox.pmax_);
     }
   }
 
-  bool overlaps(const CIBBox2DT &bbox) const {
+  bool overlaps(const CIBBox2D &bbox) const {
     return ((pmax_.x >= bbox.pmin_.x && pmin_.x <= bbox.pmax_.x) &&
             (pmax_.y >= bbox.pmin_.y && pmin_.y <= bbox.pmax_.y));
   }
 
-  bool overlapsX(const BBox &bbox) const {
+  bool overlapsX(const CIBBox2D &bbox) const {
     if (! set_ || ! bbox.set_) return false;
 
     return (pmax_.x >= bbox.pmin_.x && pmin_.x <= bbox.pmax_.x);
   }
 
-  bool overlapsY(const BBox &bbox) const {
+  bool overlapsY(const CIBBox2D &bbox) const {
     if (! set_ || ! bbox.set_) return false;
 
     return (pmax_.y >= bbox.pmin_.y && pmin_.y <= bbox.pmax_.y);
   }
 
-  bool intersect(const BBox &bbox, BBox &ibbox) const {
+  bool intersect(const CIBBox2D &bbox, CIBBox2D &ibbox) const {
     if (! set_ || ! bbox.set_) return false;
 
     if ((pmax_.x < bbox.pmin_.x || pmin_.x > bbox.pmax_.x) ||
@@ -342,40 +335,43 @@ class CIBBox2DT {
   }
 
   bool insideX(int x) const {
+    if (! set_) return false;
     return (x >= pmin_.x && x <= pmax_.x);
   }
 
   bool insideY(int y) const {
+    if (! set_) return false;
     return (y >= pmin_.y && y <= pmax_.y);
   }
 
-  bool inside(const Point &point) const {
+  bool inside(const CIPoint2D &point) const {
+    if (! set_) return false;
     return ((point.x >= pmin_.x && point.x <= pmax_.x) &&
             (point.y >= pmin_.y && point.y <= pmax_.y));
   }
 
-  void expand(T delta) {
+  void expand(int delta) {
     pmin_ += delta;
     pmax_ += delta;
   }
 
-  Point getCenter() const {
+  CIPoint2D getCenter() const {
     return (pmin_ + pmax_)/2;
   }
 
-  Point getLL() const {
+  CIPoint2D getLL() const {
     return pmin_;
   }
 
-  Point getLR() const {
-    return Point(pmax_.x, pmin_.y);
+  CIPoint2D getLR() const {
+    return CIPoint2D(pmax_.x, pmin_.y);
   }
 
-  Point getUL() const {
-    return Point(pmin_.x, pmax_.y);
+  CIPoint2D getUL() const {
+    return CIPoint2D(pmin_.x, pmax_.y);
   }
 
-  Point getUR() const {
+  CIPoint2D getUR() const {
     return pmax_;
   }
 
@@ -390,26 +386,24 @@ class CIBBox2DT {
       os << "(" << pmin_ << ") (" << pmax_ << ")";
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const CIBBox2DT &bbox) {
+  friend std::ostream &operator<<(std::ostream &os, const CIBBox2D &bbox) {
     bbox.print(os);
 
     return os;
   }
 
-  friend bool operator==(const CIBBox2DT &lhs, const CIBBox2DT &rhs) {
+  friend bool operator==(const CIBBox2D &lhs, const CIBBox2D &rhs) {
     return (lhs.pmin_ == rhs.pmin_ && lhs.pmax_ == rhs.pmax_);
   }
 
-  friend bool operator!=(const CIBBox2DT &lhs, const CIBBox2DT &rhs) {
+  friend bool operator!=(const CIBBox2D &lhs, const CIBBox2D &rhs) {
     return ! (lhs == rhs);
   }
 
  private:
-  Point pmin_;
-  Point pmax_;
-  bool  set_ { false };
+  CIPoint2D pmin_;
+  CIPoint2D pmax_;
+  bool      set_ { false };
 };
-
-typedef CIBBox2DT<int> CIBBox2D;
 
 #endif
