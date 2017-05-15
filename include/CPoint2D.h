@@ -7,7 +7,9 @@
 
 class CPoint2D {
  public:
-  explicit CPoint2D(double x1=0, double y1=0) :
+  CPoint2D() { }
+
+  CPoint2D(double x1, double y1) :
    x(x1), y(y1) {
   }
 
