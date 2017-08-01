@@ -7,9 +7,7 @@
 
 class CRange2D {
  public:
-  CRange2D() :
-   set_(false), x1_(0), y1_(0), x2_(0), y2_(0) {
-  }
+  CRange2D() { }
 
   CRange2D(double x1, double y1, double x2, double y2) :
    set_(true), x1_(x1), y1_(y1), x2_(x2), y2_(y2) {
@@ -29,6 +27,10 @@ class CRange2D {
     *x2 = x2_; *y2 = y2_;
 
     return set_;
+  }
+
+  void reset() {
+    set_ = false; x1_ = 0; y1_ = 0; x2_ = 0; y2_ = 0;
   }
 
   double dx() const { assert(set_); return x2_ - x1_; }
@@ -64,6 +66,19 @@ class CRange2D {
 
   void incX(double dx) { assert(set_); x1_ += dx; x2_ += dx; }
   void incY(double dy) { assert(set_); y1_ += dy; y2_ += dy; }
+
+  void updateRange(double x, double y) {
+    if (! set_) {
+      x1_ = x; y1_ = y;
+      x2_ = x; y2_ = y;
+
+      set_ = true;
+    }
+    else {
+      x1_ = std::min(x1_, x); y1_ = std::min(y1_, y);
+      x2_ = std::max(x2_, x); y2_ = std::max(y2_, y);
+    }
+  }
 
   CRange2D &operator=(const CRange2D &range) {
     set_ = range.set_;
