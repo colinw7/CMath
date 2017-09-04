@@ -25,6 +25,7 @@ CMathGeom2D.cpp \
 CMathGeom3D.cpp \
 CMathPoly2D.cpp \
 CMathRand.cpp \
+CMathRound.cpp \
 COffsetBezier.cpp \
 CParticle2D.cpp \
 CPrime.cpp \

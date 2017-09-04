@@ -1,7 +1,6 @@
 #ifndef CARRAY_2D_H
 #define CARRAY_2D_H
 
-#include <CThrow.h>
 #include <CArray1D.h>
 
 // 2D Array of specified type, data is optionally owned
@@ -35,19 +34,19 @@ class CArray2D {
  public:
   CArray2D(value_type *data, index_type d1, index_type d2) :
    data_(data), d1_(d1), d2_(d2), size_(d1*d2) {
-    if (OWNER) CTHROW("Not Owner");
+    if (OWNER) assert(false && "Not Owner");
   }
 
   CArray2D(index_type d1, index_type d2) :
    d1_(d1), d2_(d2), size_(d1*d2) {
-    if (! OWNER) CTHROW("Owner");
+    if (! OWNER) assert(false && "Owner");
 
     allocate(size_);
   }
 
   CArray2D(index_type d1, index_type d2, const_reference idata) :
    d1_(d1), d2_(d2), size_(d1*d2) {
-    if (! OWNER) CTHROW("Owner");
+    if (! OWNER) assert(false && "Owner");
 
     allocate(size_, idata);
   }

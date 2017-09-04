@@ -3,7 +3,6 @@
 
 #include <CIPoint2D.h>
 #include <CIVector2D.h>
-#include <CMathGen.h>
 
 class CILine2D {
  public:

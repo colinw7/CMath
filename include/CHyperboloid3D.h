@@ -5,6 +5,7 @@
 #include <CVector3D.h>
 #include <CLine3D.h>
 #include <CPoint3D.h>
+#include <CMathGen.h>
 #include <COptVal.h>
 #include <NaN.h>
 
@@ -123,7 +124,7 @@ class CHyperboloid3D : public CShape3D {
 
     CVector3D dpdu, dpdv;
 
-    pointDetails(p, NULL, NULL, &dpdu, &dpdv);
+    pointDetails(p, nullptr, nullptr, &dpdu, &dpdv);
 
     dpdu = CShape3D::transformFrom(dpdu);
     dpdv = CShape3D::transformFrom(dpdv);
@@ -225,8 +226,7 @@ class CHyperboloid3D : public CShape3D {
 
     CPoint3D pr = (1.0 - v)*point1_ + v*point2_;
 
-    double phi = atan2(pr.x*point.y - pr.y*point.x,
-                  pr.x*point.x + pr.y*point.y);
+    double phi = atan2(pr.x*point.y - pr.y*point.x, pr.x*point.x + pr.y*point.y);
 
     if (phi < 0.0) phi += 2.0*M_PI;
 
@@ -234,13 +234,12 @@ class CHyperboloid3D : public CShape3D {
   }
 
  private:
-  CPoint3D point1_;      //! CPoint3D 1
-  CPoint3D point2_;      //! CPoint3D 2
-  double   phi_max_;     //! Angle/Sweep Max
-  double   zmin_, zmax_; //! Height Range
-  double   rmax_;        //!
-  double   a_, c_;
-
+  CPoint3D point1_;                         //! CPoint3D 1
+  CPoint3D point2_;                         //! CPoint3D 2
+  double   phi_max_ { 0.0 };                //! Angle/Sweep Max
+  double   zmin_    { 0.0 }, zmax_ { 0.0 }; //! Height Range
+  double   rmax_    { 0.0 };                //!
+  double   a_       { 0.0 }, c_ { 0.0 };
   COptReal area_;
 };
 

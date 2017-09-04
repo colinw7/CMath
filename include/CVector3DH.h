@@ -3,7 +3,6 @@
 
 // TODO: use CMath::sqrt() and CMath::isqrt() to allow replacement
 
-#include <CMathGen.h>
 #include <CPoint3DH.h>
 
 class CVector3DH {

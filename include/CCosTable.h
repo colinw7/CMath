@@ -4,14 +4,9 @@
 #include <cmath>
 
 class CCosTable {
- private:
-  uint    size_;
-  double *lookup_;
-  double  di_, idi_;
-
  public:
   CCosTable(uint size=500) :
-   size_(size), lookup_(NULL) {
+   size_(size) {
     di_  = 2.0*M_PI/size_;
     idi_ = 1.0/di_;
 
@@ -32,7 +27,7 @@ class CCosTable {
     size_   = size;
     di_     = 2.0*M_PI/size_;
     idi_    = 1.0/di_;
-    lookup_ = NULL;
+    lookup_ = nullptr;
 
     init();
   }
@@ -54,12 +49,18 @@ class CCosTable {
 
  private:
   void init() {
-    if (lookup_ == NULL)
+    if (! lookup_)
       lookup_ = new double [size_ + 1];
 
     for (uint i = 0; i <= size_; ++i)
       lookup_[i] = ::cos(di_*i);
   }
+
+ private:
+  uint    size_   { 500 };
+  double *lookup_ { nullptr };
+  double  di_     { 1 };
+  double  idi_    { 1 };
 };
 
 #endif

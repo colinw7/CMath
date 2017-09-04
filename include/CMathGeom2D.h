@@ -12,22 +12,26 @@
 
 struct CPoint2DParam {
   CPoint2D p;
-  double   t;
+  double   t { 0.0 };
 
   CPoint2DParam(const CPoint2D &tp, double tt) :
    p(tp), t(tt) {
   }
 };
 
+//---
+
 struct CPoint2DParam2 {
   CPoint2D p;
-  double   t1;
-  double   t2;
+  double   t1 { 0.0 };
+  double   t2 { 0.0 };
 
   CPoint2DParam2(const CPoint2D &tp, double tt1, double tt2) :
    p(tp), t1(tt1), t2(tt2) {
   }
 };
+
+//---
 
 namespace CMathGeom2D {
   enum ClipZone {
@@ -123,12 +127,12 @@ namespace CMathGeom2D {
   bool LinesAreCoincident(const CPoint2D &p11, const CPoint2D &p12,
                           const CPoint2D &p21, const CPoint2D &p22);
 
-  bool IntersectLine(double x11, double y11, double x21, double y21, double x12, double y12,
-                     double x22, double y22, double *xi, double *yi,
-                     double *mu1 = NULL, double *mu2 = NULL);
+  bool IntersectLine(double x11, double y11, double x21, double y21,
+                     double x12, double y12, double x22, double y22,
+                     double *xi, double *yi, double *mu1=nullptr, double *mu2=nullptr);
   bool IntersectLine(const CPoint2D &line1s, const CPoint2D &line1e,
                      const CPoint2D &line2s, const CPoint2D &line2e,
-                     CPoint2D *point, double *mu1 = NULL, double *mu2 = NULL);
+                     CPoint2D *point, double *mu1=nullptr, double *mu2=nullptr);
 
   CPolygonOrientation PolygonOrientation(const double *x, const double *y, uint num_xy);
   CPolygonOrientation PolygonOrientation(const int *x, const int *y, uint num_xy);

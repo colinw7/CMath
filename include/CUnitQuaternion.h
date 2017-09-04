@@ -191,7 +191,7 @@ class CUnitQuaternion {
     double l = ::sqrt(w_*w_ + x_*x_ + y_*y_ + z_*z_);
 
     if (l <= 0.0)
-      CTHROW("Divide by zero");
+      assert(false && "Divide by zero");
     else {
       double li = 1.0/l;
 

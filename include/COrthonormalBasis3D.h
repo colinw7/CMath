@@ -3,6 +3,7 @@
 
 #include <CVector3D.h>
 #include <CMatrix3D.h>
+#include <CMathGen.h>
 #include <CMathMacros.h>
 
 class COrthonormalBasis3D {

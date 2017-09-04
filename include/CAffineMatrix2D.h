@@ -1,11 +1,9 @@
 #ifndef CMATRIX_2D_H
 #define CMATRIX_2D_H
 
-#include <CMathGen.h>
 #include <CPoint2D.h>
 #include <CVector2D.h>
 #include <CMatrixType.h>
-#include <CThrow.h>
 
 /* / a b tx \ */
 /* | c d ty | */
@@ -38,7 +36,7 @@ class CAffineMatrix2D {
     else if (n == 6)
       setValues(m[0], m[1], m[2], m[3], m[4], m[5]);
     else
-     CTHROW("Invalid size");
+     assert(false && "Invalid size");
   }
 
   CAffineMatrix2D(const Vector &v0, const Vector &v1) :
@@ -252,7 +250,7 @@ class CAffineMatrix2D {
       v[4] = tx_; v[5] = ty_;
     }
     else
-      CTHROW("Invalid Size");
+      assert(false && "Invalid Size");
   }
 
   //---------
@@ -407,7 +405,7 @@ class CAffineMatrix2D {
     CAffineMatrix2D imatrix;
 
     if (! invert(imatrix))
-      CTHROW("Divide by zero");
+      assert(false && "Divide by zero");
 
     return imatrix;
   }
@@ -593,7 +591,7 @@ class CAffineMatrix2D {
     CAffineMatrix2D bi;
 
     if (! b.invert(bi)) {
-      CTHROW("Divide by zero");
+      assert(false && "Divide by zero");
       return *this;
     }
 

@@ -4,7 +4,6 @@
 #include <CMathGen.h>
 #include <CPoint3D.h>
 #include <CVector3D.h>
-#include <CThrow.h>
 #include <iostream>
 #include <cstring>
 
@@ -29,7 +28,7 @@ class CMatrix3x3 {
     if (type == CMATRIX_3x3_IDENTITY)
       setIdentity();
     else
-      CTHROW("Bad Matrix Type");
+      assert(false && "Bad Matrix Type");
   }
 
   CMatrix3x3(double m00, double m01, double m02, double m10, double m11, double m12,
@@ -43,7 +42,7 @@ class CMatrix3x3 {
     if      (n == 9)
       memcpy(&m00_, m, 9*sizeof(double));
     else
-      CTHROW("Invalid size");
+      assert(false && "Invalid size");
   }
 
   CMatrix3x3(CMathGen::AxisType3D axis, double angle,
@@ -206,7 +205,7 @@ class CMatrix3x3 {
       v[6] = m20_; v[7] = m21_; v[8] = m22_;
     }
     else
-      CTHROW("Invalid size");
+      assert(false && "Invalid size");
   }
 
   void setColumn(int c, double x, double y, double z) {
@@ -350,7 +349,7 @@ class CMatrix3x3 {
     CMatrix3x3 imatrix;
 
     if (! invert(imatrix))
-      CTHROW("Divide by 0.0");
+      assert(false && "Divide by 0.0");
 
     return imatrix;
   }
@@ -533,7 +532,7 @@ class CMatrix3x3 {
     CMatrix3x3 bi;
 
     if (! b.invert(bi)) {
-      CTHROW("Divide by 0.0");
+      assert(false && "Divide by 0.0");
       return *this;
     }
 

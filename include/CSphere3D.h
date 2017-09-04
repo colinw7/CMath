@@ -6,6 +6,7 @@
 #include <CLine3D.h>
 #include <CPoint3D.h>
 #include <CVector2D.h>
+#include <CMathGen.h>
 #include <COptVal.h>
 
 /*! Sphere of specified radius centered at origin
@@ -121,7 +122,7 @@ class CSphere3D : public CShape3D {
 
     CVector3D dpdu, dpdv;
 
-    pointDetails(p, NULL, NULL, &dpdu, &dpdv);
+    pointDetails(p, nullptr, nullptr, &dpdu, &dpdv);
 
     dpdu = CShape3D::transformFrom(dpdu);
     dpdv = CShape3D::transformFrom(dpdv);

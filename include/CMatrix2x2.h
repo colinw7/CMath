@@ -1,10 +1,8 @@
 #ifndef CMATRIX_2X2_H
 #define CMATRIX_2X2_H
 
-#include <CMathGen.h>
 #include <CPoint2D.h>
 #include <CVector2D.h>
-#include <CThrow.h>
 #include <iostream>
 #include <cstring>
 
@@ -28,7 +26,7 @@ class CMatrix2x2 {
     if (type == CMATRIX_2x2_IDENTITY)
       setIdentity();
     else
-      CTHROW("Bad Matrix Type");
+      assert(false && "Bad Matrix Type");
   }
 
   CMatrix2x2(double a, double b, double c, double d) :
@@ -39,7 +37,7 @@ class CMatrix2x2 {
     if (n == 4)
       setValues(m[0], m[1], m[2], m[3]);
     else
-     CTHROW("Invalid size");
+     assert(false && "Invalid size");
   }
 
   CMatrix2x2(const CMatrix2x2 &a) {
@@ -198,7 +196,7 @@ class CMatrix2x2 {
     CMatrix2x2 imatrix;
 
     if (! invert(imatrix))
-      CTHROW("Divide by zero");
+      assert(false && "Divide by zero");
 
     return imatrix;
   }
@@ -364,7 +362,7 @@ class CMatrix2x2 {
     CMatrix2x2 bi;
 
     if (! b.invert(bi)) {
-      CTHROW("Divide by zero");
+      assert(false && "Divide by zero");
       return *this;
     }
 

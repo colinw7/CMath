@@ -5,6 +5,7 @@
 #include <CVector3D.h>
 #include <CLine3D.h>
 #include <CPoint3D.h>
+#include <CMathGen.h>
 #include <COptVal.h>
 
 /*! Cylinder of specified radius (r) and specified height (h)
@@ -126,7 +127,7 @@ class CCylinder3D : public CShape3D {
 
     CVector3D dpdu, dpdv;
 
-    pointDetails(p, NULL, NULL, &dpdu, &dpdv);
+    pointDetails(p, nullptr, nullptr, &dpdu, &dpdv);
 
     dpdu = CShape3D::transformFrom(dpdu);
     dpdv = CShape3D::transformFrom(dpdv);
@@ -199,12 +200,12 @@ class CCylinder3D : public CShape3D {
   }
 
  private:
-  double   radius_; //! Radius r
-  double   height_; //! Height h
+  double   radius_ { 1.0 }; //! Radius r
+  double   height_ { 1.0 }; //! Height h
 
   // limits
-  double   zmin_, zmax_; //! Height Range
-  double   phi_max_;     //! Angle/Sweep Max
+  double   zmin_    { 0.0 }, zmax_ { 0.0 }; //! Height Range
+  double   phi_max_ { 0.0 };                //! Angle/Sweep Max
 
   COptReal area_;
 };

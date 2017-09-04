@@ -5,6 +5,7 @@
 #include <CMatrix3D.h>
 #include <CPoint3D.h>
 #include <CVector3D.h>
+#include <CMathGen.h>
 
 class CRefTransform3D {
  private:

@@ -2,7 +2,6 @@
 #define CIBBOX_2D_H
 
 #include <iostream>
-#include <CMathGen.h>
 #include <CIPoint2D.h>
 #include <CISize2D.h>
 #include <CIVector2D.h>

@@ -5,6 +5,7 @@
 #include <CVector3D.h>
 #include <CLine3D.h>
 #include <CPoint3D.h>
+#include <CMathGen.h>
 #include <COptVal.h>
 
 /*! Paraboloid of specified center (cx, cy, cz), radius (r) and height (h)
@@ -98,7 +99,7 @@ class CParaboloid3D : public CShape3D {
 
     CVector3D dpdu, dpdv;
 
-    pointDetails(p, NULL, NULL, &dpdu, &dpdv);
+    pointDetails(p, nullptr, nullptr, &dpdu, &dpdv);
 
     dpdu = CShape3D::transformFrom(dpdu);
     dpdv = CShape3D::transformFrom(dpdv);
@@ -175,11 +176,9 @@ class CParaboloid3D : public CShape3D {
   }
 
  private:
-  double   radius_;      //! Radius r
-  double   zmin_, zmax_; //!
-
-  double   phi_max_;     //! Angle/Sweep Max
-
+  double   radius_  { 0.0 };                //! Radius r
+  double   zmin_    { 0.0 }, zmax_ { 0.0 }; //!
+  double   phi_max_ { 0.0 };                //! Angle/Sweep Max
   COptReal area_;
 };
 

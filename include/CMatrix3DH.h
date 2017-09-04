@@ -5,7 +5,6 @@
 #include <CPoint3D.h>
 #include <CVector3D.h>
 #include <CMatrix3D.h>
-#include <CThrow.h>
 #include <cstring>
 
 /* Homogeneous 3D Matrix */
@@ -46,7 +45,7 @@ class CMatrix3DH {
     if (type == CMATRIX_3DH_IDENTITY)
       setIdentity();
     else
-      CTHROW("Bad Matrix Type");
+      assert(false && "Bad Matrix Type");
   }
 
   CMatrix3DH(double m00, double m01, double m02,
@@ -105,7 +104,7 @@ class CMatrix3DH {
                 m[ 8], m[ 9], m[10], m[11],
                 m[12], m[13], m[14], m[15]);
     else
-      CTHROW("Invalid size");
+      assert(false && "Invalid size");
   }
 
   CMatrix3DH(CMathGen::AxisType3D axis, double angle,
@@ -554,7 +553,7 @@ class CMatrix3DH {
       v[12] = m30_; v[13] = m31_; v[14] = m32_; v[15] = m33_;
     }
     else
-      CTHROW("Invalid size");
+      assert(false && "Invalid size");
   }
 
   //---------
@@ -881,7 +880,7 @@ class CMatrix3DH {
     CMatrix3DH imatrix;
 
     if (! invert(imatrix))
-      CTHROW("Divide by zero");
+      assert(false && "Divide by zero");
 
     return imatrix;
   }
@@ -947,7 +946,7 @@ class CMatrix3DH {
     CMatrix3DH imatrix;
 
     if (! affineInvert(imatrix))
-      CTHROW("Divide by zero");
+      assert(false && "Divide by zero");
 
     return imatrix;
   }
@@ -1162,7 +1161,7 @@ class CMatrix3DH {
     CMatrix3DH bi;
 
     if (! b.invert(bi)) {
-      CTHROW("Divide by zero");
+      assert(false && "Divide by zero");
       return *this;
     }
 

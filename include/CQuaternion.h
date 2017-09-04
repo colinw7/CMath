@@ -1,7 +1,6 @@
 #ifndef CQUATERNION_H
 #define CQUATERNION_H
 
-#include <CThrow.h>
 #include <CMatrix3D.h>
 #include <CPoint3D.h>
 #include <CVector3D.h>
@@ -209,7 +208,7 @@ class CQuaternion {
     double l = length();
 
     if (l <= 0.0) {
-      CTHROW("Divide by zero");
+      assert(false && "Divide by zero");
       return *this;
     }
 
@@ -230,7 +229,7 @@ class CQuaternion {
     double l = dotProductSelf();
 
     if (l <= 0.0) {
-      CTHROW("Divide by zero");
+      assert(false && "Divide by zero");
       return *this;
     }
 

@@ -55,8 +55,8 @@ typedef std::vector<Point> PointArray;
 
 class Circle {
  public:
-  Point  c; // Center
-  double r; // Radius
+  Point  c { 0.0, 0.0 }; // Center
+  double r { 1.0 };      // Radius
 
   bool valid;
 

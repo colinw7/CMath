@@ -3,7 +3,6 @@
 
 #include <CPoint2D.h>
 #include <CBBox2D.h>
-//#include <CMathGen.h>
 #include <vector>
 
 class C2Bezier2D {

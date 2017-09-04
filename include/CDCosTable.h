@@ -5,14 +5,9 @@
 #include <CMathMacros.h>
 
 class CDCosTable {
- private:
-  uint    size_;
-  double *lookup_;
-  double  di_, idi_;
-
  public:
   CDCosTable(uint size=500) :
-   size_(size), lookup_(NULL) {
+   size_(size) {
     di_  = 360.0/size_;
     idi_ = 1.0/di_;
 
@@ -33,7 +28,7 @@ class CDCosTable {
     size_   = size;
     di_     = 360.0/size_;
     idi_    = 1.0/di_;
-    lookup_ = NULL;
+    lookup_ = nullptr;
 
     init();
   }
@@ -55,12 +50,18 @@ class CDCosTable {
 
  private:
   void init() {
-    if (lookup_ == NULL)
+    if (! lookup_)
       lookup_ = new double [size_ + 1];
 
     for (uint i = 0; i <= size_; ++i)
       lookup_[i] = ::cos(DEG_TO_RAD(di_*i));
   }
+
+ private:
+  uint    size_   { 500 };
+  double *lookup_ { nullptr };
+  double  di_     { 1 };
+  double  idi_    { 1 };
 };
 
 #endif

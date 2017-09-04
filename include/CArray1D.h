@@ -1,7 +1,6 @@
 #ifndef CARRAY_1D_H
 #define CARRAY_1D_H
 
-#include <CThrow.h>
 #include <iostream>
 #include <cstddef>
 
@@ -33,19 +32,19 @@ class CArray1D {
  public:
   CArray1D(value_type *data, index_type d1) :
    data_(data), d1_(d1), size_(d1) {
-    if (OWNER) CTHROW("Owner");
+    if (OWNER) assert(false && "Owner");
   }
 
   explicit CArray1D(index_type d1) :
    d1_(d1), size_(d1) {
-    if (! OWNER) CTHROW("Not Owner");
+    if (! OWNER) assert(false && "Not Owner");
 
     allocate(size_);
   }
 
   CArray1D(index_type d1, const_reference idata) :
    d1_(d1), size_(d1) {
-    if (! OWNER) CTHROW("Not Owner");
+    if (! OWNER) assert(false && "Not Owner");
 
     allocate(size_, idata);
   }

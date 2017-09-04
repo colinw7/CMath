@@ -7,7 +7,7 @@
 class CATanTable {
  public:
   CATanTable(uint size=500) :
-   size_(size), lookup_(NULL) {
+   size_(size) {
     init();
   }
 
@@ -23,7 +23,7 @@ class CATanTable {
     delete [] lookup_;
 
     size_   = size;
-    lookup_ = NULL;
+    lookup_ = nullptr;
 
     init();
   }
@@ -60,7 +60,7 @@ class CATanTable {
 
  private:
   void init() {
-    if (lookup_ == NULL)
+    if (! lookup_)
       lookup_ = new double [size_ + 2];
 
     double di = 1.0/size_;
@@ -72,8 +72,8 @@ class CATanTable {
   }
 
  private:
-  uint    size_;
-  double *lookup_;
+  uint    size_   { 500 };
+  double *lookup_ { nullptr };
 };
 
 #endif

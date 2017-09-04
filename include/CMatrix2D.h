@@ -1,12 +1,10 @@
 #ifndef CMATRIX_2D_H
 #define CMATRIX_2D_H
 
-#include <CMathGen.h>
 #include <CMathMacros.h>
 #include <CPoint2D.h>
 #include <CVector2D.h>
 #include <CMatrixType.h>
-#include <CThrow.h>
 #include <cstring>
 #include <sstream>
 
@@ -21,28 +19,19 @@
 class CMatrix2D {
  public:
   // constructor/destructor
-  CMatrix2D() :
-   m00_(0.0), m01_(0.0), m02_(0.0),
-   m10_(0.0), m11_(0.0), m12_(0.0),
-   m20_(0.0), m21_(0.0), m22_(0.0) {
-  }
+  CMatrix2D() { }
 
  ~CMatrix2D() { }
 
-  explicit CMatrix2D(CMatrixType type) :
-   m00_(0.0), m01_(0.0), m02_(0.0),
-   m10_(0.0), m11_(0.0), m12_(0.0),
-   m20_(0.0), m21_(0.0), m22_(0.0) {
+  explicit CMatrix2D(CMatrixType type) {
     if (type == CMATRIX_TYPE_IDENTITY)
       setIdentity();
     else
-      CTHROW("Bad Matrix Type");
+      assert(false && "Bad Matrix Type");
   }
 
   CMatrix2D(double a, double b, double c, double d) :
-   m00_(a  ), m01_(b  ), m02_(0.0),
-   m10_(c  ), m11_(d  ), m12_(0.0),
-   m20_(0.0), m21_(0.0), m22_(0.0) {
+   m00_(a), m01_(b), m10_(c), m11_(d) {
     setBottomIdentity();
   }
 
@@ -57,22 +46,17 @@ class CMatrix2D {
    m20_(m20), m21_(m21), m22_(m22) {
   }
 
-  CMatrix2D(const double *m, int n) :
-   m00_(0.0), m01_(0.0), m02_(0.0),
-   m10_(0.0), m11_(0.0), m12_(0.0),
-   m20_(0.0), m21_(0.0), m22_(0.0) {
+  CMatrix2D(const double *m, int n) {
     if      (n == 4)
       setValues(m[0], m[1], m[2], m[3]);
     else if (n == 6)
       setValues(m[0], m[1], m[2], m[3], m[4], m[5]);
     else
-     CTHROW("Invalid size");
+     assert(false && "Invalid size");
   }
 
   CMatrix2D(const CVector2D &v0, const CVector2D &v1) :
-   m00_(v0.getX()), m01_(v1.getX()), m02_(0.0),
-   m10_(v0.getY()), m11_(v1.getY()), m12_(0.0),
-   m20_(0.0      ), m21_(0.0      ), m22_(0.0) {
+   m00_(v0.getX()), m01_(v1.getX()), m10_(v0.getY()), m11_(v1.getY()) {
     setOuterIdentity ();
     setBottomIdentity();
   }
@@ -319,7 +303,7 @@ class CMatrix2D {
     else if (n == 9)
       setValues(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8]);
     else
-      CTHROW("Invalid Size");
+      assert(false && "Invalid Size");
   }
 
   void getValues(double *a, double *b, double *c, double *d) const {
@@ -354,7 +338,7 @@ class CMatrix2D {
       v[6] = m20_; v[7] = m21_; v[8] = m22_;
     }
     else
-      CTHROW("Invalid Size");
+      assert(false && "Invalid Size");
   }
 
   //---------
@@ -524,7 +508,7 @@ class CMatrix2D {
     CMatrix2D imatrix;
 
     if (! invert(imatrix))
-      CTHROW("Divide by zero");
+      assert(false && "Divide by zero");
 
     return imatrix;
   }
@@ -746,7 +730,7 @@ class CMatrix2D {
     CMatrix2D bi;
 
     if (! b.invert(bi)) {
-      CTHROW("Divide by zero");
+      assert(false && "Divide by zero");
       return *this;
     }
 

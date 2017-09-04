@@ -65,12 +65,6 @@ namespace CMathGen {
     INTERSECT_VALID   = (INTERSECT_INSIDE | INTERSECT_OUTSIDE)
   };
 
-  enum Rounding {
-    ROUND_DOWN,
-    ROUND_UP,
-    ROUND_NEAREST
-  };
-
   extern double EPSILON_E4;
   extern double EPSILON_E5;
   extern double EPSILON_E6;
@@ -122,12 +116,6 @@ namespace CMathGen {
 
   double DegToRad(double deg);
   double RadToDeg(double rad);
-
-  int Round(double x, Rounding rounding=ROUND_NEAREST);
-
-  int RoundNearest(double x);
-  int RoundUp(double x);
-  int RoundDown(double x);
 
   bool isInteger(double d);
 

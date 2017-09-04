@@ -2,7 +2,6 @@
 #define C3BEZIER_2D_H
 
 #include <CPoint2D.h>
-//#include <CMathGen.h>
 #include <C2Bezier2D.h>
 
 class C3Bezier2D {

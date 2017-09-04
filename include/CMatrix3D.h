@@ -9,7 +9,6 @@
 #include <CPoint3D.h>
 #include <CVector3D.h>
 #include <CGaussianMatrix.h>
-#include <CThrow.h>
 
 /* / m00 m01 m02 m03 \ */
 /* | m10 m11 m12 m13 | */
@@ -36,7 +35,7 @@ class CMatrix3D {
     if (type == CMATRIX_TYPE_IDENTITY)
       setIdentity();
     else
-      CTHROW("Bad CMatrix3D Type");
+      assert(false && "Bad CMatrix3D Type");
   }
 
   CMatrix3D(double m00, double m01, double m02,
@@ -95,7 +94,7 @@ class CMatrix3D {
                 m[ 8], m[ 9], m[10], m[11],
                 m[12], m[13], m[14], m[15]);
     else
-      CTHROW("Invalid size");
+      assert(false && "Invalid size");
   }
 
   CMatrix3D(const CVector3D &v0, const CVector3D &v1, const CVector3D &v2) :
@@ -604,7 +603,7 @@ class CMatrix3D {
       v[12] = m30_; v[13] = m31_; v[14] = m32_; v[15] = m33_;
     }
     else
-      CTHROW("Invalid size");
+      assert(false && "Invalid size");
   }
 
   void getValuesI(double *v, int n) const {
@@ -626,7 +625,7 @@ class CMatrix3D {
       v[12] = m03_; v[13] = m13_; v[14] = m23_; v[15] = m33_;
     }
     else
-      CTHROW("Invalid size");
+      assert(false && "Invalid size");
   }
 
   //---------
@@ -911,7 +910,7 @@ class CMatrix3D {
     CMatrix3D imatrix;
 
     if (! invert(imatrix))
-      CTHROW("Divide by 0.0");
+      assert(false && "Divide by 0.0");
 
     return imatrix;
   }
@@ -1157,7 +1156,7 @@ class CMatrix3D {
     CMatrix3D bi;
 
     if (! b.invert(bi)) {
-      CTHROW("Divide by 0.0");
+      assert(false && "Divide by 0.0");
       return *this;
     }
 

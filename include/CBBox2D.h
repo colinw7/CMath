@@ -157,10 +157,7 @@ class CBBox2D {
   }
 
   bool inside(double x, double y) const {
-    if (! set_) return false;
-
-    return ((x >= pmin_.x && x <= pmax_.x) &&
-            (y >= pmin_.y && y <= pmax_.y));
+    return inside(CPoint2D(x, y));
   }
 
   bool inside(const CPoint2D &point) const {

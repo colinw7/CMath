@@ -1,7 +1,6 @@
 #ifndef CSYMMETRIC_MATRIX_3D_H
 #define CSYMMETRIC_MATRIX_3D_H
 
-#include <CMathGen.h>
 #include <CPoint3D.h>
 #include <CVector3D.h>
 

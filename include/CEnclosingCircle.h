@@ -18,8 +18,9 @@ class CEnclosingCircle {
     double r() const { return r_; }
 
    private:
-    double x_, y_;
-    double r_;
+    double x_ { 0.0 };
+    double y_ { 0.0 };
+    double r_ { 1.0 };
   };
 
   typedef std::vector<Circle> Circles;

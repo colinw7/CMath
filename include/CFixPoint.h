@@ -1,8 +1,6 @@
 #ifndef CFIXED_POINT_H
 #define CFIXED_POINT_H
 
-#include <CThrow.h>
-
 // Unsigned fixed point float
 // Need operator< ...
 
@@ -21,19 +19,19 @@ class CUnsignedFixPoint {
   CUnsignedFixPoint(uint w, uint d = 0) :
    w_(w), d_(d) {
     if (w >= WHOLE_MAX || d >= DECIMAL_MAX)
-      CTHROW("Overflow");
+      assert(false && "Overflow");
   }
 
   CUnsignedFixPoint(double r) :
    w_(0), d_(0) {
     if (r < 0)
-      CTHROW("Negative");
+      assert(false && "Negative");
 
     uint w = (uint)(r);
     uint d = (uint)((r - w)*DECIMAL_MAX + 0.5);
 
     if (w >= WHOLE_MAX || d >= DECIMAL_MAX)
-      CTHROW("Overflow");
+      assert(false && "Overflow");
 
     w_ = w;
     d_ = d;
@@ -52,7 +50,7 @@ class CUnsignedFixPoint {
 
   CUnsignedFixPoint operator-(const CUnsignedFixPoint &rhs) {
     if (w_ < rhs.w_ || (w_ == rhs.w_ && d_ < rhs.d_)) {
-      CTHROW("Negative");
+      assert(false && "Negative");
       return CUnsignedFixPoint(0,0);
     }
 
@@ -63,7 +61,7 @@ class CUnsignedFixPoint {
       d1 += DECIMAL_MAX + 1;
 
       if (w1 <= 0) {
-        CTHROW("Negative");
+        assert(false && "Negative");
         return CUnsignedFixPoint(0,0);
       }
 
@@ -137,7 +135,7 @@ class CFixPoint {
   CFixPoint(int w, uint d = 0) :
    s_(w < 0 ? 1 : 0), w_(abs(w)), d_(d) {
     if (abs(w) >= WHOLE_MAX || d >= DECIMAL_MAX)
-      CTHROW("Overflow");
+      assert(false && "Overflow");
   }
 
   CFixPoint(double r) :
@@ -146,7 +144,7 @@ class CFixPoint {
     uint d = (uint)((fabs(r) - w)*DECIMAL_MAX + 0.5);
 
     if (w >= WHOLE_MAX || d >= DECIMAL_MAX)
-      CTHROW("Overflow");
+      assert(false && "Overflow");
 
     w_ = w;
     d_ = d;
