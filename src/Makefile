@@ -1,3 +1,5 @@
+.SILENT:
+
 CPP_CC = g++
 C_CC   = gcc
 
@@ -9,9 +11,12 @@ CDEBUG = -g
 INC_DIR = ../include
 OBJ_DIR = ../obj
 LIB_DIR = ../lib
-BIN_DIR = ../bin
 
-all: $(LIB_DIR)/libCMath.a
+all: dirs $(LIB_DIR)/libCMath.a
+
+dirs:
+	@if [ ! -e ../obj ]; then mkdir ../obj; fi
+	@if [ ! -e ../bin ]; then mkdir ../bin; fi
 
 CPP_SRC = \
 CArcToBezier.cpp \
