@@ -3,7 +3,6 @@
 
 #include <CPoint2D.h>
 #include <CVector2D.h>
-#include <CMatrixType.h>
 
 /* / a b tx \ */
 /* | c d ty | */

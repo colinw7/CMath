@@ -1,14 +1,13 @@
 #ifndef CMATRIX_3D_H
 #define CMATRIX_3D_H
 
-#include <cassert>
-#include <cstring>
-
-#include <CMatrixType.h>
 #include <CMathGen.h>
 #include <CPoint3D.h>
 #include <CVector3D.h>
 #include <CGaussianMatrix.h>
+
+#include <cassert>
+//#include <cstring>
 
 /* / m00 m01 m02 m03 \ */
 /* | m10 m11 m12 m13 | */
@@ -16,6 +15,11 @@
 /* \ m30 m31 m32 m33 / */
 
 class CMatrix3D {
+ public:
+  enum class Type {
+    IDENTITY
+  };
+
  public:
   // constructor/destructor
   CMatrix3D() :
@@ -27,12 +31,12 @@ class CMatrix3D {
 
  ~CMatrix3D() { }
 
-  explicit CMatrix3D(CMatrixType type) :
+  explicit CMatrix3D(Type type) :
    m00_(0), m01_(0), m02_(0), m03_(0),
    m10_(0), m11_(0), m12_(0), m13_(0),
    m20_(0), m21_(0), m22_(0), m23_(0),
    m30_(0), m31_(0), m32_(0), m33_(0) {
-    if (type == CMATRIX_TYPE_IDENTITY)
+    if (type == Type::IDENTITY)
       setIdentity();
     else
       assert(false && "Bad CMatrix3D Type");

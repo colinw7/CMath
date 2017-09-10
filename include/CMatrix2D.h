@@ -4,7 +4,6 @@
 #include <CMathMacros.h>
 #include <CPoint2D.h>
 #include <CVector2D.h>
-#include <CMatrixType.h>
 #include <cstring>
 #include <sstream>
 
@@ -18,13 +17,18 @@
 
 class CMatrix2D {
  public:
+  enum class Type {
+    IDENTITY
+  };
+
+ public:
   // constructor/destructor
   CMatrix2D() { }
 
  ~CMatrix2D() { }
 
-  explicit CMatrix2D(CMatrixType type) {
-    if (type == CMATRIX_TYPE_IDENTITY)
+  explicit CMatrix2D(Type type) {
+    if (type == Type::IDENTITY)
       setIdentity();
     else
       assert(false && "Bad Matrix Type");
@@ -106,7 +110,7 @@ class CMatrix2D {
   //------
 
   static CMatrix2D identity() {
-    return CMatrix2D(CMATRIX_TYPE_IDENTITY);
+    return CMatrix2D(Type::IDENTITY);
   }
 
   static CMatrix2D translation(const CPoint2D &point) {
