@@ -1,6 +1,10 @@
 #ifndef CBoxWhisker_H
 #define CBoxWhisker_H
 
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
 class CBoxWhisker {
  public:
   typedef std::vector<double> Values;
@@ -11,30 +15,34 @@ class CBoxWhisker {
 
   CBoxWhisker(const Values &values) :
    values_(values) {
-    calc();
+    invalidate();
   }
 
   int numValues() const { return int(values_.size()); }
 
-  double value(int i) const { return values_[i]; }
+  double value(int i) const {
+    assert(i >= 0 && i < int(values_.size()));
+
+    return values_[i];
+  }
 
   void addValue(double value) {
     values_.push_back(value);
 
-    calc();
+    invalidate();
   }
 
   void setValues(const Values &values) {
     values_ = values;
 
-    calc();
+    invalidate();
   }
 
   void addValues(std::initializer_list<double> values) {
     for (auto value : values)
       values_.push_back(value);
 
-    calc();
+    invalidate();
   }
 
   double range() const { return range_; }
@@ -42,7 +50,7 @@ class CBoxWhisker {
   void setRange(double r) {
     range_ = r;
 
-    calc();
+    invalidate();
   }
 
   double fraction() const { return fraction_; }
@@ -50,22 +58,38 @@ class CBoxWhisker {
   void setFraction(double r) {
     fraction_ = r;
 
-    calc();
+    invalidate();
   }
 
-  double median() const { return median_; }
+  double median() const { const_calc(); return median_; }
 
-  double min() const { return min_; }
-  double max() const { return max_; }
+  double min() const { const_calc(); return min_; }
+  double max() const { const_calc(); return max_; }
 
-  double lower() const { return lower_; }
-  double upper() const { return upper_; }
+  double lower() const { const_calc(); return lower_; }
+  double upper() const { const_calc(); return upper_; }
 
-  const Outliers &outliers() const { return outliers_; }
+  const Outliers &outliers() const { const_calc(); return outliers_; }
+
+  void init() { calc(); }
 
  private:
+  void invalidate() {
+    valid_ = false;
+  }
+
+  void const_calc() const {
+    const_cast<CBoxWhisker *>(this)->calc();
+  }
+
   void calc() {
-    if (values_.empty()) return;
+    if (valid_)
+      return;
+
+    valid_ = true;
+
+    if (values_.empty())
+      return;
 
     std::sort(values_.begin(), values_.end());
 
@@ -77,21 +101,29 @@ class CBoxWhisker {
 
       medianInd(0, nv - 1, nv1, nv2);
 
-      median_ = (values_[nv1] + values_[nv2])/2.0;
+      median_ = (value(nv1) + value(nv2))/2.0;
 
       // lower median
-      int nl1, nl2;
+      if (nv1 > 0) {
+        int nl1, nl2;
 
-      medianInd(0, nv1 - 1, nl1, nl2);
+        medianInd(0, nv1 - 1, nl1, nl2);
 
-      lower_ = (values_[nl1] + values_[nl2])/2.0;
+        lower_ = (value(nl1) + value(nl2))/2.0;
+      }
+      else
+        lower_ = value(0);
 
       // upper median
-      int nu1, nu2;
+      if (nv2 < nv - 1) {
+        int nu1, nu2;
 
-      medianInd(nv2 + 1, nv - 1, nu1, nu2);
+        medianInd(nv2 + 1, nv - 1, nu1, nu2);
 
-      upper_ = (values_[nu1] + values_[nu2])/2.0;
+        upper_ = (value(nu1) + value(nu2))/2.0;
+      }
+      else
+        upper_ = value(nv - 1);
 
       // outliers outside range()*(upper - lower)
       double routlier = upper_ - lower_;
@@ -142,6 +174,7 @@ class CBoxWhisker {
 
  private:
   Values   values_;
+  bool     valid_    { false };
   double   range_    { 1.5 };
   double   fraction_ { 0.95 }; // TODO
   double   median_   { 0.0 };
