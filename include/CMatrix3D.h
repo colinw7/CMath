@@ -7,7 +7,7 @@
 #include <CGaussianMatrix.h>
 
 #include <cassert>
-//#include <cstring>
+#include <cstring>
 
 /* / m00 m01 m02 m03 \ */
 /* | m10 m11 m12 m13 | */
