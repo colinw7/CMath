@@ -2942,7 +2942,7 @@ CircleCircleIntersect(double x1, double y1, double r1, double x2, double y2, dou
   *yi1 = y3 + ry;
   *yi2 = y3 - ry;
 
-  return 1;
+  return true;
 }
 
 //-----------------
