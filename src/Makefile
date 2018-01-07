@@ -1,4 +1,4 @@
-.SILENT:
+#.SILENT:
 
 CPP_CC = g++
 C_CC   = gcc
