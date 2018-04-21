@@ -6,74 +6,97 @@
 
 class CSize2D {
  public:
-  CSize2D() :
-   width(0), height(0) {
-  }
+  CSize2D() = default;
 
   CSize2D(double w, double h) :
-   width(w), height(h) {
-  }
-
-  explicit CSize2D(const CISize2D &size) :
-   width(size.getWidth()), height(size.getHeight()) {
+   set_(true), width_(w), height_(h) {
   }
 
   CSize2D(const CSize2D &size) :
-   width(size.width), height(size.height) {
+   set_(size.set_), width_(size.width_), height_(size.height_) {
   }
 
+  explicit CSize2D(const CISize2D &size) :
+   set_(true), width_(size.getWidth()), height_(size.getHeight()) {
+  }
+
+  bool isSet() const { return set_; }
+
   void set(double w, double h) {
-    width  = w;
-    height = h;
+    set_    = true;
+    width_  = w;
+    height_ = h;
   }
 
   void get(double *w, double *h) const {
-    *w = width;
-    *h = height;
+    assert(set_);
+
+    *w = width_;
+    *h = height_;
   }
 
-  double getWidth () const { return width ; }
-  double getHeight() const { return height; }
+  double getWidth () const { assert(set_); return width_ ; }
+  double getHeight() const { assert(set_); return height_; }
 
-  void setWidth (double w) { width  = w; }
-  void setHeight(double h) { height = h; }
+  void setWidth (double w) { set_ = true; width_  = w; }
+  void setHeight(double h) { set_ = true; height_ = h; }
 
-  double area() const { return width*height; }
+  double area() const { assert(set_); return width_*height_; }
 
+  // m*size
   friend CSize2D operator*(double m, const CSize2D &size) {
-    return CSize2D(m*size.width, m*size.height);
+    assert(size.set_);
+
+    return CSize2D(m*size.width_, m*size.height_);
   }
 
+  // size*m
   friend CSize2D operator*(const CSize2D &size, double m) {
-    return CSize2D(m*size.width, m*size.height);
+    assert(size.set_);
+
+    return CSize2D(m*size.width_, m*size.height_);
   }
 
+  // size/m
   friend CSize2D operator/(const CSize2D &size, double m) {
-    return CSize2D(size.width/m, size.height/m);
+    assert(size.set_);
+
+    return CSize2D(size.width_/m, size.height_/m);
   }
 
   friend std::ostream &operator<<(std::ostream &os, const CSize2D &size) {
-    return os << "(" << size.width << "," << size.height << ")";
+    if (size.set_)
+      return os << "(" << size.width_ << "," << size.height_ << ")";
+    else
+      return os << "<not_set>";
   }
 
+  // size + p
   friend CPoint2D operator+(const CSize2D &s, const CPoint2D &p) {
-    return CPoint2D(p.x + s.width, p.y + s.height);
+    assert(s.set_);
+
+    return CPoint2D(p.x + s.width_, p.y + s.height_);
   }
 
+  // p + size
   friend CPoint2D operator+(const CPoint2D &p, const CSize2D &s) {
     return (s + p);
   }
 
   friend bool operator==(const CSize2D &lhs, const CSize2D &rhs) {
-    return (lhs.width == rhs.width && lhs.height == rhs.height);
+    if (! lhs.set_ || ! rhs.set_) return false;
+
+    return (lhs.width_ == rhs.width_ && lhs.height_ == rhs.height_);
   }
 
   friend bool operator!=(const CSize2D &lhs, const CSize2D &rhs) {
     return ! (lhs == rhs);
   }
 
- public:
-  double width { 0 }, height { 0 };
+ private:
+  bool   set_    { false };
+  double width_  { 0.0 };
+  double height_ { 0.0 };
 };
 
 #endif

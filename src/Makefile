@@ -40,7 +40,7 @@ CTriangulate2D.cpp \
 CPP_OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(CPP_SRC))
 
 CPPFLAGS = \
--std=c++11 \
+-std=c++14 \
 $(CDEBUG) \
 -I$(INC_DIR) \
 -I../../CMath/include \

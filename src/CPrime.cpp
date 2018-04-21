@@ -25,11 +25,13 @@ class CPrimeMgr {
   bool checkPrime(int n) const;
 
  private:
-  typedef std::set<int> Primes;
+  using Primes = std::set<int>;
 
   mutable Primes primes_;
-  mutable int    prime_max_;
+  mutable int    primeMax_ { 0 };
 };
+
+//------
 
 CPrimeMgr *
 CPrimeMgr::
@@ -50,12 +52,10 @@ void
 CPrimeMgr::
 initPrimes()
 {
-  primes_.insert(2);
-  primes_.insert(3);
   primes_.insert(5);
   primes_.insert(7);
 
-  prime_max_ = 10;
+  primeMax_ = 10;
 }
 
 bool
@@ -64,7 +64,7 @@ isPrime(int i) const
 {
   assert(i > 0);
 
-  if (i == 1) return true;
+  if (i <= 3) return true;
 
   genPrime(i);
 
@@ -75,15 +75,15 @@ void
 CPrimeMgr::
 genPrime(int n) const
 {
-  if (n <= prime_max_)
+  if (n <= primeMax_)
     return;
 
-  for (int i = prime_max_ + 1; i <= n; ++i) {
+  for (int i = primeMax_ + 1; i <= n; ++i) {
     if (checkPrime(i))
       primes_.insert(i);
   }
 
-  prime_max_ = n;
+  primeMax_ = n;
 }
 
 bool

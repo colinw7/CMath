@@ -1,7 +1,6 @@
 #ifndef CMATRIX_2D_H
 #define CMATRIX_2D_H
 
-#include <CMathMacros.h>
 #include <CPoint2D.h>
 #include <CVector2D.h>
 #include <cstring>
@@ -588,20 +587,20 @@ class CMatrix2D {
 
   bool isIdentity() const {
     return isInnerIdentity() && isTranslateIdentity() &&
-           REAL_EQ(m20_, 0.0) && REAL_EQ(m21_, 0.0) && REAL_EQ(m22_, 1.0);
+           realEq(m20_, 0.0) && realEq(m21_, 0.0) && realEq(m22_, 1.0);
   }
 
   bool isInnerIdentity() const {
-    return REAL_EQ(m00_, 1.0) && REAL_EQ(m01_, 0.0) &&
-           REAL_EQ(m10_, 0.0) && REAL_EQ(m11_, 1.0);
+    return realEq(m00_, 1.0) && realEq(m01_, 0.0) &&
+           realEq(m10_, 0.0) && realEq(m11_, 1.0);
   }
 
   bool isTranslateIdentity() const {
-    return REAL_EQ(m02_, 0.0) && REAL_EQ(m12_, 0.0);
+    return realEq(m02_, 0.0) && realEq(m12_, 0.0);
   }
 
   bool isInnerRotation() const {
-    return ! REAL_EQ(m01_, 0.0) && ! REAL_EQ(m10_, 0.0);
+    return ! realEq(m01_, 0.0) && ! realEq(m10_, 0.0);
   }
 
   double getAngle() const {
@@ -881,6 +880,10 @@ class CMatrix2D {
   friend bool operator!=(const CMatrix2D &lhs, const CMatrix2D &rhs) { return lhs.cmp(rhs) != 0; }
 
  private:
+  static bool realEq(double r1, double r2) {
+    return (fabs((r1) - (r2)) < 1E-5);
+  }
+
   static double calcDeterminant(double m00, double m01, double m10, double m11) {
     return m00*m11 - m01*m10;
   }

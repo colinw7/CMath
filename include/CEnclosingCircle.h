@@ -4,6 +4,7 @@
 #include <cmath>
 #include <algorithm>
 #include <CPointsCircle.h>
+//#include <COSNaN.h>
 
 class CEnclosingCircle {
  public:
@@ -11,6 +12,7 @@ class CEnclosingCircle {
    public:
     Circle(double x=0.0, double y=0.0, double r=1.0) :
      x_(x), y_(y), r_(r) {
+      //assert(! COSNaN::is_nan(x_) && ! COSNaN::is_nan(y_) && ! COSNaN::is_nan(r_));
     }
 
     double x() const { return x_; }

@@ -17,6 +17,13 @@ class CPoint2D {
    x(point.x), y(point.y) {
   }
 
+  CPoint2D &operator=(const CPoint2D &point) {
+    x = point.x;
+    y = point.y;
+
+    return *this;
+  }
+
   double getX() const { return x; }
   double getY() const { return y; }
 

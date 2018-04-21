@@ -161,8 +161,8 @@ CMathGeom2D::
 IntersectPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &points2,
                   std::vector<CPoint2D> &ipoints)
 {
-  static CPoint2D *f[2];
-  static uint      num_f;
+  static std::vector<CPoint2D> f[2];
+  static uint                  num_f;
 
   ipoints.clear();
 
@@ -183,11 +183,8 @@ IntersectPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint
   if (num_f < ni) {
     num_f = ni;
 
-    delete [] f[0];
-    delete [] f[1];
-
-    f[0] = new CPoint2D [num_f];
-    f[1] = new CPoint2D [num_f];
+    f[0].resize(num_f);
+    f[1].resize(num_f);
   }
 
   // store polygon one in start point array
@@ -338,8 +335,8 @@ CMathGeom2D::
 CutPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &points2,
             std::vector< std::vector<CPoint2D> > &cpoints)
 {
-  static CutPoint *f[2];
-  static uint      num_f;
+  static std::vector<CutPoint> f[2];
+  static uint                  num_f;
 
   CutPointArrayList opoints;
 
@@ -360,11 +357,8 @@ CutPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &p
   if (num_f < ni) {
     num_f = ni;
 
-    delete [] f[0];
-    delete [] f[1];
-
-    f[0] = new CutPoint [num_f];
-    f[1] = new CutPoint [num_f];
+    f[0].resize(num_f);
+    f[1].resize(num_f);
   }
 
   // store polygon one in start point array

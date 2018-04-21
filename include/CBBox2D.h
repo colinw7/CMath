@@ -368,8 +368,8 @@ class CBBox2D {
       pmin_.y = 0;
     }
 
-    pmax_.x = pmin_.x + size.width;
-    pmax_.y = pmin_.y + size.height;
+    pmax_.x = pmin_.x + size.getWidth ();
+    pmax_.y = pmin_.y + size.getHeight();
     set_    = true;
   }
 
