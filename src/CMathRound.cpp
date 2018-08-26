@@ -1,26 +1,21 @@
 #include <CMathRound.h>
+#include <cmath>
 #include <climits>
 #include <cerrno>
 
-namespace {
-  double EPSILON_E6 = 1E-6;
-}
+namespace CMathRound {
 
-int
-CMathRound::
-Round(double x, Rounding rounding)
-{
+double EPSILON_E6 = 1E-6;
+
+int Round(double x, Rounding rounding) {
   switch (rounding) {
-    case ROUND_UP  : return RoundUp(x);
-    case ROUND_DOWN: return RoundDown(x);
+    case ROUND_UP  : return RoundUp     (x);
+    case ROUND_DOWN: return RoundDown   (x);
     default        : return RoundNearest(x);
   }
 }
 
-int
-CMathRound::
-RoundNearest(double x)
-{
+int RoundNearest(double x) {
   double x1;
 
   if (x <= 0.0)
@@ -34,10 +29,7 @@ RoundNearest(double x)
   return int(x1);
 }
 
-int
-CMathRound::
-RoundUp(double x)
-{
+int RoundUp(double x) {
   double x1;
 
   if (x <= 0.0)
@@ -51,10 +43,7 @@ RoundUp(double x)
   return int(x1);
 }
 
-int
-CMathRound::
-RoundDown(double x)
-{
+int RoundDown(double x) {
   double x1;
 
   if (x >= 0.0)
@@ -66,4 +55,47 @@ RoundDown(double x)
     errno = ERANGE;
 
   return int(x1);
+}
+
+double RoundF(double x, Rounding rounding) {
+  switch (rounding) {
+    case ROUND_UP  : return RoundUpF     (x);
+    case ROUND_DOWN: return RoundDownF   (x);
+    default        : return RoundNearestF(x);
+  }
+}
+
+double RoundNearestF(double x) {
+  double x1;
+
+  if (x <= 0.0)
+    x1 = (x - 0.499999);
+  else
+    x1 = (x + 0.500001);
+
+  return std::trunc(x1);
+}
+
+double RoundUpF(double x) {
+  double x1;
+
+  if (x <= 0.0)
+    x1 = (x       - EPSILON_E6);
+  else
+    x1 = (x + 1.0 - EPSILON_E6);
+
+  return std::trunc(x1);
+}
+
+double RoundDownF(double x) {
+  double x1;
+
+  if (x >= 0.0)
+    x1 = (x       + EPSILON_E6);
+  else
+    x1 = (x - 1.0 + EPSILON_E6);
+
+  return std::trunc(x1);
+}
+
 }

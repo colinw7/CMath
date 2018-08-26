@@ -153,10 +153,6 @@ namespace CMathGen {
 
   //-----
 
-  bool realEq(double v1, double v2, double tol=1E-6);
-
-  //-----
-
   template<typename T>
   T clamp(T val, T low, T high) {
     if (val < low ) return low;

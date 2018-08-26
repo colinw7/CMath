@@ -1,6 +1,7 @@
 #ifndef CGAUSSIAN_BLUR_H
 #define CGAUSSIAN_BLUR_H
 
+#include <CMathUtil.h>
 #include <CRGBA.h>
 #include <vector>
 
@@ -106,7 +107,7 @@ class CGaussianBlur {
   }
 
   void setMatrix(double bx, double by, int nx, int ny) {
-    if (realEq(bx, bx_) && realEq(by_, by) && nx == nx_ && ny == ny_)
+    if (CMathUtil::realEq(bx, bx_) && CMathUtil::realEq(by_, by) && nx == nx_ && ny == ny_)
       return;
 
     int nx1 = -nx/2;
@@ -182,11 +183,6 @@ class CGaussianBlur {
     nx_ = nx;
     ny_ = ny;
     sm_ = sm;
-  }
-
- private:
-  static bool realEq(double r1, double r2) {
-    return (std::fabs(r1 - r2) < 1E-6);
   }
 
  private:

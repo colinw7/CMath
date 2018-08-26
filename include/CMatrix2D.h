@@ -587,20 +587,20 @@ class CMatrix2D {
 
   bool isIdentity() const {
     return isInnerIdentity() && isTranslateIdentity() &&
-           realEq(m20_, 0.0) && realEq(m21_, 0.0) && realEq(m22_, 1.0);
+           CMathUtil::isZero(m20_) && CMathUtil::isZero(m21_) && CMathUtil::realEq(m22_, 1.0);
   }
 
   bool isInnerIdentity() const {
-    return realEq(m00_, 1.0) && realEq(m01_, 0.0) &&
-           realEq(m10_, 0.0) && realEq(m11_, 1.0);
+    return CMathUtil::realEq(m00_, 1.0) && CMathUtil::isZero(m01_     ) &&
+           CMathUtil::isZero(m10_     ) && CMathUtil::realEq(m11_, 1.0);
   }
 
   bool isTranslateIdentity() const {
-    return realEq(m02_, 0.0) && realEq(m12_, 0.0);
+    return CMathUtil::isZero(m02_) && CMathUtil::isZero(m12_);
   }
 
   bool isInnerRotation() const {
-    return ! realEq(m01_, 0.0) && ! realEq(m10_, 0.0);
+    return ! CMathUtil::isZero(m01_) && ! CMathUtil::isZero(m10_);
   }
 
   double getAngle() const {
@@ -880,10 +880,6 @@ class CMatrix2D {
   friend bool operator!=(const CMatrix2D &lhs, const CMatrix2D &rhs) { return lhs.cmp(rhs) != 0; }
 
  private:
-  static bool realEq(double r1, double r2) {
-    return (fabs((r1) - (r2)) < 1E-5);
-  }
-
   static double calcDeterminant(double m00, double m01, double m10, double m11) {
     return m00*m11 - m01*m10;
   }

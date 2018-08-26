@@ -11,8 +11,14 @@ namespace CMathRound {
   int Round(double x, Rounding rounding=ROUND_NEAREST);
 
   int RoundNearest(double x);
-  int RoundUp(double x);
-  int RoundDown(double x);
+  int RoundUp     (double x);
+  int RoundDown   (double x);
+
+  double RoundF(double x, Rounding rounding=ROUND_NEAREST);
+
+  double RoundNearestF(double x);
+  double RoundUpF     (double x);
+  double RoundDownF   (double x);
 }
 
 #endif

@@ -7,8 +7,7 @@
 class CRadialGradient : public CGenGradient {
  public:
   CRadialGradient() :
-   CGenGradient(), cx_(0), cy_(0), r_(1), fx_(0), fy_(0),
-   cx1_(0), cy1_(0), r1_(0), fx1_(0), fy1_(0) {
+   CGenGradient() {
   }
 
   CRadialGradient(const CRadialGradient &rg) :
@@ -17,7 +16,7 @@ class CRadialGradient : public CGenGradient {
   }
 
   CGenGradient *dup() const {
-    return new CRadialGradient(*this);;
+    return new CRadialGradient(*this);
   }
 
   double getCenterX() const { return cx_; }
@@ -65,7 +64,7 @@ class CRadialGradient : public CGenGradient {
 
     double mu = 0.0;
 
-    if (! realEq(xi1, fx1_))
+    if (! CMathUtil::realEq(xi1, fx1_))
       mu = (x - fx1_)/(xi1 - fx1_);
     else
       mu = (y - fy1_)/(yi1 - fy1_);
@@ -142,7 +141,7 @@ class CRadialGradient : public CGenGradient {
       if (offset >= offset1 && offset <= offset2) {
         double o21 = offset2 - offset1;
 
-        if (! realEq(offset1, offset2))
+        if (! CMathUtil::realEq(offset1, offset2))
           return rgba1*((offset2 - offset)/o21) + rgba2*((offset - offset1)/o21);
         else
           return (rgba1 + rgba2)/2.0;
@@ -161,18 +160,19 @@ class CRadialGradient : public CGenGradient {
   }
 
  private:
-  static bool realEq(double r1, double r2) {
-    return (fabs(r1 - r2) < 1E-5);
-  }
-
- private:
   const CRadialGradient &operator=(const CRadialGradient &rg);
 
  private:
-  double cx_, cy_, r_;
-  double fx_, fy_;
-  double cx1_, cy1_, r1_;
-  double fx1_, fy1_;
+  double cx_  { 0.0 };
+  double cy_  { 0.0 };
+  double r_   { 1.0 };
+  double fx_  { 0.0 };
+  double fy_  { 0.0 };
+  double cx1_ { 0.0 };
+  double cy1_ { 0.0 };
+  double r1_  { 0.0 };
+  double fx1_ { 0.0 };
+  double fy1_ { 0.0 };
 };
 
 #endif

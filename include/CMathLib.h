@@ -36,15 +36,6 @@ int round(T v) {
 }
 
 template<typename T>
-bool realEq(T r1, T r2, T tol=1E-6) {
-  ASSERT_IS_REAL(T)
-
-  if (r1 == r2 || abs(r1 - r2) < tol) return true;
-
-  return (abs((r1 - r2)/(abs(r2) > abs(r1) ? r2 : r1)) <= tol);
-}
-
-template<typename T>
 double radToDeg(T v) {
   return (double(v)*180.0/M_PI);
 }

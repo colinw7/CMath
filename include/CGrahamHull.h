@@ -1,5 +1,5 @@
-#ifndef CGRAHAM_HULL_H
-#define CGRAHAM_HULL_H
+#ifndef CGrahamHull_H
+#define CGrahamHull_H
 
 #include <CPoint2D.h>
 

@@ -42,7 +42,7 @@ class CIPolygon2D {
     const Point &contents() const {
       assert(pos_ < len_);
 
-      return poly_->getPoint(pos_);;
+      return poly_->getPoint(pos_);
     }
 
     friend bool operator==(const PointIteratorState &lhs, const PointIteratorState &rhs) {

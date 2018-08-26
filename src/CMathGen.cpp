@@ -1370,10 +1370,3 @@ noise(double x, double y, double z)
                  noiseLerp(u, noiseGrad(p[AB+1], x  , y-1, z-1 ),
                               noiseGrad(p[BB+1], x-1, y-1, z-1 ))));
 }
-
-bool
-CMathGen::
-realEq(double v1, double v2, double tol)
-{
-  return (fabs(v1 - v2) < tol);
-}

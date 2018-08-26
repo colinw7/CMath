@@ -3,6 +3,7 @@
 
 #include <CPoint2D.h>
 #include <CMathGen.h>
+#include <CMathUtil.h>
 
 #include <cassert>
 
@@ -216,11 +217,11 @@ class CVector2D {
   }
 
   bool isZero() const {
-    return realEq(lengthSqr(), 0);
+    return CMathUtil::realEq(lengthSqr(), 0);
   }
 
   bool isUnit() const {
-    return realEq(lengthSqr(), 1);
+    return CMathUtil::realEq(lengthSqr(), 1);
   }
 
   //------
@@ -703,11 +704,6 @@ class CVector2D {
   }
 
   //------
-
- private:
-  static bool realEq(double r1, double r2, double tol=1E-6) {
-    return (std::fabs(r1 - r2) < tol);
-  }
 
  private:
   CVector2D(double x, double y, bool normalized) :

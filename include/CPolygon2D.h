@@ -55,7 +55,7 @@ class CPolygon2D : public CShape2D {
     const CPoint2D &contents() const {
       assert(pos_ < len_);
 
-      return poly_->getPoint(pos_);;
+      return poly_->getPoint(pos_);
     }
 
     friend bool operator==(const PointIteratorState &lhs, const PointIteratorState &rhs) {
