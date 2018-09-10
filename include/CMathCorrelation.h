@@ -26,9 +26,11 @@ inline double mean(const Values &xv) {
 inline double calc(const Values &xv, const Values &yv) {
   assert(xv.size() == yv.size());
 
+  // calc means
   double xmean = mean(xv);
   double ymean = mean(yv);
 
+  // calc correlation
   int nxy = xv.size();
 
   if (nxy == 0)
@@ -50,7 +52,9 @@ inline double calc(const Values &xv, const Values &yv) {
     sum_dyy += dy*dy;
   }
 
-  double p = sum_dxy/(sqrt(sum_dxx)*sqrt(sum_dyy));
+  double d = sqrt(sum_dxx)*sqrt(sum_dyy);
+
+  double p = (d > 0 ? sum_dxy/d : 0.0);
 
   return p;
 }
@@ -110,10 +114,11 @@ class CMathBivariate {
       stddev += x1*x1;
     }
 
-    if (nx > 0)
+    if (nx > 0) {
       mean /= double(nx);
 
-    stddev = sqrt(stddev/double(nx) - mean*mean);
+      stddev = sqrt(stddev/double(nx) - mean*mean);
+    }
   }
 
  private:
