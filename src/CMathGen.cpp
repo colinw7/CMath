@@ -1280,7 +1280,12 @@ getNaN()
 {
   double r;
 
-  SetNaN(r);
+#ifdef CMATH_NAN
+  COSNaN::set_nan(&r);
+#else
+  //SetNaN(r);
+  assert(false);
+#endif
 
   return r;
 }

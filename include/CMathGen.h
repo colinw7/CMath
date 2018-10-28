@@ -1,10 +1,10 @@
 #ifndef CMATH_GEN_H
 #define CMATH_GEN_H
 
+#include <CIPoint2D.h>
+//#include <NaN.h>
 #include <cmath>
 #include <sys/types.h>
-#include <NaN.h>
-#include <CIPoint2D.h>
 
 // Fast conversion from a IEEE 32-bit floating point number F in [0,1] to a
 // a 32-bit integer I in [0,2^L-1].

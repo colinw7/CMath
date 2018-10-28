@@ -572,20 +572,19 @@ class CMatrix3D {
   void getValues(double *m00, double *m01, double *m02,
                  double *m10, double *m11, double *m12,
                  double *m20, double *m21, double *m22) const {
-    if (m00) *m00 = m00_; if (m01) *m01 = m01_; if (m02) *m02 = m02_;
-    if (m10) *m10 = m10_; if (m11) *m11 = m11_; if (m12) *m12 = m12_;
-    if (m20) *m20 = m20_; if (m21) *m21 = m21_; if (m22) *m22 = m22_;
+    if (m00) { *m00 = m00_; } if (m01) { *m01 = m01_; } if (m02) { *m02 = m02_; }
+    if (m10) { *m10 = m10_; } if (m11) { *m11 = m11_; } if (m12) { *m12 = m12_; }
+    if (m20) { *m20 = m20_; } if (m21) { *m21 = m21_; } if (m22) { *m22 = m22_; }
   }
 
   void getValues(double *m00, double *m01, double *m02,
                  double *m10, double *m11, double *m12,
                  double *m20, double *m21, double *m22,
                  double *tx , double *ty , double *tz ) const {
-    if (m00) *m00 = m00_; if (m01) *m01 = m01_; if (m02) *m02 = m02_;
-    if (m10) *m10 = m10_; if (m11) *m11 = m11_; if (m12) *m12 = m12_;
-    if (m20) *m20 = m20_; if (m21) *m21 = m21_; if (m22) *m22 = m22_;
-
-    if (tx ) *tx  = m03_; if (ty ) *ty  = m13_; if (tz ) *tz  = m23_;
+    if (m00) { *m00 = m00_; } if (m01) { *m01 = m01_; } if (m02) { *m02 = m02_; }
+    if (m10) { *m10 = m10_; } if (m11) { *m11 = m11_; } if (m12) { *m12 = m12_; }
+    if (m20) { *m20 = m20_; } if (m21) { *m21 = m21_; } if (m22) { *m22 = m22_; }
+    if (tx ) { *tx  = m03_; } if (ty ) { *ty  = m13_; } if (tz ) { *tz  = m23_; }
   }
 
   void getValues(double *v, int n) const {
