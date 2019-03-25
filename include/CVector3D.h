@@ -644,7 +644,8 @@ class CVector3D {
                        const CVector3D &vector3, const CVector3D &vector4,
                        double barycentric[4]) const {
     // compute the vectors relative to V3 of the tetrahedron
-    CVector3D diff[4] = { vector1 - vector4, vector2 - vector4, vector3 - vector4, *this - vector4 };
+    CVector3D diff[4] = { vector1 - vector4, vector2 - vector4,
+                          vector3 - vector4, *this - vector4 };
 
     // If the vertices have large magnitude, the linear system of equations
     // for computing barycentric coordinates can be ill-conditioned.  To avoid

@@ -63,7 +63,8 @@ class C3Bezier2D {
   void setControlPoint2(double x, double y) { setControlPoint2(CPoint2D(x, y)); }
   void setLastPoint    (double x, double y) { setLastPoint    (CPoint2D(x, y)); }
 
-  void setPoints(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+  void setPoints(double x1, double y1, double x2, double y2,
+                 double x3, double y3, double x4, double y4) {
     setPoints(CPoint2D(x1, y1), CPoint2D(x2, y2), CPoint2D(x3, y3), CPoint2D(x4, y4));
   }
 

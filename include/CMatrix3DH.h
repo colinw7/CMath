@@ -316,7 +316,8 @@ class CMatrix3DH {
     setOuterIdentity();
   }
 
-  void setRotationTranslation(CMathGen::AxisType3D axis, double angle, double tx, double ty, double tz,
+  void setRotationTranslation(CMathGen::AxisType3D axis, double angle,
+                              double tx, double ty, double tz,
                               CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     if (handedness == CMathGen::RIGHT_HANDEDNESS)
       setInnerRotationRHS(axis, angle);
