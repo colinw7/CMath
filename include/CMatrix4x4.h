@@ -46,9 +46,9 @@ class CMatrix4x4 {
 
   void setScale(double sx, double sy, double sz) {
     m00_ = sx , m01_ = 0.0, m02_ = 0.0; m03_ = 0.0;
-    m10_ = 0.0, m11_ = sy , m12_ = 0.0; m03_ = 0.0;
-    m20_ = 0.0, m21_ = 0.0, m22_ = sz ; m03_ = 0.0;
-    m30_ = 0.0, m31_ = 0.0, m32_ = 0.0; m03_ = 0.0;
+    m10_ = 0.0, m11_ = sy , m12_ = 0.0; m13_ = 0.0;
+    m20_ = 0.0, m21_ = 0.0, m22_ = sz ; m23_ = 0.0;
+    m30_ = 0.0, m31_ = 0.0, m32_ = 0.0; m33_ = 1.0;
   }
 
   void setValues(double m00, double m01, double m02, double m03,
@@ -65,14 +65,14 @@ class CMatrix4x4 {
                  double *m10, double *m11, double *m12, double *m13,
                  double *m20, double *m21, double *m22, double *m23,
                  double *m30, double *m31, double *m32, double *m33) {
-    if (m00) *m00 = m00_; if (m01) *m01 = m01_;
-    if (m01) *m02 = m02_; if (m03) *m03 = m03_;
-    if (m10) *m10 = m10_; if (m11) *m11 = m11_;
-    if (m01) *m12 = m12_; if (m13) *m13 = m13_;
-    if (m20) *m20 = m20_; if (m21) *m21 = m21_;
-    if (m01) *m22 = m22_; if (m23) *m23 = m23_;
-    if (m30) *m30 = m30_; if (m31) *m31 = m31_;
-    if (m01) *m32 = m32_; if (m33) *m33 = m33_;
+    if (m00) { *m00 = m00_; } if (m01) { *m01 = m01_; }
+    if (m01) { *m02 = m02_; } if (m03) { *m03 = m03_; }
+    if (m10) { *m10 = m10_; } if (m11) { *m11 = m11_; }
+    if (m01) { *m12 = m12_; } if (m13) { *m13 = m13_; }
+    if (m20) { *m20 = m20_; } if (m21) { *m21 = m21_; }
+    if (m01) { *m22 = m22_; } if (m23) { *m23 = m23_; }
+    if (m30) { *m30 = m30_; } if (m31) { *m31 = m31_; }
+    if (m01) { *m32 = m32_; } if (m33) { *m33 = m33_; }
   }
 
   void setValue(unsigned int i, double value) {

@@ -474,9 +474,9 @@ class CAffineMatrix2D {
   //------
 
   bool isIdentity() const {
-    return REAL_EQ(a_ , 1.0) && REAL_EQ(d_ , 1.0) &&
-           REAL_EQ(c_ , 0.0) && REAL_EQ(b_ , 0.0) &&
-           REAL_EQ(tx_, 0.0) && REAL_EQ(ty_, 0.0);
+    return CMathUtil::realEq(a_ , 1.0) && CMathUtil::realEq(d_ , 1.0) &&
+           CMathUtil::realEq(c_ , 0.0) && CMathUtil::realEq(b_ , 0.0) &&
+           CMathUtil::realEq(tx_, 0.0) && CMathUtil::realEq(ty_, 0.0);
   }
 
   double getAngle() const { return asin(c_); }

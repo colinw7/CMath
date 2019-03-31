@@ -4,6 +4,7 @@
 // TODO: use CMath::sqrt() and CMath::isqrt() to allow replacement
 
 #include <CMathGen.h>
+#include <CMathUtil.h>
 #include <CPoint3D.h>
 #include <CMathMacros.h>
 
@@ -238,11 +239,11 @@ class CVector3D {
   }
 
   bool isZero() const {
-    return REAL_EQ(lengthSqr(), 0);
+    return CMathUtil::realEq(lengthSqr(), 0);
   }
 
   bool isUnit() const {
-    return REAL_EQ(lengthSqr(), 1);
+    return CMathUtil::realEq(lengthSqr(), 1);
   }
 
   //------

@@ -277,12 +277,12 @@ class COrthonormalBasis3D {
     double vw = v.dotProduct(w);
     double wu = w.dotProduct(u);
 
-    if (! REAL_EQ(uv, 0) || ! REAL_EQ(vw, 0) || ! REAL_EQ(wu, 0))
+    if (! CMathUtil::realEq(uv, 0) || ! CMathUtil::realEq(vw, 0) || ! CMathUtil::realEq(wu, 0))
       return false;
 
     CVector3D uvw = u.crossProduct(v).crossProduct(w);
 
-    if (! REAL_EQ(uvw.length(), 0))
+    if (! CMathUtil::realEq(uvw.length(), 0))
       return false;
 
     return true;

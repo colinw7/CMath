@@ -100,13 +100,13 @@ class CBox3D : public CShape3D {
 
     CVector3D n;
 
-    if      (REAL_EQ(p.x, 0.0)) n = CVector3D(-1, 0, 0);
-    else if (REAL_EQ(p.y, 0.0)) n = CVector3D( 0,-1, 0);
-    else if (REAL_EQ(p.z, 0.0)) n = CVector3D( 0, 0,-1);
-    else if (REAL_EQ(p.x, rx_)) n = CVector3D( 1, 0, 0);
-    else if (REAL_EQ(p.y, ry_)) n = CVector3D( 0, 1, 0);
-    else if (REAL_EQ(p.z, rz_)) n = CVector3D( 0, 0, 1);
-    else                        n = CVector3D( 1, 0, 0);
+    if      (CMathUtil::realEq(p.x, 0.0)) n = CVector3D(-1, 0, 0);
+    else if (CMathUtil::realEq(p.y, 0.0)) n = CVector3D( 0,-1, 0);
+    else if (CMathUtil::realEq(p.z, 0.0)) n = CVector3D( 0, 0,-1);
+    else if (CMathUtil::realEq(p.x, rx_)) n = CVector3D( 1, 0, 0);
+    else if (CMathUtil::realEq(p.y, ry_)) n = CVector3D( 0, 1, 0);
+    else if (CMathUtil::realEq(p.z, rz_)) n = CVector3D( 0, 0, 1);
+    else                                  n = CVector3D( 1, 0, 0);
 
     return CShape3D::transformFrom(n);
   }
@@ -114,12 +114,12 @@ class CBox3D : public CShape3D {
   CVector2D pointToSurfaceVector(const CPoint3D &point) const {
     CPoint3D p = CShape3D::transformTo(point);
 
-    if (REAL_EQ(p.x, 0.0)) return CVector2D(p.y/ry_, p.z/rz_);
-    if (REAL_EQ(p.y, 0.0)) return CVector2D(p.y/rx_, p.z/rz_);
-    if (REAL_EQ(p.z, 0.0)) return CVector2D(p.y/rx_, p.z/ry_);
-    if (REAL_EQ(p.x, rx_)) return CVector2D(p.y/ry_, p.z/rz_);
-    if (REAL_EQ(p.y, ry_)) return CVector2D(p.y/rx_, p.z/rz_);
-    if (REAL_EQ(p.z, rz_)) return CVector2D(p.y/rx_, p.z/ry_);
+    if (CMathUtil::realEq(p.x, 0.0)) return CVector2D(p.y/ry_, p.z/rz_);
+    if (CMathUtil::realEq(p.y, 0.0)) return CVector2D(p.y/rx_, p.z/rz_);
+    if (CMathUtil::realEq(p.z, 0.0)) return CVector2D(p.y/rx_, p.z/ry_);
+    if (CMathUtil::realEq(p.x, rx_)) return CVector2D(p.y/ry_, p.z/rz_);
+    if (CMathUtil::realEq(p.y, ry_)) return CVector2D(p.y/rx_, p.z/rz_);
+    if (CMathUtil::realEq(p.z, rz_)) return CVector2D(p.y/rx_, p.z/ry_);
 
     return CVector2D(1, 0);
   }

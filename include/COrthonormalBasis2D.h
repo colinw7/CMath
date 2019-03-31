@@ -110,7 +110,7 @@ class COrthonormalBasis2D {
 
     double uv = u.dotProduct(v);
 
-    if (! REAL_EQ(uv, 0))
+    if (! CMathUtil::realEq(uv, 0))
       return false;
 
     return true;
