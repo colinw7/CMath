@@ -11,6 +11,9 @@ inline bool isInf(double r) { return COSNaN::is_inf(r); }
 
 inline double getNaN() { double r; COSNaN::set_nan(r); return r; }
 
+inline double getNegInf() { double r; COSNaN::set_neg_inf(r); return r; }
+inline double getPosInf() { double r; COSNaN::set_pos_inf(r); return r; }
+
 inline bool isInteger(double r) {
   if (isNaN(r)) return false;
 
