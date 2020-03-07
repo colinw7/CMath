@@ -92,10 +92,10 @@ class CGaussianMatrix {
       // Zero out lower diagonal using current row
 
       for (uint r = p + 1; r < ROWS; ++r) {
-        double f = (1.0*m[r][p])/m[p][p];
+        double f1 = (1.0*m[r][p])/m[p][p];
 
         for (uint c = 0; c < COLS; ++c)
-          m[r][c] -= m[p][c]*f;
+          m[r][c] -= m[p][c]*f1;
       }
 
       //std::cout << *this << std::endl;

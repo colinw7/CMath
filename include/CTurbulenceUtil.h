@@ -94,12 +94,12 @@ class CTurbulenceUtil {
       latticeSelector[j] = k;
     }
 
-    for (int i = 0; i < BSize + 2; i++) {
-      latticeSelector[BSize + i] = latticeSelector[i];
+    for (int ii = 0; ii < BSize + 2; ii++) {
+      latticeSelector[BSize + ii] = latticeSelector[i];
 
       for (int k = 0; k < 4; k++)
         for (int j = 0; j < 2; j++)
-          gradient[k][BSize + i][j] = gradient[k][i][j];
+          gradient[k][BSize + ii][j] = gradient[k][i][j];
     }
   }
 

@@ -286,10 +286,10 @@ class C3Bezier2D {
       double minD1 = 1E50;
 
       for (int i = 0; i <= 2*steps; ++i) {
-        double x11 = (x2  - x1)*i*s + x1;
-        double y11 = (y1e - y1)*i*s + y1;
+        double tx11 = (x2  - x1)*i*s + x1;
+        double ty11 = (y1e - y1)*i*s + y1;
 
-        C3Bezier2D b(x1, y1, x11, y11, x21, y21, x2, y2);
+        C3Bezier2D b(x1, y1, tx11, ty11, x21, y21, x2, y2);
 
         double bx, by;
 
@@ -316,10 +316,10 @@ class C3Bezier2D {
       double minD2 = 1E50;
 
       for (int i = 0; i <= 2*steps; ++i) {
-        double x21 = (x1  - x2)*i*s + x2;
-        double y21 = (y2e - y2)*i*s + y2;
+        double tx21 = (x1  - x2)*i*s + x2;
+        double ty21 = (y2e - y2)*i*s + y2;
 
-        C3Bezier2D b(x1, y1, x11, y11, x21, y21, x2, y2);
+        C3Bezier2D b(x1, y1, x11, y11, tx21, ty21, x2, y2);
 
         double bx, by;
 
@@ -379,10 +379,10 @@ class C3Bezier2D {
       double minD1 = 1E50;
 
       for (int i = 1; i < 2*steps; ++i) {
-        double x11 = i*dx + x1;
-        double y11 = g1*(x11 - x1) + y1;
+        double tx11 = i*dx + x1;
+        double ty11 = g1*(tx11 - x1) + y1;
 
-        C3Bezier2D b(x1, y1, x11, y11, x21, y21, x2, y2);
+        C3Bezier2D b(x1, y1, tx11, ty11, x21, y21, x2, y2);
 
         double bx, by;
 
@@ -411,10 +411,10 @@ class C3Bezier2D {
       double minD2 = 1E50;
 
       for (int i = steps - 1; i > -steps; --i) {
-        double x21 = i*dx + x1;
-        double y21 = g2*(x21 - x2) + y2;
+        double tx21 = i*dx + x1;
+        double ty21 = g2*(tx21 - x2) + y2;
 
-        C3Bezier2D b(x1, y1, x11, y11, x21, y21, x2, y2);
+        C3Bezier2D b(x1, y1, x11, y11, tx21, ty21, x2, y2);
 
         double bx, by;
 
@@ -484,18 +484,18 @@ class C3Bezier2D {
       double minD1 = 1E50;
 
       for (int i = 1; i < steps; ++i) {
-        double x11, y11;
+        double tx11, ty11;
 
         if (use_dx) {
-          x11 = x1 + i*dx;
-          y11 = g1*x11 + c1;
+          tx11 = x1 + i*dx;
+          ty11 = g1*tx11 + c1;
         }
         else {
-          y11 = y1 + i*dy;
-          x11 = (y11 - c1)/g1;
+          ty11 = y1 + i*dy;
+          tx11 = (ty11 - c1)/g1;
         }
 
-        C3Bezier2D b(x1, y1, x11, y11, x21, y21, x2, y2);
+        C3Bezier2D b(x1, y1, tx11, ty11, x21, y21, x2, y2);
 
         double bx, by;
 
@@ -534,18 +534,18 @@ class C3Bezier2D {
       double minD2 = 1E50;
 
       for (int i = 1; i < steps; ++i) {
-        double x21, y21;
+        double tx21, ty21;
 
         if (use_dx) {
-          x21 = x2 - i*dx;
-          y21 = g2*x21 + c2;
+          tx21 = x2 - i*dx;
+          ty21 = g2*tx21 + c2;
         }
         else {
-          y21 = y2 - i*dy;
-          x21 = (y21 - c2)/g2;
+          ty21 = y2 - i*dy;
+          tx21 = (ty21 - c2)/g2;
         }
 
-        C3Bezier2D b(x1, y1, x11, y11, x21, y21, x2, y2);
+        C3Bezier2D b(x1, y1, x11, y11, tx21, ty21, x2, y2);
 
         double bx, by;
 
