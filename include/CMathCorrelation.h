@@ -59,6 +59,27 @@ inline double calc(const Values &xv, const Values &yv) {
   return p;
 }
 
+inline double stddev(const Values &v) {
+  // calc means
+  double m = mean(v);
+
+  // calc correlation
+  int n = v.size();
+
+  if (n == 0)
+    return 0.0;
+
+  double sum2 = 0.0;
+
+  for (int i = 0; i < n; ++i) {
+    double d = v[i] - m;
+
+    sum2 += d*d;
+  }
+
+  return sqrt(sum2/n);
+}
+
 }
 
 //------
