@@ -101,7 +101,7 @@ class CAngle {
     return ostr.str();
   }
 
-  void fromString(const std::string &str) {
+  bool fromString(const std::string &str) {
     std::istringstream istr(str);
 
     // handle postfix type ?
@@ -111,6 +111,8 @@ class CAngle {
 
     type_  = Type::DEGREES;
     angle_ = r;
+
+    return true;
   }
 
   void print(std::ostream &os) const {
