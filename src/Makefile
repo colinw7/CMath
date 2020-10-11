@@ -21,9 +21,11 @@ dirs:
 CPP_SRC = \
 CArcToBezier.cpp \
 CBezierToLine.cpp \
+CDelaunay.cpp \
 CGiftWrap.cpp \
 CGrahamHull.cpp \
 CGrahamHullI.cpp \
+CHull3D.cpp \
 CInvNorm.cpp \
 CMathGen.cpp \
 CMathGeom2D.cpp \
