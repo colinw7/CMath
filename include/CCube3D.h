@@ -47,54 +47,54 @@ class CCube3D : public CShape3D {
     if (plane1_.intersect(l, &t) && trange.isOutside(t)) {
       CPoint3D p = l.point(t);
 
-      CPoint2D p1(p.y, p.z);
+      CPoint2D pp11(p.y, p.z);
 
-      if (CMathGeom2D::PointInsideRect(p1, bbox_yz))
+      if (CMathGeom2D::PointInsideRect(pp11, bbox_yz))
         trange.update(t);
     }
 
     if (plane2_.intersect(l, &t) && trange.isOutside(t)) {
       CPoint3D p = l.point(t);
 
-      CPoint2D p1(p.y, p.z);
+      CPoint2D pp11(p.y, p.z);
 
-      if (CMathGeom2D::PointInsideRect(p1, bbox_yz))
+      if (CMathGeom2D::PointInsideRect(pp11, bbox_yz))
         trange.update(t);
     }
 
     if (plane3_.intersect(l, &t) && trange.isOutside(t)) {
       CPoint3D p = l.point(t);
 
-      CPoint2D p1(p.x, p.z);
+      CPoint2D pp11(p.x, p.z);
 
-      if (CMathGeom2D::PointInsideRect(p1, bbox_xz))
+      if (CMathGeom2D::PointInsideRect(pp11, bbox_xz))
         trange.update(t);
     }
 
     if (plane4_.intersect(l, &t) && trange.isOutside(t)) {
       CPoint3D p = l.point(t);
 
-      CPoint2D p1(p.x, p.z);
+      CPoint2D pp11(p.x, p.z);
 
-      if (CMathGeom2D::PointInsideRect(p1, bbox_xz))
+      if (CMathGeom2D::PointInsideRect(pp11, bbox_xz))
         trange.update(t);
     }
 
     if (plane5_.intersect(l, &t) && trange.isOutside(t)) {
       CPoint3D p = l.point(t);
 
-      CPoint2D p1(p.x, p.y);
+      CPoint2D pp11(p.x, p.y);
 
-      if (CMathGeom2D::PointInsideRect(p1, bbox_xy))
+      if (CMathGeom2D::PointInsideRect(pp11, bbox_xy))
         trange.update(t);
     }
 
     if (plane6_.intersect(l, &t) && trange.isOutside(t)) {
       CPoint3D p = l.point(t);
 
-      CPoint2D p1(p.x, p.y);
+      CPoint2D pp11(p.x, p.y);
 
-      if (CMathGeom2D::PointInsideRect(p1, bbox_xy))
+      if (CMathGeom2D::PointInsideRect(pp11, bbox_xy))
         trange.update(t);
     }
 

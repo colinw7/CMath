@@ -12,10 +12,6 @@ class CSize2D {
    set_(true), width_(w), height_(h) {
   }
 
-  CSize2D(const CSize2D &size) :
-   set_(size.set_), width_(size.width_), height_(size.height_) {
-  }
-
   explicit CSize2D(const CISize2D &size) :
    set_(true), width_(size.getWidth()), height_(size.getHeight()) {
   }

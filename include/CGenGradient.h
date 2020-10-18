@@ -15,11 +15,7 @@ enum CGradientSpreadType {
 class CGradientStop {
  public:
   CGradientStop(const CRGBA &rgba, double offset) :
-   rgba_(rgba), offset_(offset), offset1_(0.0) {
-  }
-
-  CGradientStop(const CGradientStop &s) :
-   rgba_(s.rgba_), offset_(s.offset_), offset1_(s.offset1_) {
+   rgba_(rgba), offset_(offset) {
   }
 
   const CRGBA &getColor() const { return rgba_; }
@@ -33,8 +29,8 @@ class CGradientStop {
 
  private:
   CRGBA  rgba_;
-  double offset_;
-  double offset1_;
+  double offset_  { 0.0 };
+  double offset1_ { 0.0 };
 };
 
 //---

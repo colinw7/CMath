@@ -63,7 +63,7 @@ class CLargestRect {
 
     int width1, x0, w0;
 
-    typedef std::pair<int,int> Xw;
+    using Xw = std::pair<int,int>;
 
     Xw xw;
 

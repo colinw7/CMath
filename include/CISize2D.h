@@ -18,6 +18,13 @@ class CISize2D {
    width(size.width), height(size.height) {
   }
 
+  CISize2D &operator=(const CISize2D &size) {
+    width  = size.width;
+    height = size.height;
+
+    return *this;
+  }
+
   void set(int w, int h) {
     width  = w;
     height = h;

@@ -9,16 +9,10 @@
 
 class CPoint3D {
  public:
-  CPoint3D() :
-   x(0), y(0), z(0) {
-  }
+  CPoint3D() = default;
 
   CPoint3D(double x1, double y1, double z1) :
    x(x1), y(y1), z(z1) {
-  }
-
-  CPoint3D(const CPoint3D &point) :
-   x(point.x), y(point.y), z(point.z) {
   }
 
   CPoint3D(const CPoint2D &point, double z=0) :

@@ -12,10 +12,6 @@ class CBBox2D {
    pmin_(), pmax_(), set_(false) {
   }
 
-  CBBox2D(const CBBox2D &bbox) :
-   pmin_(bbox.pmin_), pmax_(bbox.pmax_), set_(bbox.set_) {
-  }
-
   explicit CBBox2D(const CPoint2D &point) :
    pmin_(point), pmax_(point), set_(true) {
   }

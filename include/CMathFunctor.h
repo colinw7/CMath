@@ -3,6 +3,8 @@
 
 class Functor {
  public:
+  virtual ~Functor() { }
+
   double operator()(double x) const { return exec(x); }
 
   virtual double exec(double x) const = 0;
@@ -33,6 +35,8 @@ class TanFunctor : public Functor {
 
 class PolarFunctor {
  public:
+  virtual ~PolarFunctor() { }
+
   double operator()(double theta) const { return exec(theta); }
 
   virtual double exec(double theta) const = 0;
@@ -46,6 +50,8 @@ class ArchimedianSpiralFunctor : public PolarFunctor {
    a_(a), n_(n) {
     assert(a_ != 0.0 && n_ != 0.0);
   }
+
+  virtual ~ArchimedianSpiralFunctor() { }
 
   double exec(double theta) const {
     return a_*pow(theta, 1.0/n_);
@@ -75,6 +81,8 @@ class ArchimedesSpiralFunctor : public PolarFunctor {
    a_(a) {
     assert(a_ != 0.0);
   }
+
+  virtual ~ArchimedesSpiralFunctor() { }
 
   double exec(double theta) const {
     return a_*theta;

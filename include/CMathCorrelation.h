@@ -114,6 +114,9 @@ class CMathBivariate {
     return (1.0/f)*exp(a*b);
   }
 
+  double xStdDev() const { return xstddev_; }
+  double yStdDev() const { return ystddev_; }
+
  private:
   void init() {
     corr_ = CMathCorrelation::calc(xv_, yv_);

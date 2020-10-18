@@ -423,7 +423,7 @@ class CQuaternion {
     if (c < tol) {
       double angle = acos(c);
 
-      if (::abs(angle) < 1E-6)
+      if (std::abs(angle) < 1E-6)
         return p;
 
       double s = std::sin(angle);
@@ -448,7 +448,7 @@ class CQuaternion {
     if (c > -tol && c < tol) {
       double angle = acos(c);
 
-      if (::abs(angle) < 1E-6)
+      if (std::abs(angle) < 1E-6)
         return p;
 
       double s = std::sin(angle);
@@ -470,7 +470,7 @@ class CQuaternion {
 
     double angle = acos(c);
 
-    if (::abs(angle) < 1E-6)
+    if (std::abs(angle) < 1E-6)
       return p;
 
     double s = std::sin(angle);
@@ -520,12 +520,12 @@ class CQuaternion {
   }
 
   CQuaternion log() const {
-    if (::abs(w_) < 1.0) {
+    if (std::abs(w_) < 1.0) {
       double angle = acos(w_);
 
       double s = std::sin(angle);
 
-      if (::abs(s) >= 1E-6) {
+      if (std::abs(s) >= 1E-6) {
         double coeff = angle/s;
 
         return CQuaternion(0.0, coeff*v_);
@@ -540,7 +540,7 @@ class CQuaternion {
 
     double s = std::sin(angle);
 
-    if (::abs(s) >= 1E-6) {
+    if (std::abs(s) >= 1E-6) {
       double coeff = s/angle;
 
       return CQuaternion(std::cos(angle), coeff*v_);

@@ -59,7 +59,7 @@ inline double norm(double x, double low, double high) {
   if (high != low)
     return (x - low)/(high - low);
   else
-    return 0;
+    return low;
 }
 
 // map x in 0->1 to low->high
