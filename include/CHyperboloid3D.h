@@ -7,7 +7,10 @@
 #include <CPoint3D.h>
 #include <CMathGen.h>
 #include <COptVal.h>
+
+#ifdef CHYPERBOLOID_NAN
 #include <NaN.h>
+#endif
 
 /*! Hyperboloid betweem specified points and sweep phi
  *
@@ -70,7 +73,7 @@ class CHyperboloid3D : public CShape3D {
       c_ = (a_*xy2 - 1.0)/(point2_.z*point2_.z);
 
       ++num_iters;
-    } while (num_iters < 1000 && (IsInf(a_) || IsNaN(a_)));
+    } while (num_iters < 1000 && ! validReal(a_));
 
     area_.setInvalid();
   }
@@ -232,6 +235,17 @@ class CHyperboloid3D : public CShape3D {
 
     return phi;
   }
+
+ private:
+#ifdef CHYPERBOLOID_NAN
+  bool validReal(double r) const {
+    return (! IsInf(r) && ! IsNaN(r));
+  }
+#else
+  bool validReal(double) const {
+    return true;
+  }
+#endif
 
  private:
   CPoint3D point1_;                         //! CPoint3D 1
