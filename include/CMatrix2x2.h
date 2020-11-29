@@ -16,8 +16,8 @@ class CMatrix2x2 {
   };
 
  private:
-  typedef CPoint2D  Point;
-  typedef CVector2D Vector;
+  using Point  = CPoint2D;
+  using Vector = CVector2D;
 
  public:
   CMatrix2x2() { }

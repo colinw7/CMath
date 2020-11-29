@@ -1024,8 +1024,8 @@ double
 CMathGen::
 mapToReal(long i)
 {
-  static double factor1 = -1.0/LONG_MIN;
-  static double factor2 =  1.0/LONG_MAX;
+  static double factor1 = -1.0/((double) LONG_MIN);
+  static double factor2 =  1.0/((double) LONG_MAX);
 
   if (i < 0)
     return 0.5*(i*factor1 + 1.0);
@@ -1037,7 +1037,7 @@ double
 CMathGen::
 mapToReal(ulong i)
 {
-  static double factor = 1.0/ULONG_MAX;
+  static double factor = 1.0/((double) ULONG_MAX);
 
   return i*factor;
 }

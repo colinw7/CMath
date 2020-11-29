@@ -9,8 +9,8 @@
 
 class CAffineMatrix2D {
  private:
-  typedef CPoint2D  Point;
-  typedef CVector2D Vector;
+  using Point  = CPoint2D;
+  using Vector = CVector2D;
 
  public:
   // constructor/destructor

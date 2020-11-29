@@ -9,11 +9,11 @@
 
 class CRefTransform3D {
  private:
-  typedef CMatrix3D       Matrix;
-  typedef CVector3D       Vector;
-  typedef CPoint3D        Point;
-  typedef CNormal3D       Normal;
-  typedef CRefPtr<Matrix> MatrixPtr;
+  using Matrix    = CMatrix3D;
+  using Vector    = CVector3D;
+  using Point     = CPoint3D;
+  using Normal    = CNormal3D;
+  using MatrixPtr = CRefPtr<Matrix>;
 
  public:
   CRefTransform3D() {

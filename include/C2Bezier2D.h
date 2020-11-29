@@ -7,9 +7,7 @@
 
 class C2Bezier2D {
  public:
-  C2Bezier2D() :
-   p1_(), p2_(), p3_() {
-  }
+  C2Bezier2D() { }
 
   C2Bezier2D(double x1, double y1, double x2, double y2, double x3, double y3) :
    p1_(x1, y1), p2_(x2, y2), p3_(x3, y3) {
@@ -19,17 +17,7 @@ class C2Bezier2D {
    p1_(p1), p2_(p2), p3_(p3) {
   }
 
-  C2Bezier2D(const C2Bezier2D &bezier) :
-    p1_(bezier.p1_), p2_(bezier.p2_), p3_(bezier.p3_) {
-  }
-
-  C2Bezier2D &operator=(const C2Bezier2D &bezier) {
-    p1_ = bezier.p1_;
-    p2_ = bezier.p2_;
-    p3_ = bezier.p3_;
-
-    return *this;
-  }
+  //---
 
   const CPoint2D &getFirstPoint  () const { return p1_; }
   const CPoint2D &getControlPoint() const { return p2_; }
@@ -39,6 +27,8 @@ class C2Bezier2D {
   void setControlPoint(const CPoint2D &p2) { p2_ = p2; };
   void setLastPoint   (const CPoint2D &p3) { p3_ = p3; };
 
+  //---
+
   void getFirstPoint  (double *x, double *y) const { *x = p1_.x; *y = p1_.y; }
   void getControlPoint(double *x, double *y) const { *x = p2_.x; *y = p2_.y; }
   void getLastPoint   (double *x, double *y) const { *x = p3_.x; *y = p3_.y; }
@@ -47,6 +37,8 @@ class C2Bezier2D {
   void setControlPoint(double x, double y) { setControlPoint(CPoint2D(x, y)); }
   void setLastPoint   (double x, double y) { setLastPoint   (CPoint2D(x, y)); }
 
+  //---
+
   void setPoints(double x1, double y1, double x2, double y2, double x3, double y3) {
     setPoints(CPoint2D(x1, y1), CPoint2D(x2, y2), CPoint2D(x3, y3));
   }
@@ -54,6 +46,8 @@ class C2Bezier2D {
   void setPoints(const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p3) {
     p1_ = p1; p2_ = p2; p3_ = p3;
   }
+
+  //---
 
   void calc(double t, double *x, double *y) const {
     CPoint2D p;
@@ -76,6 +70,8 @@ class C2Bezier2D {
 
     return p1_*uu + 2.0*p2_*t*u + p3_*tt;
   }
+
+  //---
 
   bool interp(double x, double y, double *t) const {
     return interp(CPoint2D(x, y), t);
@@ -145,6 +141,8 @@ class C2Bezier2D {
     return true;
   }
 
+  //---
+
   double gradientStart() const {
     //return CMathGen::atan2(p2_.x - p1_.x, p2_.y - p1_.y);
     return atan2(p2_.y - p1_.y, p2_.x - p1_.x);
@@ -166,6 +164,8 @@ class C2Bezier2D {
     return g;
   }
 
+  //---
+
   void getHullPolygon(std::vector<CPoint2D> &points) const {
     points.push_back(p1_);
     points.push_back(p2_);
@@ -180,6 +180,8 @@ class C2Bezier2D {
     bbox.add(p3_);
   }
 
+  //---
+
   void split(C2Bezier2D &bezier1, C2Bezier2D &bezier2) const {
     // split at control point
     CPoint2D p12 = (p1_ + p2_)/2.0;
@@ -190,6 +192,8 @@ class C2Bezier2D {
     bezier1 = C2Bezier2D(p1_, p12, pm );
     bezier2 = C2Bezier2D(pm , p23, p3_);
   }
+
+  //---
 
   double arcLength(double tol=1E-3) const {
     double l1 = p1_.distanceTo(p3_);
@@ -204,6 +208,8 @@ class C2Bezier2D {
 
     return bezier1.arcLength(tol) + bezier2.arcLength(tol);
   }
+
+  //---
 
   void print(std::ostream &os) const {
     os << "[[" << p1_.x << ", " << p1_.y << "] [" <<

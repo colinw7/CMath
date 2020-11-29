@@ -4,9 +4,15 @@
 #include <C3Bezier2D.h>
 #include <vector>
 
+/*
+ * convert arc to bezier:
+ *  center (x, y)
+ *  radii  (rx, ry)
+ *  from angle1 to angle2 (radians)
+ */
 class CArcToBezier {
  public:
-  typedef std::vector<C3Bezier2D> BezierList;
+  using BezierList = std::vector<C3Bezier2D>;
 
  public:
   static void ArcToBeziers(double x, double y, double rx, double ry,

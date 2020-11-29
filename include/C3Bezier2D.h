@@ -6,9 +6,7 @@
 
 class C3Bezier2D {
  public:
-  C3Bezier2D() :
-   p1_(), p2_(), p3_(), p4_() {
-  }
+  C3Bezier2D() = default;
 
   C3Bezier2D(double x1, double y1, double x2, double y2,
              double x3, double y3, double x4, double y4) :
@@ -17,10 +15,6 @@ class C3Bezier2D {
 
   C3Bezier2D(const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p3, const CPoint2D &p4) :
    p1_(p1), p2_(p2), p3_(p3), p4_(p4) {
-  }
-
-  C3Bezier2D(const C3Bezier2D &bezier) :
-    p1_(bezier.p1_), p2_(bezier.p2_), p3_(bezier.p3_), p4_(bezier.p4_) {
   }
 
   // create order 3 bezier from order 2 using 'degree elevation'
@@ -34,14 +28,7 @@ class C3Bezier2D {
     p3_ = (2*p + p4_)/3;
   }
 
-  C3Bezier2D &operator=(const C3Bezier2D &bezier) {
-    p1_ = bezier.p1_;
-    p2_ = bezier.p2_;
-    p3_ = bezier.p3_;
-    p4_ = bezier.p4_;
-
-    return *this;
-  }
+  //---
 
   const CPoint2D &getFirstPoint   () const { return p1_; }
   const CPoint2D &getControlPoint1() const { return p2_; }
@@ -53,6 +40,8 @@ class C3Bezier2D {
   void setControlPoint2(const CPoint2D &p3) { p3_ = p3; };
   void setLastPoint    (const CPoint2D &p4) { p4_ = p4; };
 
+  //---
+
   void getFirstPoint   (double *x, double *y) const { *x = p1_.x; *y = p1_.y; }
   void getControlPoint1(double *x, double *y) const { *x = p2_.x; *y = p2_.y; }
   void getControlPoint2(double *x, double *y) const { *x = p3_.x; *y = p3_.y; }
@@ -62,6 +51,8 @@ class C3Bezier2D {
   void setControlPoint1(double x, double y) { setControlPoint1(CPoint2D(x, y)); }
   void setControlPoint2(double x, double y) { setControlPoint2(CPoint2D(x, y)); }
   void setLastPoint    (double x, double y) { setLastPoint    (CPoint2D(x, y)); }
+
+  //---
 
   void setPoints(double x1, double y1, double x2, double y2,
                  double x3, double y3, double x4, double y4) {
@@ -75,6 +66,8 @@ class C3Bezier2D {
   void getPoints(CPoint2D &p1, CPoint2D &p2, CPoint2D &p3, CPoint2D &p4) const {
     p1 = p1_; p2 = p2_; p3 = p3_; p4 = p4_;
   }
+
+  //---
 
   void calc(double t, double *x, double *y) const {
     CPoint2D p;
@@ -100,6 +93,8 @@ class C3Bezier2D {
 
     return p1_*uuu + 3.0*p2_*t*uu + 3.0*p3_*tt*u + p4_*ttt;
   }
+
+  //---
 
   bool interp(double x, double y, double *t) const {
     return interp(CPoint2D(x, y), t);
@@ -169,6 +164,8 @@ class C3Bezier2D {
     return true;
   }
 
+  //---
+
   double gradientStart() const {
     //return CMathGen::atan2(p2_.x - p1_.x, p2_.y - p1_.y);
     return atan2(p2_.y - p1_.y, p2_.x - p1_.x);
@@ -194,6 +191,8 @@ class C3Bezier2D {
     return g;
   }
 
+  //---
+
   void getHullPolygon(std::vector<CPoint2D> &points) const {
     points.push_back(p1_);
     points.push_back(p2_);
@@ -209,6 +208,8 @@ class C3Bezier2D {
     bbox.add(p3_);
     bbox.add(p4_);
   }
+
+  //---
 
   void split(C3Bezier2D &bezier1, C3Bezier2D &bezier2) const {
     split(0.5, bezier1, bezier2);
@@ -240,6 +241,8 @@ class C3Bezier2D {
 
     return true;
   }
+
+  //---
 
   CPoint2D deCasteljauInterp(double t) const {
     double u = 1.0 - t;
@@ -582,6 +585,8 @@ class C3Bezier2D {
     return C3Bezier2D(x1, y1, x11, y11, x21, y21, x2, y2);
   }
 
+  //---
+
   double arcLength(double tol=1E-3) const {
     double l1 = p1_.distanceTo(p4_);
     double l2 = p1_.distanceTo(p2_) + p2_.distanceTo(p3_) + p3_.distanceTo(p4_);
@@ -595,6 +600,8 @@ class C3Bezier2D {
 
     return bezier1.arcLength(tol) + bezier2.arcLength(tol);
   }
+
+  //---
 
   void print(std::ostream &os) const {
     os << "[[" << p1_.x << ", " << p1_.y << "] [" <<
