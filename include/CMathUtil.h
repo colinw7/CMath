@@ -2,6 +2,7 @@
 #define CMathUtil_H
 
 #include <COSNaN.h>
+#include <string>
 #include <cmath>
 
 namespace CMathUtil {
@@ -96,6 +97,64 @@ inline double normalizeAngle(double a, bool isEnd=false) {
   }
 
   return a;
+}
+
+//------
+
+inline std::string scaledNumberString(double r, int ndp=3) {
+  // (1,000) k, (1,000,000) M, (1,000,000,000) G, (1,000,000,000,000) T
+  // (0.001) m, (0.000 001) µ, (0.000 000 001) n, (0.000 000 000 001) p
+
+  if (r == 0.0) return "0"; // TODO: epsilon
+
+  if (r < 0) return "-" + scaledNumberString(-r);
+
+  int n = std::log10(r);
+
+  auto realToString = [&](double r) {
+    auto s = std::to_string(r);
+
+    auto len = s.size();
+
+    auto p = s.find('.');
+
+    if (ndp > 0) {
+      if (p == std::string::npos) {
+        s += ".";
+
+        p = s.find('.');
+      }
+
+      while (int(len - p) <= ndp) {
+        s += "0";
+
+        ++len;
+      }
+
+      return s.substr(0, p + ndp + 1);
+    }
+    else {
+      if (p == std::string::npos)
+        return s;
+
+      return s.substr(0, p);
+    }
+  };
+
+  if (n >= 0) {
+    if      (n <  3) return realToString(r                )      ;
+    else if (n <  6) return realToString(r/         1000.0) + "k";
+    else if (n <  9) return realToString(r/      1000000.0) + "M";
+    else if (n < 12) return realToString(r/   1000000000.0) + "G";
+    else             return realToString(r/1000000000000.0) + "T";
+  }
+  else {
+    if      (n >  -3) return realToString(r                )      ;
+    else if (n >  -6) return realToString(r*         1000.0) + "m";
+    else if (n >  -9) return realToString(r*      1000000.0) + "µ";
+    else if (n > -12) return realToString(r*   1000000000.0) + "n";
+    else              return realToString(r*1000000000000.0) + "p";
+  }
 }
 
 }
