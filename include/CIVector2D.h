@@ -10,10 +10,6 @@ class CIVector2D {
    x_(x), y_(y) {
   }
 
-  CIVector2D(const CIVector2D &vector) :
-   x_(vector.x_), y_(vector.y_) {
-  }
-
   explicit CIVector2D(const CIPoint2D &point) :
    x_(point.x), y_(point.y) {
   }

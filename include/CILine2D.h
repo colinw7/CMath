@@ -10,10 +10,6 @@ class CILine2D {
    p1_(), p2_(), v_() {
   }
 
-  CILine2D(const CILine2D &line) :
-    p1_(line.p1_), p2_(line.p2_), v_(line.v_) {
-  }
-
   CILine2D(int x1, int y1, int x2, int y2) :
    p1_(x1, y1), p2_(x2, y2), v_(x2 - x1, y2 - y1) {
   }

@@ -145,10 +145,14 @@ uint
 CArcToBezier::
 getCalcNumBeziers()
 {
-  uint num_beziers = CMathRound::Round(2*angle_diff_/M_PI);
+  uint num_beziers;
+
+#if 0
+  num_beziers = CMathRound::Round(2*angle_diff_/M_PI);
 
   if (num_beziers <= 0)
     num_beziers = 1;
+#endif
 
   //------
 
