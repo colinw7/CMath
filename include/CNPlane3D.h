@@ -7,33 +7,21 @@
 
 class CNPlane3D {
  public:
-  CNPlane3D() :
-   direction_(0.0, 0.0, 0.0),
-   scalar_   (0.0) {
-  }
+  CNPlane3D() { }
 
   CNPlane3D(const CVector3D &direction, double scalar=0.0) :
-   direction_(direction),
-   scalar_   (scalar) {
+   direction_(direction), scalar_(scalar) {
   }
 
   CNPlane3D(const CPoint3D &direction, double scalar=0.0) :
-   direction_(direction),
-   scalar_   (scalar) {
+   direction_(direction), scalar_(scalar) {
   }
 
   CNPlane3D(double x, double y, double z, double scalar=0.0) :
-   direction_(x, y, z),
-   scalar_   (scalar) {
+   direction_(x, y, z), scalar_(scalar) {
   }
 
-  CNPlane3D(const CNPlane3D &normal) :
-   direction_(normal.direction_),
-   scalar_   (normal.scalar_) {
-  }
-
-  CNPlane3D(const CPoint3D &v1, const CPoint3D &v2, const CPoint3D &v3) :
-   direction_(), scalar_(0.0) {
+  CNPlane3D(const CPoint3D &v1, const CPoint3D &v2, const CPoint3D &v3) {
     CVector3D diff1(v1, v2);
     CVector3D diff2(v2, v3);
 
@@ -153,8 +141,8 @@ class CNPlane3D {
   }
 
  private:
-  CVector3D direction_;
-  double    scalar_;
+  CVector3D direction_ { 0.0, 0.0, 0.0 };
+  double    scalar_    { 0.0 };
 };
 
 //------

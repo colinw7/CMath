@@ -7,13 +7,7 @@
 
 class CBBox3D {
  public:
-  CBBox3D() :
-   pmin_(), pmax_(), set_(false) {
-  }
-
-  CBBox3D(const CBBox3D &bbox) :
-   pmin_(bbox.pmin_), pmax_(bbox.pmax_), set_(bbox.set_) {
-  }
+  CBBox3D() { }
 
   CBBox3D(const CPoint3D &point) {
     pmin_ = point;
@@ -37,7 +31,6 @@ class CBBox3D {
   }
 
   void reset() { set_ = false; }
-
   bool isSet() const { return set_; }
 
   const CPoint3D &getMin() const { return pmin_; }
