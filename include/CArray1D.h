@@ -52,7 +52,7 @@ class CArray1D {
  private:
   CArray1D(const CArray1D &array);
 
-  const CArray1D &operator=(const CArray1D &array);
+  CArray1D &operator=(const CArray1D &array);
 
  public:
  ~CArray1D() {

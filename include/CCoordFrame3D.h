@@ -32,7 +32,7 @@ class CCoordFrame3D {
     basis_ (coord_frame.basis_ ) {
   }
 
-  const CCoordFrame3D &operator=(const CCoordFrame3D &coord_frame) {
+  CCoordFrame3D &operator=(const CCoordFrame3D &coord_frame) {
     origin_ = coord_frame.origin_;
     basis_  = coord_frame.basis_ ;
 

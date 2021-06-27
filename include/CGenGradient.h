@@ -85,7 +85,7 @@ class CGenGradient {
   virtual CRGBA getColor(double x, double y) const = 0;
 
  private:
-  const CGenGradient &operator=(const CGenGradient &g);
+  CGenGradient &operator=(const CGenGradient &g);
 
  protected:
   StopList            stops_;

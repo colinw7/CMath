@@ -209,7 +209,7 @@ class CMatrixStack2D {
     mValid_ = false;
   }
 
-  const CMatrixStack2D &operator=(const CMatrixStack2D &m) {
+  CMatrixStack2D &operator=(const CMatrixStack2D &m) {
     transformStack_ = m.transformStack_;
     mValid_         = m.mValid_;
     m_              = m.m_;

@@ -1,6 +1,8 @@
 #ifndef CTurbulenceUtil_H
 #define CTurbulenceUtil_H
 
+#include <cmath>
+
 class CTurbulenceUtil {
  private:
   static const int RAND_m = 2147483647; /* 2**31 - 1 */
@@ -69,12 +71,11 @@ class CTurbulenceUtil {
         for (int j = 0; j < 2; j++) {
           lSeed = random(lSeed);
 
-          gradient[k][i][j] =
-            double((lSeed) % (BSize + BSize) - BSize)/BSize;
+          gradient[k][i][j] = double((lSeed) % (BSize + BSize) - BSize)/BSize;
         }
 
-        s = sqrt(gradient[k][i][0]*gradient[k][i][0] +
-                 gradient[k][i][1]*gradient[k][i][1]);
+        s = std::sqrt(gradient[k][i][0]*gradient[k][i][0] +
+                      gradient[k][i][1]*gradient[k][i][1]);
 
         gradient[k][i][0] /= s;
         gradient[k][i][1] /= s;

@@ -7,16 +7,10 @@
 
 class CPoint4D {
  public:
-  CPoint4D() :
-   x(0), y(0), z(0), w(1) {
-  }
+  CPoint4D() { }
 
   CPoint4D(double x1, double y1, double z1, double w1=1) :
    x(x1), y(y1), z(z1), w(w1) {
-  }
-
-  CPoint4D(const CPoint4D &point) :
-   x(point.x), y(point.y), z(point.z), w(point.w) {
   }
 
   double getX() const { return x; }
@@ -182,7 +176,10 @@ class CPoint4D {
   }
 
  public:
-  double x { 0 }, y { 0 }, z { 0 }, w { 1 };
+  double x { 0 };
+  double y { 0 };
+  double z { 0 };
+  double w { 1 };
 };
 
 #endif

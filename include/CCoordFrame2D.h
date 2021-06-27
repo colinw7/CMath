@@ -31,7 +31,7 @@ class CCoordFrame2D {
    origin_(coord_frame.origin_), basis_ (coord_frame.basis_ ) {
   }
 
-  const CCoordFrame2D &operator=(const CCoordFrame2D &coord_frame) {
+  CCoordFrame2D &operator=(const CCoordFrame2D &coord_frame) {
     origin_ = coord_frame.origin_;
     basis_  = coord_frame.basis_ ;
 

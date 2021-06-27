@@ -77,7 +77,7 @@ class CMatrix2D {
    m20_(a.m20_), m21_(a.m21_), m22_(a.m22_) {
   }
 
-  const CMatrix2D &operator=(const CMatrix2D &a) {
+  CMatrix2D &operator=(const CMatrix2D &a) {
     memcpy(&m00_, &a.m00_, 9*sizeof(double));
 
     return *this;

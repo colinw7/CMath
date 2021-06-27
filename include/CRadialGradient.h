@@ -160,7 +160,7 @@ class CRadialGradient : public CGenGradient {
   }
 
  private:
-  const CRadialGradient &operator=(const CRadialGradient &rg);
+  CRadialGradient &operator=(const CRadialGradient &rg);
 
  private:
   double cx_  { 0.0 };

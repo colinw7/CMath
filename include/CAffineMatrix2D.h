@@ -53,7 +53,7 @@ class CAffineMatrix2D {
    a_(a.a_), b_(a.b_), c_(a.c_), d_(a.d_), tx_(a.tx_), ty_(a.ty_) {
   }
 
-  const CAffineMatrix2D &operator=(const CAffineMatrix2D &a) {
+  CAffineMatrix2D &operator=(const CAffineMatrix2D &a) {
     memcpy(&a_, &a.a_, 6*sizeof(double));
 
     return *this;

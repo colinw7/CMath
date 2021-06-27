@@ -158,7 +158,7 @@ class CLinearGradient : public CGenGradient {
  private:
   double distance1(double x, double y) const { return x*c_ + y*s_; }
 
-  const CLinearGradient &operator=(const CLinearGradient &lg);
+  CLinearGradient &operator=(const CLinearGradient &lg);
 
  private:
   double x1_, y1_, x2_, y2_;

@@ -6,63 +6,53 @@
 #include <CVector2D.h>
 #include <CSize2D.h>
 
+/*!
+ * 2D Bounding Box
+ *
+ * Note: Input points are sorted so x1 < x2 and y1 < y2
+ */
 class CBBox2D {
  public:
-  CBBox2D() :
-   pmin_(), pmax_(), set_(false) {
-  }
+  CBBox2D() { }
 
+  // construct single point bbox
   explicit CBBox2D(const CPoint2D &point) :
    pmin_(point), pmax_(point), set_(true) {
   }
 
+  // construct two point bbox
   CBBox2D(const CPoint2D &pmin, const CPoint2D &pmax) :
    pmin_(pmin), pmax_(pmax), set_(true) {
     update();
   }
 
+  // construct bbox (x1, y1) -> (x2, y2)
   CBBox2D(double x1, double y1, double x2, double y2) :
    pmin_(x1, y1), pmax_(x2, y2), set_(true) {
     update();
   }
 
+  // construct bbox from origin and size
   CBBox2D(const CPoint2D &o, const CSize2D &s) :
    pmin_(o), pmax_(o + s), set_(true) {
     update();
   }
 
+  // set/reset set state
+  bool isSet() const { return set_; }
   void reset() { set_ = false; }
 
-  bool isSet() const { return set_; }
+  //---
 
-  CBBox2D operator+(const CPoint2D &rhs) const {
-    CBBox2D t(*this);
+  // add point (expands range)
+  CBBox2D operator+(const CPoint2D &rhs) const { CBBox2D t(*this); t += rhs; return t; }
+  CBBox2D &operator+=(const CPoint2D &rhs) { add(rhs.x, rhs.y); return *this; }
 
-    t += rhs;
+  // add bbox (expands range)
+  CBBox2D operator+(const CBBox2D &rhs) const { CBBox2D t(*this); t += rhs; return t; }
+  CBBox2D &operator+=(const CBBox2D &rhs) { add(rhs); return *this; }
 
-    return t;
-  }
-
-  CBBox2D &operator+=(const CPoint2D &rhs) {
-    add(rhs.x, rhs.y);
-
-    return *this;
-  }
-
-  CBBox2D operator+(const CBBox2D &rhs) const {
-    CBBox2D t(*this);
-
-    t += rhs;
-
-    return t;
-  }
-
-  CBBox2D &operator+=(const CBBox2D &rhs) {
-    add(rhs);
-
-    return *this;
-  }
-
+  // multiple by scale
   friend CBBox2D operator*(const CBBox2D &lhs, double rhs) {
     return CBBox2D(lhs.pmin_*rhs, lhs.pmax_*rhs);
   }
@@ -70,6 +60,8 @@ class CBBox2D {
   friend CBBox2D operator*(double rhs, const CBBox2D &lhs) {
     return CBBox2D(lhs.pmin_*rhs, lhs.pmax_*rhs);
   }
+
+  //---
 
   void add(const CPoint2D &point) {
     add(point.x, point.y);
@@ -107,6 +99,9 @@ class CBBox2D {
     }
   }
 
+  //---
+
+  // check two bboxes overlap
   bool overlaps(const CBBox2D &bbox) const {
     if (! set_ || ! bbox.set_) return false;
 
@@ -114,18 +109,21 @@ class CBBox2D {
             (pmax_.y >= bbox.pmin_.y && pmin_.y <= bbox.pmax_.y));
   }
 
+  // check two bboxes overlap in x direction
   bool overlapsX(const CBBox2D &bbox) const {
     if (! set_ || ! bbox.set_) return false;
 
     return (pmax_.x >= bbox.pmin_.x && pmin_.x <= bbox.pmax_.x);
   }
 
+  // check two bboxes overlap in y direction
   bool overlapsY(const CBBox2D &bbox) const {
     if (! set_ || ! bbox.set_) return false;
 
     return (pmax_.y >= bbox.pmin_.y && pmin_.y <= bbox.pmax_.y);
   }
 
+  // check two bboxes intersect (same as overlap ?)
   bool intersect(const CBBox2D &bbox) const {
     if (! set_ || ! bbox.set_) return false;
 
@@ -136,6 +134,7 @@ class CBBox2D {
     return true;
   }
 
+  // return intersect box of two bboxes
   bool intersect(const CBBox2D &bbox, CBBox2D &ibbox) const {
     if (! set_ || ! bbox.set_) return false;
 
@@ -152,6 +151,7 @@ class CBBox2D {
     return true;
   }
 
+  // is point inside
   bool inside(double x, double y) const {
     return inside(CPoint2D(x, y));
   }
@@ -163,6 +163,7 @@ class CBBox2D {
             (point.y >= pmin_.y && point.y <= pmax_.y));
   }
 
+  // is bbox (completely) inside
   bool inside(const CBBox2D &bbox) const {
     if (! set_) return false;
 
@@ -170,6 +171,7 @@ class CBBox2D {
             (bbox.pmin_.y >= pmin_.y && bbox.pmax_.y <= pmax_.y));
   }
 
+  // distance between bboxes
   double distanceTo(const CBBox2D &bbox) const {
     if (! set_) return 1E50; // assert
 
@@ -218,6 +220,7 @@ class CBBox2D {
     }
   }
 
+  // expand bbox by delta in all directions
   void expand(double delta) {
     if (! set_) return;
 
@@ -227,6 +230,7 @@ class CBBox2D {
     update();
   }
 
+  // expand bbox by delta in each direction
   void expand(double x1, double y1, double x2, double y2) {
     if (! set_) return;
 
@@ -238,6 +242,7 @@ class CBBox2D {
     update();
   }
 
+  // get expanded bbox by delta in each direction
   CBBox2D expanded(double x1, double y1, double x2, double y2) const {
     CBBox2D bbox(*this);
 
@@ -246,6 +251,7 @@ class CBBox2D {
     return bbox;
   }
 
+  // get area
   double area() const {
     if (! set_) return 0.0;
 
@@ -254,10 +260,12 @@ class CBBox2D {
     return fabs(diag.getX()*diag.getY());
   }
 
+  // get perimeter
   double perimeter() const {
     return 2*getWidth() + 2*getHeight();
   }
 
+  // get max direction
   CMathGen::AxisType2D maxAxis() const {
     if (! set_) return CMathGen::X_AXIS_2D;
 
@@ -269,7 +277,9 @@ class CBBox2D {
       return CMathGen::Y_AXIS_2D;
   }
 
+  // get lower left
   CPoint2D getMin() const { assert(set_); return pmin_; }
+  // get upper right
   CPoint2D getMax() const { assert(set_); return pmax_; }
 
   double getLeft  () const { return getXMin(); }
@@ -285,10 +295,10 @@ class CBBox2D {
   double getXMid() const { return (getXMin() + getXMax())/2; }
   double getYMid() const { return (getYMin() + getYMax())/2; }
 
-  CPoint2D getCenter() const {
-    return 0.5*(getMin() + getMax());
-  }
+  // get center
+  CPoint2D getCenter() const { return 0.5*(getMin() + getMax()); }
 
+  // move to new center
   void setCenter(const CPoint2D &point) {
     double dx = point.x - getCenter().x;
     double dy = point.y - getCenter().y;
@@ -296,6 +306,7 @@ class CBBox2D {
     moveBy(CPoint2D(dx, dy));
   }
 
+  // move to new lower left
   void setLL(const CPoint2D &point) {
     pmin_ = point;
 
@@ -305,6 +316,7 @@ class CBBox2D {
     }
   }
 
+  // move to new upper right
   void setUR(const CPoint2D &point) {
     pmax_ = point;
 
@@ -314,9 +326,12 @@ class CBBox2D {
     }
   }
 
+  // set left
   void setX(double x) { setXMin(x); }
+  // set bottom
   void setY(double y) { setYMin(y); }
 
+  // set width
   void setWidth(double width) {
     if (! set_)
       pmin_.x = 0;
@@ -325,6 +340,7 @@ class CBBox2D {
     set_    = true;
   }
 
+  // set height
   void setHeight(double height) {
     if (! set_)
       pmin_.y = 0;
@@ -338,25 +354,10 @@ class CBBox2D {
   void setRight (double x) { setXMax(x); }
   void setTop   (double y) { setYMax(y); }
 
-  void setXMin(double x) {
-    pmin_.x = x;
-    set_    = true;
-  }
-
-  void setYMin(double y) {
-    pmin_.y = y;
-    set_    = true;
-  }
-
-  void setXMax(double x) {
-    pmax_.x = x;
-    set_    = true;
-  }
-
-  void setYMax(double y) {
-    pmax_.y = y;
-    set_    = true;
-  }
+  void setXMin(double x) { pmin_.x = x; set_ = true; }
+  void setYMin(double y) { pmin_.y = y; set_ = true; }
+  void setXMax(double x) { pmax_.x = x; set_ = true; }
+  void setYMax(double y) { pmax_.y = y; set_ = true; }
 
   void setSize(const CSize2D &size) {
     if (! set_) {
@@ -374,23 +375,17 @@ class CBBox2D {
   CPoint2D getUL() const { assert(set_); return CPoint2D(pmin_.x, pmax_.y); }
   CPoint2D getUR() const { return getMax(); }
 
-  CSize2D getSize() const {
-    return CSize2D(getWidth(), getHeight());
-  }
+  CSize2D getSize() const { return CSize2D(getWidth(), getHeight()); }
 
+  // get distance between opposite corners
   double getRadius() const {
     CVector2D radius = 0.5*CVector2D(getMin(), getMax());
 
     return radius.length();
   }
 
-  double getWidth() const {
-    return fabs(getXMax() - getXMin());
-  }
-
-  double getHeight() const {
-    return fabs(getYMax() - getYMin());
-  }
+  double getWidth () const { return fabs(getXMax() - getXMin()); }
+  double getHeight() const { return fabs(getYMax() - getYMin()); }
 
   CBBox2D &moveXTo(double x) {
     assert(set_);

@@ -11,7 +11,7 @@ class CIPoint3D {
    x(point.x), y(point.y), z(point.z) {
   }
 
-  const CIPoint3D &operator=(const CIPoint3D &point) {
+  CIPoint3D &operator=(const CIPoint3D &point) {
     x = point.x;
     y = point.y;
 

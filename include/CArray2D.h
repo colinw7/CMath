@@ -54,7 +54,7 @@ class CArray2D {
  private:
   CArray2D(const CArray2D &array);
 
-  const CArray2D &operator=(const CArray2D &array);
+  CArray2D &operator=(const CArray2D &array);
 
  public:
  ~CArray2D() {
