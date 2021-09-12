@@ -549,7 +549,7 @@ class CQuaternion {
     return CQuaternion(0.0, 0.0, 0.0, 0.0);
   }
 
-  void print(ostream &os) const {
+  void print(std::ostream &os) const {
     os << "[" << w_ << ", " << v_ << "]";
   }
 
@@ -560,7 +560,7 @@ class CQuaternion {
 
 //------
 
-inline ostream &operator<<(ostream &os, const CQuaternion &q) {
+inline std::ostream &operator<<(std::ostream &os, const CQuaternion &q) {
   q.print(os);
 
   return os;

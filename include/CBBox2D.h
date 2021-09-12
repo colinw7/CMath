@@ -5,6 +5,7 @@
 #include <CPoint2D.h>
 #include <CVector2D.h>
 #include <CSize2D.h>
+#include <sstream>
 
 /*!
  * 2D Bounding Box
@@ -469,6 +470,14 @@ class CBBox2D {
 
   friend bool operator==(const CBBox2D &lhs, const CBBox2D &rhs) {
     return (lhs.pmin_ == rhs.pmin_ && lhs.pmax_ == rhs.pmax_);
+  }
+
+  //---
+
+  std::string toString() const {
+    std::ostringstream ss;
+    ss << *this;
+    return ss.str();
   }
 
   void print(std::ostream &os) const {

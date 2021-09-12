@@ -353,6 +353,19 @@ class CMatrixStack2D {
     transformStack_[i] = t;
   }
 
+  CMatrixStack2D &prepend(const CMatrixStack2D &m) {
+    auto transformStack = m.transformStack_;
+
+    for (const auto &t : transformStack_)
+      transformStack.push_back(t);
+
+    transformStack_ = transformStack;
+
+    mValid_ = false;
+
+    return *this;
+  }
+
   CMatrixStack2D &append(const CMatrixStack2D &m) {
     for (const auto &t : m.transformStack_)
       transformStack_.push_back(t);
@@ -380,6 +393,10 @@ class CMatrixStack2D {
     }
 
     return m_;
+  }
+
+  CMatrix2D getIMatrix() const {
+    return getMatrix().inverse();
   }
 
   void multiplyPoint(const CPoint2D &point1, CPoint2D &point2) const {

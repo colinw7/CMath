@@ -247,7 +247,7 @@ class CMatrix2D {
   }
 
   void setReflection(double a) {
-    setUnitInnerReflection(cos(a), sin(a));
+    setUnitInnerReflection(std::cos(a), std::sin(a));
     setOuterIdentity      ();
     setBottomIdentity     ();
   }
@@ -801,30 +801,30 @@ class CMatrix2D {
   }
 
   void setInnerRotation(double a) {
-    double c = ::cos(a);
-    double s = ::sin(a);
+    double c = std::cos(a);
+    double s = std::sin(a);
 
     m00_ =  c, m01_ = -s;
     m10_ =  s, m11_ =  c;
   }
 
   void setInnerSkew(double x, double y) {
-    double tx = ::tan(x);
-    double ty = ::tan(y);
+    double tx = std::tan(x);
+    double ty = std::tan(y);
 
     m00_ = 1 , m01_ = tx;
     m10_ = ty, m11_ = 1 ;
   }
 
   void setInnerSkewX(double x) {
-    double tx = ::tan(x);
+    double tx = std::tan(x);
 
     m00_ = 1, m01_ = tx;
     m10_ = 0, m11_ = 1 ;
   }
 
   void setInnerSkewY(double y) {
-    double ty = ::tan(y);
+    double ty = std::tan(y);
 
     m00_ = 1 , m01_ = 0;
     m10_ = ty, m11_ = 1;

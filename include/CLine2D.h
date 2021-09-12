@@ -22,7 +22,9 @@ class CLine2D : public CShape2D {
     return tolerance;
   }
 
-  CLine2D(double x1=0, double y1=0, double x2=0, double y2=0) :
+  CLine2D() { }
+
+  CLine2D(double x1, double y1, double x2, double y2) :
    p1_(x1, y1), p2_(x2, y2), v_(x2 - x1, y2 - y1) {
   }
 
@@ -44,6 +46,9 @@ class CLine2D : public CShape2D {
     v_  = p2_ - p1_;
   }
 
+  bool isSegment() const { return segment_; }
+  void setSegment(bool b) { segment_ = b; }
+
   CPoint2D getMid() {
     return CPoint2D((p1_.x + p2_.x)/2, (p1_.y + p2_.y)/2);
   }
@@ -53,7 +58,7 @@ class CLine2D : public CShape2D {
   }
 
   void setBBox(const CBBox2D &bbox) {
-    CBBox2D obbox = getBBox();
+    auto obbox = getBBox();
 
     if (p1_.x < p2_.x) {
       p1_.x += bbox.getXMin() - obbox.getXMin();
@@ -140,7 +145,7 @@ class CLine2D : public CShape2D {
   intersect(const CLine2D &line, CPoint2D &point) const {
     double t1, t2;
 
-    CMathGen::IntersectType type = intersectParms(line, &t1, &t2);
+    auto type = intersectParms(line, &t1, &t2);
 
     if (type != CMathGen::INTERSECT_NONE) {
       point.x = p1_.x + v_.getX()*t1;
@@ -152,7 +157,7 @@ class CLine2D : public CShape2D {
 
   CMathGen::IntersectType
   intersect(const CLine2D &line, CPoint2D &point, double *mu1, double *mu2) const {
-    CMathGen::IntersectType type = intersectParms(line, mu1, mu2);
+    auto type = intersectParms(line, mu1, mu2);
 
     if (type != CMathGen::INTERSECT_NONE) {
       point.x = p1_.x + v_.getX()*(*mu1);
@@ -220,7 +225,7 @@ class CLine2D : public CShape2D {
   }
 
   void split(double t, CLine2D &line1, CLine2D &line2) const {
-    CPoint2D pi = interp(t);
+    auto pi = interp(t);
 
     line1 = CLine2D(p1_, pi);
     line2 = CLine2D(pi, p2_);
@@ -264,6 +269,7 @@ class CLine2D : public CShape2D {
  private:
   CPoint2D  p1_, p2_;
   CVector2D v_;
+  bool      segment_ { true };
 };
 
 //---------

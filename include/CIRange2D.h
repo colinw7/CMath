@@ -5,7 +5,9 @@
 
 class CIRange2D {
  public:
-  explicit CIRange2D(int x11 = 0, int y11 = 0, int x21 = 0, int y21 = 0) {
+  CIRange2D() { }
+
+  CIRange2D(int x11, int y11, int x21, int y21) {
     set(x11, y11, x21, y21);
   }
 
@@ -35,13 +37,6 @@ class CIRange2D {
 
   void incX(int dx) { x1 += dx; x2 += dx; }
   void incY(int dy) { y1 += dy; y2 += dy; }
-
-  CIRange2D &operator=(const CIRange2D &range) {
-    x1 = range.x1; y1 = range.y1;
-    x2 = range.x2; y2 = range.y2;
-
-    return *this;
-  }
 
   void print(std::ostream &os) const {
     os << x1 << "," << y1 << "," << x2 << "," << y2;

@@ -25,9 +25,9 @@ class CPolygon2D : public CShape2D {
   };
 
  public:
-  typedef std::vector<CPoint2D> PointList;
-  typedef std::vector<CLine2D>  LineList;
-  typedef std::list<EarPoint>   EarPointList;
+  using PointList    = std::vector<CPoint2D>;
+  using LineList     = std::vector<CLine2D>;
+  using EarPointList = std::list<EarPoint>;
 
   //------
 
@@ -36,13 +36,11 @@ class CPolygon2D : public CShape2D {
   class PointIteratorState {
    public:
     PointIteratorState(const CPolygon2D *poly) :
-     poly_(poly), len_(poly->getNumPoints()), pos_(0), end_(false) {
+     poly_(poly), len_(poly->getNumPoints()), end_(false) {
       end_ = (pos_ >= len_);
     }
 
-    PointIteratorState() :
-     poly_(nullptr), len_(0), pos_(0), end_(true) {
-    }
+    PointIteratorState() { }
 
     void next() {
       assert(pos_ < len_);
@@ -67,12 +65,12 @@ class CPolygon2D : public CShape2D {
 
    private:
     const CPolygon2D *poly_ { nullptr };
-    int               len_ { 0 };
-    int               pos_ { 0 };
-    bool              end_ { true };
+    int               len_  { 0 };
+    int               pos_  { 0 };
+    bool              end_  { true };
   };
 
-  typedef CInputIterator<PointIteratorState, CPoint2D> PointIterator;
+  using PointIterator = CInputIterator<PointIteratorState, CPoint2D>;
 
   //------
 
@@ -81,13 +79,11 @@ class CPolygon2D : public CShape2D {
   class LineIteratorState {
    public:
     LineIteratorState(const CPolygon2D *poly) :
-     poly_(poly), len_(poly->getNumPoints()), pos_(0), end_(false) {
+     poly_(poly), len_(poly->getNumPoints()), end_(false) {
       end_ = (pos_ >= len_);
     }
 
-    LineIteratorState() :
-     poly_(nullptr), len_(0), pos_(0), end_(true) {
-    }
+    LineIteratorState() { }
 
     void next() {
       assert(pos_ < len_);
@@ -114,43 +110,44 @@ class CPolygon2D : public CShape2D {
     }
 
    private:
-    const CPolygon2D *poly_;
-    int               len_, pos_;
-    bool              end_;
+    const CPolygon2D *poly_ { nullptr };
+    int               len_  { 0 };
+    int               pos_  { 0 };
+    bool              end_  { true };
     mutable CLine2D   line_;
   };
 
-  typedef CInputIterator<LineIteratorState, CLine2D> LineIterator;
+  using LineIterator = CInputIterator<LineIteratorState, CLine2D>;
 
   //------
 
  public:
-  CPolygon2D() :
-   array_set_(false), x_(), y_() {
-  }
+  CPolygon2D() { }
 
   CPolygon2D(const CPolygon2D &rhs) :
-   CShape2D(rhs), points_(rhs.points_), array_set_(false), x_(), y_() {
+   CShape2D(rhs), points_(rhs.points_) {
   }
 
   CPolygon2D &operator=(const CPolygon2D &rhs) {
     points_ = rhs.points_;
 
-    array_set_ = false;
+    arraySet_ = false;
+
+    x_.clear();
+    y_.clear();
 
     return *this;
   }
 
   CPolygon2D(const PointList &points) :
-   points_(points), array_set_(false), x_(), y_() {
+   points_(points) {
   }
 
   CPolygon2D(const CPoint2D *points, uint num_points) :
-   points_(&points[0], &points[num_points]), array_set_(false), x_(), y_() {
+   points_(&points[0], &points[num_points]) {
   }
 
-  CPolygon2D(const double *x, const double *y, uint num_xy) :
-   points_(), array_set_(false), x_(), y_() {
+  CPolygon2D(const double *x, const double *y, uint num_xy) {
     for (uint i = 0; i < num_xy; ++i)
       points_.push_back(CPoint2D(x[i], y[i]));
   }
@@ -158,6 +155,10 @@ class CPolygon2D : public CShape2D {
  ~CPolygon2D() { }
 
   const PointList &getPoints() const { return points_; }
+
+  const CPoint2D *getPointsArray() const { return &points_[0]; }
+
+  bool isEmpty() const { return points_.empty(); }
 
   uint getNumPoints() const { return points_.size(); }
 
@@ -167,13 +168,8 @@ class CPolygon2D : public CShape2D {
   LineIterator getLinesBegin() const { return LineIterator(LineIteratorState(this)); }
   LineIterator getLinesEnd  () const { return LineIterator(); }
 
-  const CPoint2D &getPoint(uint i) const {
-    return points_[i];
-  }
-
-  CPoint2D &getPoint(uint i) {
-    return points_[i];
-  }
+  const CPoint2D &getPoint(uint i) const { return points_[i]; }
+  CPoint2D &getPoint(uint i) { return points_[i]; }
 
   void getPoint(uint i, double *x, double *y) const {
     *x = points_[i].x;
@@ -183,32 +179,32 @@ class CPolygon2D : public CShape2D {
   void clearPoints() {
     points_.clear();
 
-    array_set_ = false;
+    arraySet_ = false;
   }
 
   void setPoint(uint i, double x, double y) {
     points_[i] = CPoint2D(x, y);
 
-    array_set_ = false;
+    arraySet_ = false;
   }
 
   void setPoint(uint i, const CPoint2D &point) {
     points_[i] = point;
 
-    array_set_ = false;
+    arraySet_ = false;
   }
 
   void addPoint(const CPoint2D &point) {
     points_.push_back(point);
 
-    array_set_ = false;
+    arraySet_ = false;
   }
 
   CBBox2D getBBox() const {
     CBBox2D bbox;
 
-    typename PointList::const_iterator ps = points_.begin();
-    typename PointList::const_iterator pe = points_.end  ();
+    auto ps = points_.begin();
+    auto pe = points_.end  ();
 
     for ( ; ps != pe; ++ps)
       bbox.add(*ps);
@@ -222,8 +218,8 @@ class CPolygon2D : public CShape2D {
     double sx = bbox.getWidth () / obbox.getWidth ();
     double sy = bbox.getHeight() / obbox.getHeight();
 
-    typename PointList::iterator ps = points_.begin();
-    typename PointList::iterator pe = points_.end  ();
+    auto ps = points_.begin();
+    auto pe = points_.end  ();
 
     for ( ; ps != pe; ++ps) {
       CPoint2D &p = *ps;
@@ -232,7 +228,7 @@ class CPolygon2D : public CShape2D {
       p.y = sy*(p.y - obbox.getYMin()) + bbox.getYMin();
     }
 
-    array_set_ = false;
+    arraySet_ = false;
   }
 
   CPoint2D centroid() const {
@@ -295,13 +291,13 @@ class CPolygon2D : public CShape2D {
   }
 
   void moveBy(const CPoint2D &p) {
-    typename PointList::iterator ps = points_.begin();
-    typename PointList::iterator pe = points_.end  ();
+    auto ps = points_.begin();
+    auto pe = points_.end  ();
 
     for ( ; ps != pe; ++ps)
       *ps += p;
 
-    array_set_ = false;
+    arraySet_ = false;
   }
 
   void resizeBy(const CPoint2D &ll, const CPoint2D &ur) {
@@ -316,8 +312,8 @@ class CPolygon2D : public CShape2D {
     double sx = (w > 0 ? (w + dw) / w : 1);
     double sy = (h > 0 ? (h + dh) / h : 1);
 
-    typename PointList::iterator ps = points_.begin();
-    typename PointList::iterator pe = points_.end  ();
+    auto ps = points_.begin();
+    auto pe = points_.end  ();
 
     for ( ; ps != pe; ++ps) {
       CPoint2D &p = *ps;
@@ -326,17 +322,17 @@ class CPolygon2D : public CShape2D {
       p.y = sy*(p.y - bbox.getYMin()) + bbox.getYMin() + ll.y;
     }
 
-    array_set_ = false;
+    arraySet_ = false;
   }
 
   void rotateBy(double da, const CPoint2D &o) {
-    typename PointList::iterator ps = points_.begin();
-    typename PointList::iterator pe = points_.end  ();
+    auto ps = points_.begin();
+    auto pe = points_.end  ();
 
     for ( ; ps != pe; ++ps)
       *ps = CShape2D::rotatePoint(*ps, da, o);
 
-    array_set_ = false;
+    arraySet_ = false;
   }
 
   int orientation() const {
@@ -392,14 +388,14 @@ class CPolygon2D : public CShape2D {
   void triangulate(std::vector<CTriangle2D> &triangle_list) const {
     EarPointList ear_points;
 
-    typename PointList::const_iterator ps = points_.begin();
-    typename PointList::const_iterator pe = points_.end  ();
+    auto ps = points_.begin();
+    auto pe = points_.end  ();
 
     for ( ; ps != pe; ++ps)
       ear_points.push_back(EarPoint(*ps));
 
-    typename EarPointList::iterator eps = ear_points.begin();
-    typename EarPointList::iterator epe = ear_points.end  ();
+    auto eps = ear_points.begin();
+    auto epe = ear_points.end  ();
 
     typename EarPointList::iterator ep1, ep2, ep3, ep4, ep5;
 
@@ -470,7 +466,7 @@ class CPolygon2D : public CShape2D {
 
  private:
   void initArray() const {
-    if (array_set_) return;
+    if (arraySet_) return;
 
     uint n = points_.size();
 
@@ -485,7 +481,7 @@ class CPolygon2D : public CShape2D {
     for (uint i = 0; ps != pe; ++ps, ++i)
       (*ps).getXY(&x_[i], &y_[i]);
 
-    array_set_ = true;
+    arraySet_ = true;
   }
 
  private:
@@ -510,11 +506,11 @@ class CPolygon2D : public CShape2D {
   static bool isDiagonalInOut(const EarPointList &ear_points,
                               const typename EarPointList::const_iterator &epa,
                               const typename EarPointList::const_iterator &epb) {
-    typename EarPointList::const_iterator eps = ear_points.begin();
-    typename EarPointList::const_iterator epe = ear_points.end  ();
+    auto eps = ear_points.begin();
+    auto epe = ear_points.end  ();
 
-    typename EarPointList::const_iterator ep2 = eps;
-    typename EarPointList::const_iterator ep1 = ep2++;
+    auto ep2 = eps;
+    auto ep1 = ep2++;
 
     do {
       if (ep1 != epa && ep2 != epa && ep1 != epb && ep2 != epb) {
@@ -533,11 +529,11 @@ class CPolygon2D : public CShape2D {
   static bool inCone(const EarPointList &ear_points,
                      const typename EarPointList::const_iterator &ep1,
                      const typename EarPointList::const_iterator &epb) {
-    typename EarPointList::const_iterator eps = ear_points.begin();
-    typename EarPointList::const_iterator epe = ear_points.end();
+    auto eps = ear_points.begin();
+    auto epe = ear_points.end();
 
-    typename EarPointList::const_iterator ep0 = ep1; --ep0;
-    typename EarPointList::const_iterator ep2 = ep1; ++ep2;
+    auto ep0 = ep1; --ep0;
+    auto ep2 = ep1; ++ep2;
 
     if (ep0 == epe) ep0 = (++ear_points.rbegin()).base(); // last element
     if (ep2 == epe) ep2 = eps;
@@ -570,7 +566,7 @@ class CPolygon2D : public CShape2D {
  private:
   PointList points_;
 
-  mutable bool                array_set_ { false };
+  mutable bool                arraySet_ { false };
   mutable std::vector<double> x_, y_;
 };
 

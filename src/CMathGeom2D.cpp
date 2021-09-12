@@ -173,8 +173,8 @@ IntersectPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint
   if (num_points1 < 3 || num_points2 < 3)
     return false;
 
-  CPolygonOrientation orient1 = PolygonOrientation(points1);
-  CPolygonOrientation orient2 = PolygonOrientation(points2);
+  auto orient1 = PolygonOrientation(points1);
+  auto orient2 = PolygonOrientation(points2);
 
   // max number of intersection
   uint ni = num_points1*num_points2;
@@ -347,8 +347,8 @@ CutPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &p
   if (num_points1 < 3 || num_points2 < 3)
     return false;
 
-  CPolygonOrientation orient1 = PolygonOrientation(points1);
-  CPolygonOrientation orient2 = PolygonOrientation(points2);
+  auto orient1 = PolygonOrientation(points1);
+  auto orient2 = PolygonOrientation(points2);
 
   // max number of intersection
   uint ni = num_points1*num_points2;
@@ -477,8 +477,8 @@ CutPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &p
   uint num_opoints = opoints.size();
 
   while (num_opoints >= 2) {
-    CutPointArrayList::iterator p2 = opoints.begin();
-    CutPointArrayList::iterator p1 = p2++;
+    auto p2 = opoints.begin();
+    auto p1 = p2++;
 
     CutPointArray &opoints0 = *p1;
     CutPointArray &opoints1 = *p2;
@@ -597,8 +597,8 @@ AddPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &p
 
   // store polygon one in start point array
   // Note: if orients don't match we invert the first polygon's point order
-  CPolygonOrientation orient1 = PolygonOrientation(points1);
-  CPolygonOrientation orient2 = PolygonOrientation(points2);
+  auto orient1 = PolygonOrientation(points1);
+  auto orient2 = PolygonOrientation(points2);
 
   AddPointArray apoints1;
   AddPointArray apoints2;
@@ -890,35 +890,34 @@ bool
 CMathGeom2D::
 PointInsideConvex(const CPoint2D &point, const CPoint2D *points, uint num_points)
 {
-  CPolygonOrientation orient = PolygonOrientation(points, num_points);
-
-  if (orient == CPOLYGON_ORIENTATION_UNKNOWN) return false;
+  auto orient = PolygonOrientation(points, num_points);
+  if (orient == CPOLYGON_ORIENTATION_UNKNOWN) return false; // degenerate
 
   if (orient == CPOLYGON_ORIENTATION_ANTICLOCKWISE) {
+    // iterate forwards through polygon lines (i1 -> i2)
     int i1 = num_points - 1;
 
-    // iterate forwards through polygon lines (i1 -> i2)
     for (int i2 = 0; i2 < (int) num_points; i1 = i2++) {
       // test orientation of triangle made from point and
       // line matches polygon orientation
       double f = (points[i2].x - points[i1].x)*(point.y - points[i1].y) -
                  (points[i2].y - points[i1].y)*(point.x - points[i1].x);
 
-      if (f < 0)
+      if (f < 0.0)
         return false;
     }
   }
   else {
+    // iterate backwards through polygon lines (i1 -> i2)
     int i1 = 0;
 
-    // iterate backwards through polygon lines (i1 -> i2)
     for (int i2 = num_points - 1; i2 >= 0; i1 = i2--) {
       // test orientation of triangle made from point and
       // line matches polygon orientation
       double f = (points[i2].x - points[i1].x)*(point.y - points[i1].y) -
                  (points[i2].y - points[i1].y)*(point.x - points[i1].x);
 
-      if (f < 0)
+      if (f < 0.0)
         return false;
     }
   }
@@ -941,33 +940,32 @@ bool
 CMathGeom2D::
 PointInsideConvex(double x, double y, const double *px, const double *py, uint np)
 {
-  CPolygonOrientation orient = PolygonOrientation(px, py, np);
-
-  if (orient == CPOLYGON_ORIENTATION_UNKNOWN) return false;
+  auto orient = PolygonOrientation(px, py, np);
+  if (orient == CPOLYGON_ORIENTATION_UNKNOWN) return false; // degenerate
 
   if (orient == CPOLYGON_ORIENTATION_ANTICLOCKWISE) {
+    // iterate forwards through polygon lines (i1 -> i2)
     int i1 = np - 1;
 
-    // iterate forwards through polygon lines (i1 -> i2)
     for (int i2 = 0; i2 < (int) np; i1 = i2++) {
       // test orientation of triangle made from point and
       // line matches polygon orientation
       double f = (px[i2] - px[i1])*(y - py[i1]) - (py[i2] - py[i1])*(x - px[i1]);
 
-      if (f < 0)
+      if (f < 0.0)
         return false;
     }
   }
   else {
+    // iterate backwards through polygon lines (i1 -> i2)
     int i1 = 0;
 
-    // iterate backwards through polygon lines (i1 -> i2)
     for (int i2 = np - 1; i2 >= 0; i1 = i2--) {
       // test orientation of triangle made from point and
       // line matches polygon orientation
       double f = (px[i2] - px[i1])*(y - py[i1]) - (py[i2] - py[i1])*(x - px[i1]);
 
-      if (f < 0)
+      if (f < 0.0)
         return false;
     }
   }
@@ -991,8 +989,6 @@ bool
 CMathGeom2D::
 PointInsideEvenOdd(const CPoint2D &point, const CPoint2D *points, uint num_points)
 {
-  double xinters;
-
   int counter = 0;
 
   int             i2     = num_points - 1;
@@ -1000,7 +996,7 @@ PointInsideEvenOdd(const CPoint2D &point, const CPoint2D *points, uint num_point
 
   // iterate through all lines of the polygon
   for (int i1 = 0; i1 < (int) num_points; ++i1) {
-    const CPoint2D *point1 = &points[i1];
+    const auto *point1 = &points[i1];
 
     // intersect current line with horizontal line at inside point
     if (point.y > std::min(point1->y, point2->y)) {
@@ -1008,8 +1004,8 @@ PointInsideEvenOdd(const CPoint2D &point, const CPoint2D *points, uint num_point
         if (point.x <= std::max(point1->x, point2->x)) {
           if (point1->y != point2->y) {
             // if we have an intersection, increase count
-            xinters = (point.y   - point1->y)*(point2->x - point1->x)/
-                      (point2->y - point1->y) + point1->x;
+            double xinters = (point.y   - point1->y)*(point2->x - point1->x)/
+                             (point2->y - point1->y) + point1->x;
 
             if (point1->x == point2->x || point.x <= xinters)
               ++counter;
@@ -1045,15 +1041,15 @@ bool
 CMathGeom2D::
 PointInsideEvenOdd(double x, double y, const double *xp, const double *yp, uint np)
 {
-  double xinters, x1, y1, x2, y2;
-
   int counter = 0;
 
   int i2 = np - 1;
 
-  x2 = xp[i2]; y2 = yp[i2];
+  double x2 = xp[i2], y2 = yp[i2];
 
   // iterate through all lines of the polygon
+  double x1, y1;
+
   for (int i1 = 0; i1 < (int) np; i2 = i1++, x2 = x1, y2 = y1) {
     x1 = xp[i1]; y1 = yp[i1];
 
@@ -1063,7 +1059,7 @@ PointInsideEvenOdd(double x, double y, const double *xp, const double *yp, uint 
         if (x <= std::max(x1, x2)) {
           if (y1 != y2) {
             // if we have an intersection, increase count
-            xinters = (y - y1)*(x2 - x1)/(y2 - y1) + x1;
+            double xinters = (y - y1)*(x2 - x1)/(y2 - y1) + x1;
 
             if (x1 == x2 || x <= xinters)
               ++counter;
@@ -1089,22 +1085,22 @@ PointInside1(double x, double y, double *xp, double *yp, uint np)
 
   int i2 = np - 1;
 
-  double dx, dy;
-
-  x2 = xp[i2]; y2 = yp[i2];
+  double x2 = xp[i2], y2 = yp[i2];
 
   // iterate through all lines of the polygon
+  double x1, y1;
+
   for (int i1 = 0; i1 < (int) np; i2 = i1++, x2 = x1, y2 = y1) {
     x1 = xp[i1]; y1 = yp[i1];
 
     // intersect current line with horizontal line at inside point
     if (((y1 <= y) && (y < y2)) || ((y2 <= y) && (y < y1))) {
-      dy = y2 - y1;
+      double dy = y2 - y1;
 
       if (fabs(dy) < EPSILON_E6)
         continue;
 
-      dx = x2 - x1;
+      double dx = x2 - x1;
 
       // if we have an intersection, flip bit
       if ((x < dx*(y - y1)/dy + x1))
@@ -1131,19 +1127,17 @@ bool
 CMathGeom2D::
 PointInsideByAngle(double x, double y, const double *xp, const double *yp, uint np)
 {
-  double x1, y1, x2, y2;
-
-  double angle = 0;
+  double angle = 0.0;
 
   int i = np - 1;
 
   // iterate through all lines of the polygon
   for (int j = 0; j < (int) np; i = j++) {
     // add angle between two vectors from point to ends of line
-    x1 = xp[i] - x;
-    y1 = yp[i] - y;
-    x2 = xp[j] - x;
-    y2 = yp[j] - y;
+    double x1 = xp[i] - x;
+    double y1 = yp[i] - y;
+    double x2 = xp[j] - x;
+    double y2 = yp[j] - y;
 
     angle += IncludedAngle(x1, y1, x2, y2);
   }
@@ -1168,19 +1162,17 @@ bool
 CMathGeom2D::
 PointInsideByAngle(const CPoint2D &point, const CPoint2D *points, uint num_points)
 {
-  double x1, y1, x2, y2;
-
-  double angle = 0;
+  double angle = 0.0;
 
   int i = num_points - 1;
 
   // iterate through all lines of the polygon
   for (int j = 0; j < (int) num_points; i = j++) {
     // add angle between two vectors from point to ends of line
-    x1 = points[i].x - point.x;
-    y1 = points[i].y - point.y;
-    x2 = points[j].x - point.x;
-    y2 = points[j].y - point.y;
+    double x1 = points[i].x - point.x;
+    double y1 = points[i].y - point.y;
+    double x2 = points[j].x - point.x;
+    double y2 = points[j].y - point.y;
 
     angle += IncludedAngle(x1, y1, x2, y2);
   }
@@ -1198,11 +1190,42 @@ bool
 CMathGeom2D::
 PointInsideConvex1(double x, double y, const double *xp, const double *yp, uint np)
 {
-  CPolygonOrientation orient = PolygonOrientation(xp, yp, np);
+  auto orient = PolygonOrientation(xp, yp, np);
+  if (orient == CPOLYGON_ORIENTATION_UNKNOWN) return false; // degenerate
 
   double d = (y - yp[0])*(xp[1] - xp[0]) - (x - xp[0])*(yp[1] - yp[0]);
 
   return ((d < 0 && orient < 0) || (d > 0 && orient > 0)); // TODO: test
+}
+
+//-------
+
+// winding number test for a point in a polygon
+bool
+CMathGeom2D::
+PointInsideWinding(const CPoint2D &p, const CPoint2D *points, uint num_points)
+{
+  auto isLeft = [&](const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p3) {
+    return int((p2.x - p1.x)*(p3.y - p1.y) - (p3.x - p1.x)*(p2.y - p1.y));
+  };
+
+  int wn = 0; // the winding number counter (=0 only when p is outside)
+
+  // loop through all edges of the polygon
+  for (uint i = 0; i < num_points; ++i) {   // edge from points[i] to  points[i+1]
+    if (points[i].y <= p.y) {  // start y <= p.y
+      if (points[i + 1].y > p.y) // an upward crossing
+        if (isLeft(points[i], points[i + 1], p) > 0) // p left of edge
+          ++wn; // have a valid up intersect
+    }
+    else {                     // start y > p.y (no test needed)
+      if (points[i + 1].y <= p.y) // a downward crossing
+        if (isLeft(points[i], points[i + 1], p) < 0) // p right of edge
+          --wn; // have a valid down intersect
+    }
+  }
+
+  return (wn != 0);
 }
 
 //-------
@@ -1268,8 +1291,8 @@ ArcThrough(double x1, double y1, double x2, double y2, double x3, double y3, dou
   if (s1 == 0.0 || s2 == 0.0)
     return false;
 
-  double d1 = sqrt(s1);
-  double d2 = sqrt(s2);
+  double d1 = std::sqrt(s1);
+  double d2 = std::sqrt(s2);
 
   double cs = fabs((s1 + s2 - s3)/(2.0*d1*d2));
 
@@ -1324,8 +1347,8 @@ ConvertFromSVGArc(double x1, double y1, double x2, double y2, double phi, double
 
   double phi1 = CMathGen::DegToRad(phi);
 
-  double c = cos(phi1);
-  double s = sin(phi1);
+  double c = std::cos(phi1);
+  double s = std::sin(phi1);
 
   double xx =  c*dx2 + s*dy2;
   double yy = -s*dx2 + c*dy2;
@@ -1341,7 +1364,7 @@ ConvertFromSVGArc(double x1, double y1, double x2, double y2, double phi, double
   double rc = xx2/rx2 + yy2/ry2;
 
   if (rc > 1) {
-    double rc2 = sqrt(rc);
+    double rc2 = std::sqrt(rc);
 
     rx *= rc2;
     ry *= rc2;
@@ -1358,7 +1381,7 @@ ConvertFromSVGArc(double x1, double y1, double x2, double y2, double phi, double
 
   sq = (sq < 0) ? 0 : sq;
 
-  double coef = sign*sqrt(sq);
+  double coef = sign*std::sqrt(sq);
 
   double cx1 =  coef*((rx*yy)/ry);
   double cy1 = -coef*((ry*xx)/rx);
@@ -1394,7 +1417,7 @@ ConvertFromSVGArc(double x1, double y1, double x2, double y2, double phi, double
   while (*theta < -360)
     *theta += 360;
 
-  mod_u = sqrt((ux*ux + uy*uy) * (vx*vx + vy*vy));
+  mod_u = std::sqrt((ux*ux + uy*uy) * (vx*vx + vy*vy));
   mod_v = ux*vx + uy*vy;
 
   sign = ((ux*vy - uy*vx) < 0) ? -1 : 1;
@@ -1430,11 +1453,11 @@ ConvertToSVGArc(double cx, double cy, double rx, double ry, double theta, double
 
   // Figure out the coordinates of the beginning and ending points
 
-  *x0 = cx + cos(phi_r) * rx * cos(theta1) + sin(-phi_r) * ry * sin(theta1);
-  *y0 = cy + sin(phi_r) * rx * cos(theta1) + cos( phi_r) * ry * sin(theta1);
+  *x0 = cx + std::cos(phi_r)*rx*std::cos(theta1) + std::sin(-phi_r)*ry*std::sin(theta1);
+  *y0 = cy + std::sin(phi_r)*rx*std::cos(theta1) + std::cos( phi_r)*ry*std::sin(theta1);
 
-  *x1 = cx + cos(phi_r) * rx * cos(theta2) + sin(-phi_r) * ry * sin(theta2);
-  *y1 = cy + sin(phi_r) * rx * cos(theta2) + cos( phi_r) * ry * sin(theta2);
+  *x1 = cx + std::cos(phi_r)*rx*std::cos(theta2) + std::sin(-phi_r)*ry*std::sin(theta2);
+  *y1 = cy + std::sin(phi_r)*rx*std::cos(theta2) + std::cos( phi_r)*ry*std::sin(theta2);
 
   *fa = (delta > 180) ? 1 : 0;
   *fs = (delta > 0  ) ? 1 : 0;
@@ -1582,8 +1605,7 @@ PolygonOrientation(const double *x, const double *y, uint num_xy)
   int i = 2;
 
   while (i < (int) num_xy) {
-    CPolygonOrientation orient =
-      PolygonOrientation(x[i - 2], y[i - 2], x[i - 1], y[i - 1], x[i], y[i]);
+    auto orient = PolygonOrientation(x[i - 2], y[i - 2], x[i - 1], y[i - 1], x[i], y[i]);
 
     if (orient != CPOLYGON_ORIENTATION_UNKNOWN)
       return orient;
@@ -1602,8 +1624,7 @@ PolygonOrientation(const int *x, const int *y, uint num_xy)
   int i = 2;
 
   while (i < (int) num_xy) {
-    CPolygonOrientation orient =
-      PolygonOrientation(x[i - 2], y[i - 2], x[i - 1], y[i - 1], x[i], y[i]);
+    auto orient = PolygonOrientation(x[i - 2], y[i - 2], x[i - 1], y[i - 1], x[i], y[i]);
 
     if (orient != CPOLYGON_ORIENTATION_UNKNOWN)
       return orient;
@@ -1622,7 +1643,7 @@ PolygonOrientation(const CPoint2D *points, uint num_points)
   int i = 2;
 
   while (i < (int) num_points) {
-    CPolygonOrientation orient = PolygonOrientation(points[i - 2], points[i - 1], points[i]);
+    auto orient = PolygonOrientation(points[i - 2], points[i - 1], points[i]);
 
     if (orient != CPOLYGON_ORIENTATION_UNKNOWN)
       return orient;
@@ -1643,7 +1664,7 @@ PolygonOrientation(const std::vector<CPoint2D> &points)
   uint num_points = points.size();
 
   while (i < (int) num_points) {
-    CPolygonOrientation orient = PolygonOrientation(points[i - 2], points[i - 1], points[i]);
+    auto orient = PolygonOrientation(points[i - 2], points[i - 1], points[i]);
 
     if (orient != CPOLYGON_ORIENTATION_UNKNOWN)
       return orient;
@@ -1659,6 +1680,7 @@ CPolygonOrientation
 CMathGeom2D::
 PolygonOrientation(double x1, double y1, double x2, double y2, double x3, double y3)
 {
+  // same as CMathGen::sign(TriangleArea2(x1, y1, x2, y2, x3, y3))
   double dx1 = x2 - x1;
   double dy1 = y2 - y1;
 
@@ -1834,6 +1856,7 @@ double
 CMathGeom2D::
 PolygonArea(double x1, double y1, double x2, double y2, double x3, double y3)
 {
+  // TODO: return signed value
   return fabs(0.5*TriangleArea2(x1, y1, x2, y2, x3, y3));
 }
 
@@ -1893,6 +1916,8 @@ double
 CMathGeom2D::
 PolygonArea2(const double *x, const double *y, uint num_xy)
 {
+  assert(num_xy > 2);
+
   double area = 0.0;
 
   int i1 = num_xy - 1;
@@ -1909,6 +1934,8 @@ double
 CMathGeom2D::
 PolygonArea2(const int *x, const int *y, uint num_xy)
 {
+  assert(num_xy > 2);
+
   double area = 0.0;
 
   int i1 = num_xy - 1;
@@ -1961,12 +1988,12 @@ PolygonArea2(const std::list<CPoint2D> &points)
 {
   double area = 0.0;
 
-  std::list<CPoint2D>::const_iterator ps = points.begin();
-  std::list<CPoint2D>::const_iterator pe = points.end();
+  auto ps = points.begin();
+  auto pe = points.end();
 
-  std::list<CPoint2D>::const_iterator p3 = ps;
-  std::list<CPoint2D>::const_iterator p1 = p3++;
-  std::list<CPoint2D>::const_iterator p2 = p3++;
+  auto p3 = ps;
+  auto p1 = p3++;
+  auto p2 = p3++;
 
   while (p1 != pe) {
     area += TriangleArea2(*p1, *p2, *p3);
@@ -2107,8 +2134,8 @@ IncludedAngle(double x1, double y1, double x2, double y2, double x3, double y3)
   if (s1 == 0.0 || s2 == 0.0)
     return 0.0;
 
-  double d1 = sqrt(s1);
-  double d2 = sqrt(s2);
+  double d1 = std::sqrt(s1);
+  double d2 = std::sqrt(s2);
 
   double s3 = (x3 - x1)*(x3 - x1) + (y3 - y1)*(y3 - y1);
 
@@ -2132,8 +2159,8 @@ IncludedAngle(const CPoint2D &point1, const CPoint2D &point2, const CPoint2D &po
   if (s1 == 0.0 || s2 == 0.0)
     return 0.0;
 
-  double d1 = sqrt(s1);
-  double d2 = sqrt(s2);
+  double d1 = std::sqrt(s1);
+  double d2 = std::sqrt(s2);
 
   double s3 = (point3.x - point1.x)*(point3.x - point1.x) +
               (point3.y - point1.y)*(point3.y - point1.y);
@@ -2461,39 +2488,48 @@ getClipZone(double x, double y, double xmin, double ymin, double xmax, double ym
 
 //-------
 
+// TODO: support line (infinite) or segment (bounded)
 bool
 CMathGeom2D::
 PointLineDistance(const CPoint2D &point, const CLine2D &line, double *dist)
 {
   CVector2D pl(line.start(), point);
 
-  CVector2D l = line.vector();
+  auto l = line.vector();
 
   double u1 = pl.dotProduct(l);
-  double u2 = l .lengthSqr();
+  double u2 = l .lengthSqr(); // l.dotProduct(l)
 
-  if (u2 <= 0.0) {
-    *dist = PointPointDistance(point, line.start());
-    return false;
+  if (line.isSegment()) {
+    if (u2 <= 0.0) {
+      *dist = PointPointDistance(point, line.start());
+      return false;
+    }
+  }
+  else {
+    if (u2 == 0.0)
+      return 0.0;
   }
 
   double u = u1/u2;
 
-  if      (u < 0.0) {
-    *dist = PointPointDistance(point, line.start());
-    return false;
-  }
-  else if (u > 1.0) {
-    *dist = PointPointDistance(point, line.end());
-    return false;
-  }
-  else {
-    CPoint2D intersection = line.start() + u*l;
+  if (line.isSegment()) {
+    if (u < 0.0) {
+      *dist = PointPointDistance(point, line.start());
+      return false;
+    }
 
-    *dist = PointPointDistance(point, intersection);
-
-    return true;
+    if (u > 1.0) {
+      *dist = PointPointDistance(point, line.end());
+      return false;
+    }
   }
+
+  auto intersection = line.start() + u*l;
+
+  *dist = PointPointDistance(point, intersection);
+
+  return true;
 }
 
 //-------
@@ -2515,15 +2551,16 @@ double
 CMathGeom2D::
 Hypot(double a, double b)
 {
+  // same as hypot() ?
   double r;
 
   if      (fabs(a) > fabs(b)) {
     r = b/a;
-    r = fabs(a)*sqrt(1 + r*r);
+    r = fabs(a)*std::sqrt(1 + r*r);
   }
   else if (b != 0) {
     r = a/b;
-    r = fabs(b)*sqrt(1 + r*r);
+    r = fabs(b)*std::sqrt(1 + r*r);
   }
   else {
     r = 0.0;
@@ -2566,7 +2603,7 @@ SlicePolygonByLines(const std::vector<CPoint2D> &poly, const CLine2D &line,
   for (int i2 = 0; i2 < (int) num_points; i1 = i2, ++i2) {
     tpoints2[tind].push_back(SlicePoint(SlicePoint::NORMAL, poly[i1]));
 
-    std::map<uint,CPoint2D>::const_iterator p = ipoints.find(i2);
+    auto p = ipoints.find(i2);
 
     if (p != ipoints.end()) {
       tpoints2[tind].push_back(SlicePoint(SlicePoint::INTERSECT, (*p).second));
@@ -2690,6 +2727,40 @@ PolygonLineIntersect(const double *x, const double *y, uint nxy,
   return (*num_i > 0);
 }
 
+int
+CMathGeom2D::
+NearestPolygonPointToLine(const std::vector<CPoint2D> &points, const CLine2D &line)
+{
+  // Get coefficients of the implicit line equation.
+  // Do NOT normalize since scaling by a constant
+  // is irrelevant for just comparing distances.
+  double a = line.start().y - line.end  ().y;
+  double b = line.end  ().x - line.start().x;
+  double c = line.start().x*line.end().y - line.end().x*line.start().y;
+
+  // initialize min index and distance to points[0]
+  int    mi  = 0;
+  double min = a*points[0].x + b*points[0].y + c;
+  if (min < 0) min = -min; // absolute value
+
+  // loop through Point array testing for min distance to line
+  int n = points.size();
+
+  for (int i = 1; i < n; ++i) {
+    // just use dist squared (sqrt not needed for comparison)
+    double dist = a*points[i].x + b*points[i].y + c;
+
+    if (dist < 0) dist = -dist; // absolute value
+
+    if (dist < min) {  // this point is closer
+      mi  = i;         // so have a new minimum
+      min = dist;
+    }
+  }
+
+  return mi;     // the index of the closest  Point points[mi]
+}
+
 //-------
 
 //! intersection between circle and line
@@ -2731,7 +2802,7 @@ CircleLineIntersect(double xc, double yc, double r, double x1, double y1, double
   if (dis != 0) {
     double sdy = (dy < 0.0 ? -1.0 : 1.0);
 
-    dis = sqrt(dis);
+    dis = std::sqrt(dis);
 
     double dd_idr2 = dd*idr2;
 
@@ -2903,7 +2974,7 @@ CircleCircleIntersect(double x1, double y1, double r1, double x2, double y2, dou
   double dx = x2 - x1;
   double dy = y2 - y1;
 
-  double d = sqrt(dx*dx + dy*dy);
+  double d = std::sqrt(dx*dx + dy*dy);
 
   double sr12 = r1 + r2;
   double dr12 = fabs(r1 - r2);
@@ -2920,7 +2991,7 @@ CircleCircleIntersect(double x1, double y1, double r1, double x2, double y2, dou
   double a = (r1*r1 - r2*r2 + d*d)/(2.0*d);
 
   // calc distance from point 3 to either intersection points
-  double h = sqrt(r1*r1 - a*a);
+  double h = std::sqrt(r1*r1 - a*a);
 
   // calc the coordinates of point 3
   double x3 = x1 + a*dx/d;
@@ -3180,8 +3251,8 @@ CPoint2D
 CMathGeom2D::
 RotatePoint(const CPoint2D &point, double angle, const CPoint2D &o)
 {
-  double s = sin(angle);
-  double c = cos(angle);
+  double s = std::sin(angle);
+  double c = std::cos(angle);
 
   double x1 = point.x - o.x;
   double y1 = point.y - o.y;
@@ -3235,8 +3306,8 @@ void
 CMathGeom2D::
 EllipsePointAtAngle(double cx, double cy, double xr, double yr, double a, double *x, double *y)
 {
-  double c = cos(a);
-  double s = sin(a);
+  double c = std::cos(a);
+  double s = std::sin(a);
 
   // intersect line (0,0)->(c,s) with ellipse center (0,0), radius (xr,yr)
 
@@ -3678,7 +3749,7 @@ MitreLineJoinToPolygon(const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p
 
   double theta = IncludedAngle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 
-  double s = sin(theta/2.0);
+  double s = std::sin(theta/2.0);
 
   if (s == 0.0 || 1.0/s > mitre_limit)
     return BevelLineJoinToPolygon(p1, p2, p3, points);
@@ -3783,8 +3854,8 @@ void
 CMathGeom2D::
 AddWidthToPoint(const CPoint2D &p, double g, double line_width, CPoint2D &p1, CPoint2D &p2)
 {
-  double dx = line_width*sin(g)/2.0;
-  double dy = line_width*cos(g)/2.0;
+  double dx = line_width*std::sin(g)/2.0;
+  double dy = line_width*std::cos(g)/2.0;
 
   p1.x = p.x + dx;
   p1.y = p.y - dy;

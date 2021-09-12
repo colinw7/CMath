@@ -102,6 +102,8 @@ namespace CMathGeom2D {
 
   bool PointInsideConvex1(double x, double y, const double *xp, const double *yp, uint np);
 
+  bool PointInsideWinding(const CPoint2D &point, const CPoint2D *points, uint num_points);
+
   bool PointInsideRect(double x, double y, double xmin, double ymin, double xmax, double ymax);
   bool PointInsideRect(const CPoint2D &point, const CBBox2D &rect);
 
@@ -134,10 +136,12 @@ namespace CMathGeom2D {
                      const CPoint2D &line2s, const CPoint2D &line2e,
                      CPoint2D *point, double *mu1=nullptr, double *mu2=nullptr);
 
+  // get orientation of 2D polygon
   CPolygonOrientation PolygonOrientation(const double *x, const double *y, uint num_xy);
   CPolygonOrientation PolygonOrientation(const int *x, const int *y, uint num_xy);
   CPolygonOrientation PolygonOrientation(const CPoint2D *points, uint num_points);
   CPolygonOrientation PolygonOrientation(const std::vector<CPoint2D> &points);
+  // get orientation of 2D triangle
   CPolygonOrientation PolygonOrientation(double x1, double y1, double x2, double y2,
                                          double x3, double y3);
   CPolygonOrientation PolygonOrientation(const CPoint2D &point1, const CPoint2D &point2,
@@ -146,6 +150,7 @@ namespace CMathGeom2D {
   bool PolygonIsConvex(const double *x, const double *y, int num_xy);
   bool PolygonIsConvex(const int *x, const int *y, int num_xy);
 
+  // polygon area
   double PolygonArea(double x1, double y1, double x2, double y2, double x3, double y3);
   double PolygonArea(double x1, double y1, double x2, double y2,
                      double x3, double y3, double x4, double y4);
@@ -154,6 +159,7 @@ namespace CMathGeom2D {
   double PolygonArea(const CPoint2D *points, uint num_points);
   double PolygonArea(const std::vector<CPoint2D> &points);
 
+  // polygon area (x2)
   double PolygonArea2(double x1, double y1, double x2, double y2,
                       double x3, double y3, double x4, double y4);
   double PolygonArea2(const double *x, const double *y, uint num_xy);
@@ -162,6 +168,7 @@ namespace CMathGeom2D {
   double PolygonArea2(const std::vector<CPoint2D> &points);
   double PolygonArea2(const std::list<CPoint2D> &points);
 
+  // triangle area
   double TriangleArea(const CPoint2D &point1, const CPoint2D &point2, const CPoint2D &point3);
   double TriangleArea(double x1, double y1, double x2, double y2, double x3, double y3);
   double TriangleArea2(const CPoint2D &point1, const CPoint2D &point2, const CPoint2D &point3);
@@ -202,10 +209,15 @@ namespace CMathGeom2D {
   PointPosition PointLinePosition(const CPoint2D &lpoint1, const CPoint2D &lpoint2,
                                   const CPoint2D &point);
 
-  bool PointLineLeft   (const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
-  bool PointLineRight  (const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
-  bool PointLineOn     (const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
-  bool PointLineLeftOn (const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
+  // test if point is left of infinite 2d line
+  bool PointLineLeft(const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
+  // test if point is right of infinite 2d line
+  bool PointLineRight(const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
+  // test if point is on of infinite 2d line
+  bool PointLineOn(const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
+  // test if point is left or on infinite 2d line
+  bool PointLineLeftOn(const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
+  // test if point is right or on infinite 2d line
   bool PointLineRightOn(const CPoint2D &lpoint1, const CPoint2D &lpoint2, const CPoint2D &point);
 
   bool Collinear(const CPoint2D &point1, const CPoint2D &point2, const CPoint2D &point3);
@@ -258,6 +270,9 @@ namespace CMathGeom2D {
 
   bool PolygonLineIntersect(const std::vector<CPoint2D> &points, const CLine2D &line,
                             std::map<uint,CPoint2D> &ipoints);
+
+  // nearest polygon point to line
+  int NearestPolygonPointToLine(const std::vector<CPoint2D> &points, const CLine2D &line);
 
   bool SlicePolygonByLines(const std::vector<CPoint2D> &poly, const CLine2D &line,
                            std::vector< std::vector<CPoint2D> > &opolys);
