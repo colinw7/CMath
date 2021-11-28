@@ -22,20 +22,11 @@ class CMatrix3D {
 
  public:
   // constructor/destructor
-  CMatrix3D() :
-   m00_(0), m01_(0), m02_(0), m03_(0),
-   m10_(0), m11_(0), m12_(0), m13_(0),
-   m20_(0), m21_(0), m22_(0), m23_(0),
-   m30_(0), m31_(0), m32_(0), m33_(0) {
-  }
+  CMatrix3D() { }
 
  ~CMatrix3D() { }
 
-  explicit CMatrix3D(Type type) :
-   m00_(0), m01_(0), m02_(0), m03_(0),
-   m10_(0), m11_(0), m12_(0), m13_(0),
-   m20_(0), m21_(0), m22_(0), m23_(0),
-   m30_(0), m31_(0), m32_(0), m33_(0) {
+  explicit CMatrix3D(Type type) {
     if (type == Type::IDENTITY)
       setIdentity();
     else
@@ -45,10 +36,9 @@ class CMatrix3D {
   CMatrix3D(double m00, double m01, double m02,
             double m10, double m11, double m12,
             double m20, double m21, double m22) :
-   m00_(m00), m01_(m01), m02_(m02), m03_(0),
-   m10_(m10), m11_(m11), m12_(m12), m13_(0),
-   m20_(m20), m21_(m21), m22_(m22), m23_(0),
-   m30_(0  ), m31_(0  ), m32_(0  ), m33_(0) {
+   m00_(m00), m01_(m01), m02_(m02),
+   m10_(m10), m11_(m11), m12_(m12),
+   m20_(m20), m21_(m21), m22_(m22) {
     setOuterIdentity();
   }
 
@@ -57,8 +47,7 @@ class CMatrix3D {
             double m20, double m21, double m22, double tx, double ty, double tz) :
    m00_(m00), m01_(m01), m02_(m02), m03_(tx),
    m10_(m10), m11_(m11), m12_(m12), m13_(ty),
-   m20_(m20), m21_(m21), m22_(m22), m23_(tz),
-   m30_(0  ), m31_(0  ), m32_(0  ), m33_(0 ) {
+   m20_(m20), m21_(m21), m22_(m22), m23_(tz) {
     setBottomIdentity();
   }
 
@@ -72,11 +61,7 @@ class CMatrix3D {
    m30_(m30), m31_(m31), m32_(m32), m33_(m33) {
   }
 
-  CMatrix3D(const double *m, uint n) :
-   m00_(0), m01_(0), m02_(0), m03_(0),
-   m10_(0), m11_(0), m12_(0), m13_(0),
-   m20_(0), m21_(0), m22_(0), m23_(0),
-   m30_(0), m31_(0), m32_(0), m33_(0) {
+  CMatrix3D(const double *m, uint n) {
     if      (n == 9) {
       setValues(m[ 0], m[ 1], m[ 2],
                 m[ 3], m[ 4], m[ 5],
@@ -102,15 +87,14 @@ class CMatrix3D {
   }
 
   CMatrix3D(const CVector3D &v0, const CVector3D &v1, const CVector3D &v2) :
-   m00_(v0.getX()), m01_(v1.getX()), m02_(v2.getX()), m03_(0),
-   m10_(v0.getY()), m11_(v1.getY()), m12_(v2.getY()), m13_(0),
-   m20_(v0.getZ()), m21_(v1.getZ()), m22_(v2.getZ()), m23_(0),
-   m30_(0        ), m31_(0        ), m32_(0        ), m33_(0) {
+   m00_(v0.getX()), m01_(v1.getX()), m02_(v2.getX()),
+   m10_(v0.getY()), m11_(v1.getY()), m12_(v2.getY()),
+   m20_(v0.getZ()), m21_(v1.getZ()), m22_(v2.getZ()) {
     setOuterIdentity();
   }
 
   CMatrix3D(CMathGen::AxisType3D axis, double angle,
-             CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
+            CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     setRotation(axis, angle, handedness);
   }
 
@@ -121,11 +105,7 @@ class CMatrix3D {
   //------
 
   // copy operations
-  CMatrix3D(const CMatrix3D &a) :
-   m00_(0), m01_(0), m02_(0), m03_(0),
-   m10_(0), m11_(0), m12_(0), m13_(0),
-   m20_(0), m21_(0), m22_(0), m23_(0),
-   m30_(0), m31_(0), m32_(0), m33_(0) {
+  CMatrix3D(const CMatrix3D &a) {
     memcpy(&m00_, &a.m00_, 16*sizeof(double));
   }
 
@@ -327,7 +307,7 @@ class CMatrix3D {
   }
 
   static CMatrix3D rotation(CMathGen::AxisType3D axis, double angle,
-                             CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
+                            CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     CMatrix3D m;
 
     m.setRotation(axis, angle, handedness);
@@ -1316,10 +1296,10 @@ class CMatrix3D {
   }
 
  private:
-  double m00_ { 0 }, m01_ { 0 }, m02_ { 0 }, m03_ { 0 };
-  double m10_ { 0 }, m11_ { 0 }, m12_ { 0 }, m13_ { 0 };
-  double m20_ { 0 }, m21_ { 0 }, m22_ { 0 }, m23_ { 0 };
-  double m30_ { 0 }, m31_ { 0 }, m32_ { 0 }, m33_ { 0 };
+  double m00_ { 0.0 }, m01_ { 0.0 }, m02_ { 0.0 }, m03_ { 0.0 };
+  double m10_ { 0.0 }, m11_ { 0.0 }, m12_ { 0.0 }, m13_ { 0.0 };
+  double m20_ { 0.0 }, m21_ { 0.0 }, m22_ { 0.0 }, m23_ { 0.0 };
+  double m30_ { 0.0 }, m31_ { 0.0 }, m32_ { 0.0 }, m33_ { 0.0 };
 };
 
 #endif

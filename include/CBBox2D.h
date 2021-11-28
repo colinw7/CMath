@@ -43,6 +43,8 @@ class CBBox2D {
   bool isSet() const { return set_; }
   void reset() { set_ = false; }
 
+  bool isValid() { return isSet(); } // TODO: check size non-zero
+
   //---
 
   // add point (expands range)
@@ -98,6 +100,18 @@ class CBBox2D {
       pmax_.x = std::max(pmax_.x, bbox.pmax_.x);
       pmax_.y = std::max(pmax_.y, bbox.pmax_.y);
     }
+  }
+
+  //---
+
+  void scale(double xf, double yf) {
+    double w = getWidth ()*xf;
+    double h = getHeight()*yf;
+
+    CBBox2D rect(getXMin(), getYMin(), getXMin() + w, getYMin() + h);
+
+    pmin_ = rect.getLL();
+    pmax_ = rect.getUR();
   }
 
   //---
@@ -263,7 +277,7 @@ class CBBox2D {
 
   // get perimeter
   double perimeter() const {
-    return 2*getWidth() + 2*getHeight();
+    return 2.0*getWidth() + 2.0*getHeight();
   }
 
   // get max direction
