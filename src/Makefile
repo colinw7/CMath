@@ -16,6 +16,7 @@ all: dirs $(LIB_DIR)/libCMath.a
 
 dirs:
 	@if [ ! -e ../obj ]; then mkdir ../obj; fi
+	@if [ ! -e ../lib ]; then mkdir ../lib; fi
 	@if [ ! -e ../bin ]; then mkdir ../bin; fi
 
 CPP_SRC = \
