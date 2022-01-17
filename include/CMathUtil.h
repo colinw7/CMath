@@ -4,6 +4,7 @@
 #include <COSNaN.h>
 #include <string>
 #include <cmath>
+#include <cassert>
 
 namespace CMathUtil {
 
@@ -71,6 +72,14 @@ inline double lerp(double x, double low, double high) {
 // map value in range low1->high2 to low2->high2
 inline double map(double value, double low1, double high1, double low2, double high2) {
   return lerp(norm(value, low1, high1), low2, high2);
+}
+
+inline double mapSqr(double value, double low1, double high1, double low2, double high2) {
+  assert(value >= 0 && low1 >= 0 && high1 >= 0);
+
+  auto n = norm(std::sqrt(value), std::sqrt(low1), std::sqrt(high1));
+
+  return lerp(n, low2, high2);
 }
 
 // clamp value to range
