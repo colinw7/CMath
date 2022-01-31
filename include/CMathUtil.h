@@ -19,7 +19,13 @@ inline double getPosInf() { double r; COSNaN::set_pos_inf(r); return r; }
 inline bool isInteger(double r) {
   if (isNaN(r)) return false;
 
-  return std::abs(r - int(r)) < 1E-3;
+  return std::abs(r - static_cast<int>(r)) < 1E-3;
+}
+
+inline bool isLong(double r) {
+  if (isNaN(r)) return false;
+
+  return std::abs(r - static_cast<long>(r)) < 1E-3;
 }
 
 inline bool realEq(double r1, double r2, double tol=1E-6) {

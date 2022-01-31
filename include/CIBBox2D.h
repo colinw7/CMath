@@ -217,11 +217,11 @@ class CIBBox2D {
   }
 
   int getWidth() const {
-    return std::abs((int) (getXMax() - getXMin()));
+    return std::abs(getXMax() - getXMin());
   }
 
   int getHeight() const {
-    return std::abs((int) (getYMax() - getYMin()));
+    return std::abs(getYMax() - getYMin());
   }
 
   int getMinDim() const {
