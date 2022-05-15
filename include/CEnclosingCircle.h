@@ -54,7 +54,7 @@ class CEnclosingCircle {
 
   // Given N circles calculate the center and radius of the enclosing circle
   bool calc(Circle &ecircle) {
-    uint nc = circles_.size();
+    auto nc = circles_.size();
 
     if (nc == 0)
       return false;
@@ -73,7 +73,7 @@ class CEnclosingCircle {
 
     sortClosest(ecircle.x(), ecircle.y());
 
-    for (uint i = 0; i < nc; ++i)
+    for (size_t i = 0; i < nc; ++i)
       ecircle = enclosingCircle(ecircle, circles_[i]);
 
     return true;
@@ -86,9 +86,9 @@ class CEnclosingCircle {
   void getPointCircle(Circle &pcircle) {
     CPointsCircle::PointArray points;
 
-    uint nc = circles_.size();
+    auto nc = circles_.size();
 
-    for (uint i = 1; i < nc; ++i)
+    for (size_t i = 1; i < nc; ++i)
       points.push_back(CPointsCircle::Point(circles_[i].x(), circles_[i].y()));
 
     CPointsCircle::Circle circle;

@@ -74,7 +74,7 @@ class CBresenham {
 
             eps += ady;
 
-            if ((eps << 1) >= (int) adx) {
+            if ((eps << 1) >= int(adx)) {
               ++y;
 
               eps -= adx;
@@ -90,7 +90,7 @@ class CBresenham {
 
             eps += ady;
 
-            if ((eps << 1) >= (int) adx) {
+            if ((eps << 1) >= int(adx)) {
               --y;
 
               eps -= adx;
@@ -108,7 +108,7 @@ class CBresenham {
 
             eps += ady;
 
-            if ((eps << 1) >= (int) adx) {
+            if ((eps << 1) >= int(adx)) {
               ++y;
 
               eps -= adx;
@@ -124,7 +124,7 @@ class CBresenham {
 
             eps += ady;
 
-            if ((eps << 1) >= (int) adx) {
+            if ((eps << 1) >= int(adx)) {
               --y;
 
               eps -= adx;
@@ -146,7 +146,7 @@ class CBresenham {
 
             eps += adx;
 
-            if ((eps << 1) >= (int) ady) {
+            if ((eps << 1) >= int(ady)) {
               ++x;
 
               eps -= ady;
@@ -162,7 +162,7 @@ class CBresenham {
 
             eps += adx;
 
-            if ((eps << 1) >= (int) ady) {
+            if ((eps << 1) >= int(ady)) {
               --x;
 
               eps -= ady;
@@ -180,7 +180,7 @@ class CBresenham {
 
             eps += adx;
 
-            if ((eps << 1) >= (int) ady) {
+            if ((eps << 1) >= int(ady)) {
               ++x;
 
               eps -= ady;
@@ -196,7 +196,7 @@ class CBresenham {
 
             eps += adx;
 
-            if ((eps << 1) >= (int) ady) {
+            if ((eps << 1) >= int(ady)) {
               --x;
 
               eps -= ady;

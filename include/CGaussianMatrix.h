@@ -30,12 +30,12 @@ class CGaussianMatrix {
     return os;
   }
 
-  void swapRows(int r1, int r2) {
+  void swapRows(uint r1, uint r2) {
     for (uint c = 0; c < COLS; ++c)
       std::swap(m[r1][c], m[r2][c]);
   }
 
-  void scaleRow(int r, double f) {
+  void scaleRow(uint r, double f) {
     for (uint c = 0; c < COLS; ++c)
       m[r][c] *= f;
   }

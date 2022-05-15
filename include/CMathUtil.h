@@ -19,13 +19,13 @@ inline double getPosInf() { double r; COSNaN::set_pos_inf(r); return r; }
 inline bool isInteger(double r) {
   if (isNaN(r)) return false;
 
-  return std::abs(r - static_cast<int>(r)) < 1E-3;
+  return std::abs(r - static_cast<double>(static_cast<int>(r))) < 1E-3;
 }
 
 inline bool isLong(double r) {
   if (isNaN(r)) return false;
 
-  return std::abs(r - static_cast<long>(r)) < 1E-3;
+  return std::abs(r - static_cast<double>(static_cast<long>(r))) < 1E-3;
 }
 
 inline bool realEq(double r1, double r2, double tol=1E-6) {
@@ -124,7 +124,7 @@ inline std::string scaledNumberString(double r, int ndp=3) {
 
   if (r < 0) return "-" + scaledNumberString(-r);
 
-  int n = std::log10(r);
+  int n = int(std::log10(r));
 
   auto realToString = [&](double r) {
     auto s = std::to_string(r);
@@ -146,7 +146,7 @@ inline std::string scaledNumberString(double r, int ndp=3) {
         ++len;
       }
 
-      return s.substr(0, p + ndp + 1);
+      return s.substr(0, p + size_t(ndp) + 1);
     }
     else {
       if (p == std::string::npos)

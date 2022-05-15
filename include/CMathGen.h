@@ -91,7 +91,7 @@ namespace CMathGen {
   bool isPowerOf(uint base, uint value);
   bool isPowerOf2(uint value);
 
-  int numSetBits(uint x);
+  uint numSetBits(uint x);
 
   uint clearLastBit(uint x);
 
@@ -220,6 +220,18 @@ namespace CMathGen {
   double getNaN();
 
   double noise(double x, double y, double z);
+
+  //-----
+
+  template <typename T>
+  T max(T a, T b) {
+    return (a > b ? a : b);
+  }
+
+  template <typename T, typename ... Args>
+  T max(T a, T b, Args ... args) {
+     return max(max(a,b), args...);
+  }
 }
 
 #endif

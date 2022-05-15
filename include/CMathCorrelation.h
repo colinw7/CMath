@@ -10,17 +10,15 @@ namespace CMathCorrelation {
 using Values = std::vector<double>;
 
 inline double mean(const Values &xv) {
-  int nv = xv.size();
-
-  if (nv == 0)
-    return 0.0;
+  auto nv = xv.size();
+  if (nv == 0) return 0.0;
 
   double sum = 0.0;
 
   for (const auto &x : xv)
     sum += x;
 
-  return sum/nv;
+  return sum/double(nv);
 }
 
 inline double calc(const Values &xv, const Values &yv) {
@@ -31,16 +29,14 @@ inline double calc(const Values &xv, const Values &yv) {
   double ymean = mean(yv);
 
   // calc correlation
-  int nxy = xv.size();
-
-  if (nxy == 0)
-    return 0.0;
+  auto nxy = xv.size();
+  if (nxy == 0) return 0.0;
 
   double sum_dxy = 0.0;
   double sum_dxx = 0.0;
   double sum_dyy = 0.0;
 
-  for (int i = 0; i < nxy; ++i) {
+  for (size_t i = 0; i < nxy; ++i) {
     double dx = xv[i] - xmean;
     double dy = yv[i] - ymean;
 
@@ -64,20 +60,18 @@ inline double stddev(const Values &v) {
   double m = mean(v);
 
   // calc correlation
-  int n = v.size();
-
-  if (n == 0)
-    return 0.0;
+  auto n = v.size();
+  if (n == 0) return 0.0;
 
   double sum2 = 0.0;
 
-  for (int i = 0; i < n; ++i) {
+  for (size_t i = 0; i < n; ++i) {
     double d = v[i] - m;
 
     sum2 += d*d;
   }
 
-  return sqrt(sum2/n);
+  return sqrt(sum2/double(n));
 }
 
 }
@@ -129,9 +123,9 @@ class CMathBivariate {
     mean   = 0.0;
     stddev = 0.0;
 
-    int nx = x.size();
+    auto nx = x.size();
 
-    for (int i = 0; i < nx; i++) {
+    for (size_t i = 0; i < nx; i++) {
       double x1 = x[i];
 
       mean   += x1;

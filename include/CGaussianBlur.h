@@ -70,14 +70,18 @@ class CGaussianBlur {
         for (int i = 0, x = x1; i < dx; ++i, ++x) {
           if (x < px1 || x > px2) continue;
 
+          auto ii = uint(i);
+
           for (int j = 0, y = y1; j < dy; ++j, ++y) {
             if (y < py1 || y > py2) continue;
+
+            auto jj = uint(j);
 
             double r1, g1, b1, a1;
 
             src.getRGBA(x, y, &r1, &g1, &b1, &a1);
 
-            double f = m_[i][j]/sm_;
+            double f = m_[ii][jj]/sm_;
 
             r += r1*a1*f;
             g += g1*a1*f;
@@ -118,10 +122,10 @@ class CGaussianBlur {
     int dx = nx2 - nx1 + 1;
     int dy = ny2 - ny1 + 1;
 
-    m_.resize(dx);
+    m_.resize(size_t(dx));
 
     for (int i = 0; i < dx; ++i)
-      m_[i].resize(dy);
+      m_[uint(i)].resize(size_t(dy));
 
     double sm = 0.0;
 
@@ -132,14 +136,18 @@ class CGaussianBlur {
       double ibxy2 = 1.0/(M_PI*bxy2);
 
       for (int i = 0, i1 = nx1; i < dx; ++i, ++i1) {
+        auto ii = uint(i);
+
         int x2 = i1*i1;
 
         for (int j = 0, j1 = ny1; j < dy; ++j, ++j1) {
+          auto jj = uint(j);
+
           int y2 = j1*j1;
 
-          m_[i][j] = ibxy2*exp(-(x2 + y2)/bxy2);
+          m_[ii][jj] = ibxy2*exp(-(x2 + y2)/bxy2);
 
-          sm += m_[i][j];
+          sm += m_[ii][jj];
         }
       }
     }
@@ -150,12 +158,16 @@ class CGaussianBlur {
       double ibx2 = 1.0/sqrt(M_PI*bx2);
 
       for (int i = 0, i1 = nx1; i < dx; ++i, ++i1) {
+        auto ii = uint(i);
+
         int x2 = i1*i1;
 
         for (int j = 0, j1 = ny1; j < dy; ++j, ++j1) {
-          m_[i][j] = ibx2*exp(-x2/bx22);
+          auto jj = uint(j);
 
-          sm += m_[i][j];
+          m_[ii][jj] = ibx2*exp(-x2/bx22);
+
+          sm += m_[ii][jj];
         }
       }
     }
@@ -166,12 +178,16 @@ class CGaussianBlur {
       double iby2 = 1.0/sqrt(M_PI*by2);
 
       for (int i = 0, i1 = nx1; i < dx; ++i, ++i1) {
+        auto ii = uint(i);
+
         for (int j = 0, j1 = ny1; j < dy; ++j, ++j1) {
+          auto jj = uint(j);
+
           int y2 = j1*j1;
 
-          m_[i][j] = iby2*exp(-y2/by22);
+          m_[ii][jj] = iby2*exp(-y2/by22);
 
-          sm += m_[i][j];
+          sm += m_[ii][jj];
         }
       }
     }

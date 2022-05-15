@@ -340,17 +340,17 @@ class CMatrixStack2D {
   }
 
   int length() const {
-    return transformStack_.size();
+    return int(transformStack_.size());
   }
 
   const Transform &transform(int i) const {
-    return transformStack_[i];
+    return transformStack_[size_t(i)];
   }
 
   void setTransform(int i, const Transform &t) {
     assert(i >= 0 && i < int(transformStack_.size()));
 
-    transformStack_[i] = t;
+    transformStack_[size_t(i)] = t;
   }
 
   CMatrixStack2D &prepend(const CMatrixStack2D &m) {
@@ -381,9 +381,9 @@ class CMatrixStack2D {
 
       th->m_.setIdentity();
 
-      uint num = transformStack_.size();
+      auto num = transformStack_.size();
 
-      for (uint i = 0; i < num; ++i) {
+      for (size_t i = 0; i < num; ++i) {
         const Transform &t = transformStack_[i];
 
         th->m_ *= t.calcMatrix();
@@ -430,9 +430,9 @@ class CMatrixStack2D {
   }
 
   void print(std::ostream &os) const {
-    uint num = transformStack_.size();
+    auto num = transformStack_.size();
 
-    for (uint i = 0; i < num; ++i) {
+    for (size_t i = 0; i < num; ++i) {
       const Transform &t = transformStack_[i];
 
       if (i > 0) os << " ";

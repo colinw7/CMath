@@ -93,7 +93,7 @@ PointArray slice(const PointArray &points, int i1, int i2) {
   PointArray points1;
 
   for (int i = i1; i <= i2; ++i)
-    points1.push_back(points[i]);
+    points1.push_back(points[size_t(i)]);
 
   return points1;
 }
@@ -107,11 +107,12 @@ int randIn(int low, int high) {
 
 // seed rand ?
 void shufflePoints(PointArray &points) {
-  int n = points.size();
+  auto n = points.size();
+  if (n < 2) return;
 
-  for (int i = 0; i < n; ++i) {
-    int i1 = randIn(0, n - 1);
-    int i2 = randIn(0, n - 1);
+  for (size_t i = 0; i < n; ++i) {
+    size_t i1 = size_t(randIn(0, int(n - 1)));
+    size_t i2 = size_t(randIn(0, int(n - 1)));
 
     if (i1 != i2)
       std::swap(points[i1], points[i2]);
@@ -182,7 +183,7 @@ Circle makeCircleOnePoint(const PointArray &points, const Point &p) {
       if (c.r == 0)
         c = makeDiameter(p, q);
       else
-        c = makeCircleTwoPoints(slice(points, 0, i), p, q);
+        c = makeCircleTwoPoints(slice(points, 0, int(i)), p, q);
     }
   }
 
@@ -205,7 +206,7 @@ bool makeCircle(const PointArray &points, Circle &circle) {
     const Point &p = points1[i];
 
     if (! c.valid || ! c.contains(p))
-      c = makeCircleOnePoint(slice(points1, 0, i), p);
+      c = makeCircleOnePoint(slice(points1, 0, int(i)), p);
   }
 
   if (! c.valid)

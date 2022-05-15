@@ -240,7 +240,7 @@ isPowerOf2(uint x)
 
 //------
 
-int
+uint
 CMathGen::
 numSetBits(uint x)
 {

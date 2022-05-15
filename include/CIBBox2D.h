@@ -213,7 +213,7 @@ class CIBBox2D {
   int getRadius() const {
     CIVector2D radius = CIVector2D(getMin(), getMax())/2;
 
-    return radius.length();
+    return int(radius.length());
   }
 
   int getWidth() const {

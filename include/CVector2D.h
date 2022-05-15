@@ -597,8 +597,8 @@ class CVector2D {
     // of all differences does not change the barycentric coordinates.
     double maxval = 0.0;
 
-    for (int i = 0; i < 2; ++i)
-      for (int j = 0; j < 2; ++j)
+    for (uint i = 0; i < 2; ++i)
+      for (uint j = 0; j < 2; ++j)
         maxval = std::max(maxval, std::fabs(diff[i][j]));
 
     // scale down only large data

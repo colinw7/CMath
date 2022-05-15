@@ -27,6 +27,10 @@ class CMatrix3DH {
   double m30_, m31_, m32_, m33_;
 
  public:
+  static CMatrix3DH identity() {
+    CMatrix3DH m; m.setIdentity(); return m;
+  }
+
   // constructor/destructor
   CMatrix3DH() :
    m00_(0), m01_(0), m02_(0), m03_(0),
@@ -314,6 +318,31 @@ class CMatrix3DH {
       setInnerRotationLHS(axis, angle);
 
     setOuterIdentity();
+  }
+
+  void setRotation(double theta, const CVector3D &u) {
+    double theta2 = 0.5*theta;
+
+    // rotate around the line
+    double w = cos(theta2);
+
+    //TODO: shouldn't have to normalize u
+    CVector3D v = u*sin(theta2);
+
+    //assign matrix
+    double x = v.getX(); double y = v.getY(); double z = v.getZ();
+
+    double x2 = 2.0*x; double y2 = 2.0*y; double z2 = 2.0*z;
+
+    double wx2 = x2*w; double wy2 = y2*w; double wz2 = z2*w;
+    double xx2 = x2*x; double xy2 = y2*x; double xz2 = z2*x;
+    double yy2 = y2*y; double yz2 = z2*y; double zz2 = z2*z;
+
+    double a = 1.0 - (yy2 + zz2); double b =        xy2 - wz2 ; double c =        xz2 + wy2 ;
+    double d =        xy2 + wz2 ; double e = 1.0 - (xx2 + zz2); double f =        yz2 - wx2 ;
+    double g =        xz2 - wy2 ; double h =        yz2 + wx2 ; double i = 1.0 - (xx2 + yy2);
+
+    setValues(a, b, c, d, e, f, g, h, i, 0.0, 0.0, 0.0);
   }
 
   void setRotationTranslation(CMathGen::AxisType3D axis, double angle,
@@ -964,6 +993,16 @@ class CMatrix3DH {
 
     for (int i = 0; i < 9; ++i)
       (&m00_)[i] *= id;
+  }
+
+  //------
+
+  const CMatrix3DH &rotate(double theta, const CVector3D &u) {
+    CMatrix3DH m; m.setRotation(theta, u);
+
+    *this *= m;
+
+    return *this;
   }
 
   //------
