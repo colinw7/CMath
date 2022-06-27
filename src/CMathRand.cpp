@@ -22,9 +22,16 @@ seedRand(int s)
 
 int
 CMathRand::
-randInRange(int rmin, int rmax)
+randInRange(int imin, int imax)
 {
-  return COSRand::randIn(rmin, rmax);
+  return COSRand::randIn(imin, imax);
+}
+
+long
+CMathRand::
+randInRange(long lmin, long lmax)
+{
+  return COSRand::randIn(lmin, lmax);
 }
 
 double

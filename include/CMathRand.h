@@ -9,7 +9,10 @@ namespace CMathRand {
   void timeSeedRand();
 
   // int
-  int randInRange(int rmin, int rmax);
+  int randInRange(int imin, int imax);
+
+  // long
+  long randInRange(long lmin, long lmax);
 
   // real
   double unitRand();

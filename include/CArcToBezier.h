@@ -28,7 +28,7 @@ class CArcToBezier {
 
   virtual uint getCalcNumBeziers();
 
-  uint getNumBeziers() const { return arc_beziers_.size(); }
+  uint getNumBeziers() const { return uint(arc_beziers_.size()); }
 
   const C3Bezier2D &getBezier(uint i) const { return arc_beziers_[i]; }
 
