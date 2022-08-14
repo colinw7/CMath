@@ -26,7 +26,7 @@ class CBezierToLine {
 
   virtual bool checkLength(double s);
 
-  uint getNumPoints() const { return bezierPoints_.size(); }
+  uint getNumPoints() const { return uint(bezierPoints_.size()); }
 
   const CPoint2D &getPoint(uint i) const { return bezierPoints_[i]; }
 

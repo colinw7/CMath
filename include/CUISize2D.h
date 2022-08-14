@@ -49,15 +49,18 @@ class CUISize2D {
   }
 
   friend CUISize2D operator*(double m, const CUISize2D &size) {
-    return CUISize2D((unsigned int)(m*size.width), (unsigned int)(m*size.height));
+    return CUISize2D(static_cast<unsigned int>(m*size.width),
+                     static_cast<unsigned int>(m*size.height));
   }
 
   friend CUISize2D operator*(const CUISize2D &size, double m) {
-    return CUISize2D((unsigned int)(m*size.width), (unsigned int)(m*size.height));
+    return CUISize2D(static_cast<unsigned int>(m*size.width),
+                     static_cast<unsigned int>(m*size.height));
   }
 
   friend CUISize2D operator/(const CUISize2D &size, double m) {
-    return CUISize2D((unsigned int)(size.width/m), (unsigned int)(size.height/m));
+    return CUISize2D(static_cast<unsigned int>(size.width/m),
+                     static_cast<unsigned int>(size.height/m));
   }
 
   bool operator==(const CUISize2D &size) const {

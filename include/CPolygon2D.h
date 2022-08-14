@@ -36,7 +36,7 @@ class CPolygon2D : public CShape2D {
   class PointIteratorState {
    public:
     PointIteratorState(const CPolygon2D *poly) :
-     poly_(poly), len_(poly->getNumPoints()), end_(false) {
+     poly_(poly), len_(int(poly->getNumPoints())), end_(false) {
       end_ = (pos_ >= len_);
     }
 
@@ -53,7 +53,7 @@ class CPolygon2D : public CShape2D {
     const CPoint2D &contents() const {
       assert(pos_ < len_);
 
-      return poly_->getPoint(pos_);
+      return poly_->getPoint(uint(pos_));
     }
 
     friend bool operator==(const PointIteratorState &lhs, const PointIteratorState &rhs) {
@@ -79,7 +79,7 @@ class CPolygon2D : public CShape2D {
   class LineIteratorState {
    public:
     LineIteratorState(const CPolygon2D *poly) :
-     poly_(poly), len_(poly->getNumPoints()), end_(false) {
+     poly_(poly), len_(int(poly->getNumPoints())), end_(false) {
       end_ = (pos_ >= len_);
     }
 
@@ -96,8 +96,8 @@ class CPolygon2D : public CShape2D {
     const CLine2D &contents() const {
       assert(pos_ < len_);
 
-      line_.setStart(poly_->getPoint(pos_));
-      line_.setEnd  (poly_->getPoint(pos_ < len_ - 1 ? pos_ + 1 : 0));
+      line_.setStart(poly_->getPoint(uint(pos_)));
+      line_.setEnd  (poly_->getPoint(uint(pos_ < len_ - 1 ? pos_ + 1 : 0)));
 
       return line_;
     }
@@ -160,7 +160,7 @@ class CPolygon2D : public CShape2D {
 
   bool isEmpty() const { return points_.empty(); }
 
-  uint getNumPoints() const { return points_.size(); }
+  uint getNumPoints() const { return uint(points_.size()); }
 
   PointIterator getPointsBegin() const { return PointIterator(PointIteratorState(this)); }
   PointIterator getPointsEnd  () const { return PointIterator();}
@@ -236,9 +236,9 @@ class CPolygon2D : public CShape2D {
 
     double cx, cy;
 
-    uint n = points_.size();
+    uint n = uint(points_.size());
 
-    CMathGeom2D::PolygonCentroid(&x_[0], &y_[0], n, &cx, &cy);
+    CMathGeom2D::PolygonCentroid(&x_[0], &y_[0], int(n), &cx, &cy);
 
     return CPoint2D(cx, cy);
   }
@@ -258,8 +258,8 @@ class CPolygon2D : public CShape2D {
     uint    ni { 0 };
     double *xi { nullptr }, *yi { nullptr };
 
-    uint n  = points_.size();
-    uint n1 = polygon.points_.size();
+    uint n  = uint(points_.size());
+    uint n1 = uint(polygon.points_.size());
 
     if (! CMathGeom2D::IntersectPolygons(&x_[0], &y_[0], n,
                                          &polygon.x_[0], &polygon.y_[0], n1,
@@ -338,7 +338,7 @@ class CPolygon2D : public CShape2D {
   int orientation() const {
     initArray();
 
-    uint n = points_.size();
+    uint n = uint(points_.size());
 
     return CMathGeom2D::PolygonOrientation(&x_[0], &y_[0], n);
   }
@@ -346,19 +346,19 @@ class CPolygon2D : public CShape2D {
   double area() const {
     initArray();
 
-    uint n = points_.size();
+    uint n = uint(points_.size());
 
     return CMathGeom2D::PolygonArea(&x_[0], &y_[0], n);
   }
 
   bool distanceTo(const CPoint2D &point, double *dist) const {
-    int n = points_.size();
+    uint n = uint(points_.size());
 
     double minDist { 0.0 };
     bool   minSet  { false };
 
-    for (int i1 = n - 1, i2 = 0; i2 < n; i1 = i2++) {
-      CLine2D line(points_[i1], points_[i2]);
+    for (int i1 = int(n - 1), i2 = 0; i2 < int(n); i1 = i2++) {
+      CLine2D line(points_[uint(i1)], points_[uint(i2)]);
 
       double dist1;
 
@@ -380,9 +380,9 @@ class CPolygon2D : public CShape2D {
   bool isConvex() const {
     initArray();
 
-    uint n = points_.size();
+    uint n = uint(points_.size());
 
-    return CMathGeom2D::PolygonIsConvex(&x_[0], &y_[0], n);
+    return CMathGeom2D::PolygonIsConvex(&x_[0], &y_[0], int(n));
   }
 
   void triangulate(std::vector<CTriangle2D> &triangle_list) const {
@@ -468,7 +468,7 @@ class CPolygon2D : public CShape2D {
   void initArray() const {
     if (arraySet_) return;
 
-    uint n = points_.size();
+    uint n = uint(points_.size());
 
     if (n > x_.size()) {
       x_.resize(n);
