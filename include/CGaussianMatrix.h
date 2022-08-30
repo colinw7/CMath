@@ -103,7 +103,7 @@ class CGaussianMatrix {
 
     //std::cout << "Back Subst" << std::endl;
 
-    for (uint r = ROWS - 2; r >= 0; --r) {
+    for (int r = ROWS - 2; r >= 0; --r) {
       for (uint c = r + 1; c < COLS - 1; ++c) {
         m[r][COLS - 1] -= m[r][c]*m[c][COLS - 1];
 
