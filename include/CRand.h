@@ -10,8 +10,7 @@ class CRand {
 
  public:
   CRand(unsigned long long seed = 7564231ULL) :
-   seed_(seed), mult_(6208991ULL), llong_max_(4294967295ULL),
-   float_max_(4294967295.0) {
+   seed_(seed), mult_(6208991ULL), llong_max_(4294967295ULL), float_max_(4294967295.0f) {
   }
 
   float operator()() {

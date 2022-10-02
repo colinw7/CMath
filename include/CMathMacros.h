@@ -21,7 +21,7 @@
 #define DEG_TO_RAD(a) (((a)*M_PI)/180.0)
 #define RAD_TO_DEG(a) ((a)*(180.0/M_PI))
 
-#define ROUND(r) ((int)((r) + 0.5))
+#define ROUND(r) (int((r) + 0.5))
 
 #ifndef REAL_EQ
 # define REAL_EQ(r1,r2) (fabs((r1)-(r2)) < 1E-5)

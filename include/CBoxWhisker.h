@@ -93,7 +93,7 @@ class CBoxWhisker {
 
     std::sort(values_.begin(), values_.end());
 
-    int nv = values_.size();
+    int nv = int(values_.size());
 
     if (nv > 0) {
       // median

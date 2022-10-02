@@ -189,7 +189,7 @@ class CSmooth {
 
   const Points &points() { return points_; }
 
-  int numPoints() const { return points_.size(); }
+  int numPoints() const { return int(points_.size()); }
 
   const CPoint2D &point(int i) const { return points_[i]; }
 
@@ -261,7 +261,7 @@ class CSmooth {
     }
 
     // add last segment
-    int i1 = points_.size() - 3;
+    int i1 = int(points_.size() - 3);
     int i2 = i1 + 1;
     int i3 = i2 + 1;
 

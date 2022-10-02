@@ -61,7 +61,7 @@ class CLargestRect {
 
     std::vector<int> c;
 
-    c.resize(uint(width_ + 1));
+    c.resize(size_t(width_ + 1));
 
     int width1, x0, w0;
 
@@ -77,7 +77,7 @@ class CLargestRect {
       width1 = 0;
 
       for (int x = 0; x < width_ + 1; ++x) {
-        auto xi = uint(x);
+        auto xi = size_t(x);
 
         if      (c[xi] > width1) {
           s.push_back(Xw(x, width1));
@@ -113,7 +113,7 @@ class CLargestRect {
  private:
   void updateCache(int y, std::vector<int> &c, const VALUE &value) const {
     for (int x = 0; x < width_; ++x) {
-      auto xi = uint(x);
+      auto xi = size_t(x);
 
       if (data_.getValue(x, y) == value)
         c[xi]++;

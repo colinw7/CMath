@@ -175,7 +175,7 @@ class CQuaternion {
   int cmp(const CQuaternion &rhs) const {
     double dw = w_ - rhs.w_;
 
-    if (dw != 0) return dw;
+    if (dw != 0) return int(dw);
 
     return v_.cmp(rhs.v_);
   }

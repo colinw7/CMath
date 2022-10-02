@@ -33,34 +33,22 @@ class CLineList2D {
 
   const PointList &getPoints() const { return points_; }
 
-  uint getNumPoints() const {
-    return points_.size();
-  }
+  uint getNumPoints() const { return uint(points_.size()); }
 
-  const CPoint2D &getPoint(uint i) const {
-    return points_[i];
-  }
+  const CPoint2D &getPoint(uint i) const { return points_[i]; }
 
-  CPoint2D getPoint(uint i) {
-    return points_[i];
-  }
+  CPoint2D getPoint(uint i) { return points_[i]; }
 
   void getPoint(uint i, double *x, double *y) const {
     *x = points_[i].x;
     *y = points_[i].y;
   }
 
-  void setPoint(uint i, double x, double y) {
-    points_[i] = CPoint2D(x, y);
-  }
+  void setPoint(uint i, double x, double y) { points_[i] = CPoint2D(x, y); }
 
-  void setPoint(uint i, const CPoint2D &point) {
-    points_[i] = point;
-  }
+  void setPoint(uint i, const CPoint2D &point) { points_[i] = point; }
 
-  void addPoint(const CPoint2D &point) {
-    points_.push_back(point);
-  }
+  void addPoint(const CPoint2D &point) { points_.push_back(point); }
 
   CBBox2D getBBox() const {
     CBBox2D bbox;
@@ -140,8 +128,7 @@ class CLineList2D {
   }
 
   double includedAngle() const {
-    uint np = points_.size();
-
+    auto np = points_.size();
     assert(np >= 3);
 
     return CMathGeom2D::IncludedAngle(points_[0], points_[1], points_[2]);
@@ -149,8 +136,7 @@ class CLineList2D {
 
   bool arcThrough(double xr, double yr, double *xc, double *yc,
                   double *xt1, double *yt1, double *xt2, double *yt2) {
-    uint np = points_.size();
-
+    auto np = points_.size();
     assert(np >= 3);
 
     return CMathGeom2D::ArcThrough(points_[0].x, points_[0].y,

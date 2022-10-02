@@ -126,8 +126,8 @@ inline std::string scaledNumberString(double r, int ndp=3) {
 
   int n = int(std::log10(r));
 
-  auto realToString = [&](double r) {
-    auto s = std::to_string(r);
+  auto realToString = [&](double r1) {
+    auto s = std::to_string(r1);
 
     auto len = s.size();
 

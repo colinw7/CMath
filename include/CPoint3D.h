@@ -15,8 +15,8 @@ class CPoint3D {
    x(x1), y(y1), z(z1) {
   }
 
-  CPoint3D(const CPoint2D &point, double z=0) :
-   x(point.x), y(point.y), z(z) {
+  CPoint3D(const CPoint2D &point, double z1=0) :
+   x(point.x), y(point.y), z(z1) {
   }
 
   CPoint2D toPoint2D() const { return CPoint2D(x, y); }
