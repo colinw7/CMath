@@ -26,7 +26,7 @@ class CCube3D : public CShape3D {
 
   double getSize() const { return size_; }
 
-  CBBox3D getBBox() const {
+  CBBox3D getBBox() const override {
     return CBBox3D(CShape3D::transformFrom(pmin_), CShape3D::transformFrom(pmax_));
   }
 

@@ -60,7 +60,7 @@ class CSquare3D : public CShape3D {
 
   const CPlane3D &getPlane() const { return plane_; }
 
-  CBBox3D getBBox() const {
+  CBBox3D getBBox() const override {
     CPoint3D p1(std::min(std::min(std::min(xp_[0], xp_[1]), xp_[2]), xp_[3]),
                 std::min(std::min(std::min(yp_[0], yp_[1]), yp_[2]), yp_[3]),
                 std::min(std::min(std::min(zp_[0], zp_[1]), zp_[2]), zp_[3]));

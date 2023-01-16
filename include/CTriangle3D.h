@@ -71,7 +71,7 @@ class CTriangle3D : public CShape3D {
     return p21.crossProduct(p31).length();
   }
 
-  CBBox3D getBBox() const {
+  CBBox3D getBBox() const override {
     CPoint3D p1(CPoint3D::min(CPoint3D::min(point1_, point2_), point3_));
     CPoint3D p2(CPoint3D::max(CPoint3D::max(point1_, point2_), point3_));
 

@@ -54,7 +54,7 @@ class CSphere3D : public CShape3D {
     area_.setInvalid();
   }
 
-  CBBox3D getBBox() const {
+  CBBox3D getBBox() const override {
     CPoint3D p1(-radius_, -radius_, zmin_);
     CPoint3D p2( radius_,  radius_, zmax_);
 

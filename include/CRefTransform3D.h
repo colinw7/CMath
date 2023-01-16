@@ -1,11 +1,11 @@
 #ifndef CREF_TRANSFORM_3D_H
 #define CREF_TRANSFORM_3D_H
 
-#include <CRefPtr.h>
 #include <CMatrix3D.h>
 #include <CPoint3D.h>
 #include <CVector3D.h>
 #include <CMathGen.h>
+#include <mmeory>
 
 class CRefTransform3D {
  private:
@@ -13,7 +13,7 @@ class CRefTransform3D {
   using Vector    = CVector3D;
   using Point     = CPoint3D;
   using Normal    = CNormal3D;
-  using MatrixPtr = CRefPtr<Matrix>;
+  using MatrixPtr = std::shared_ptr<Matrix>;
 
  public:
   CRefTransform3D() {

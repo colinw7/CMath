@@ -15,7 +15,7 @@ class CRadialGradient : public CGenGradient {
    cx1_(rg.cx1_), cy1_(rg.cy1_), r1_(rg.r1_), fx1_(rg.fx1_), fy1_(rg.fy1_) {
   }
 
-  CGenGradient *dup() const {
+  CGenGradient *dup() const override {
     return new CRadialGradient(*this);
   }
 
@@ -39,7 +39,7 @@ class CRadialGradient : public CGenGradient {
 
   void setFocus(double fx, double fy) { fx_ = fx; fy_ = fy; }
 
-  void init(double width, double height) const {
+  void init(double width, double height) const override {
     CRadialGradient *th = const_cast<CRadialGradient *>(this);
 
     th->cx1_ = cx_*width ;
@@ -120,7 +120,7 @@ class CRadialGradient : public CGenGradient {
     return std::min(std::max(offset, 0.0), 1.0);
   }
 
-  CRGBA getColor(double x, double y) const {
+  CRGBA getColor(double x, double y) const override {
     double offset = getOffset(x, y);
 
     CRGBA  rgba1, rgba2;

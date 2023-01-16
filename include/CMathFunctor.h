@@ -14,23 +14,23 @@ class Functor {
 
 class CosFunctor : public Functor {
  public:
-  double exec(double x) const { return cos(x); }
+  double exec(double x) const override { return cos(x); }
 
-  double gradient(double x) const { return -sin(x); }
+  double gradient(double x) const override { return -sin(x); }
 };
 
 class SinFunctor : public Functor {
  public:
-  double exec(double x) const { return sin(x); }
+  double exec(double x) const override { return sin(x); }
 
-  double gradient(double x) const { return cos(x); }
+  double gradient(double x) const override { return cos(x); }
 };
 
 class TanFunctor : public Functor {
  public:
-  double exec(double x) const { return tan(x); }
+  double exec(double x) const override { return tan(x); }
 
-  double gradient(double x) const { double t = tan(x); return 1 + t*t; }
+  double gradient(double x) const override { double t = tan(x); return 1 + t*t; }
 };
 
 class PolarFunctor {
@@ -53,7 +53,7 @@ class ArchimedianSpiralFunctor : public PolarFunctor {
 
   virtual ~ArchimedianSpiralFunctor() { }
 
-  double exec(double theta) const {
+  double exec(double theta) const override {
     return a_*pow(theta, 1.0/n_);
   }
 
@@ -61,7 +61,7 @@ class ArchimedianSpiralFunctor : public PolarFunctor {
     return theta + atan(theta);
   }
 
-  double gradient(double theta) const {
+  double gradient(double theta) const override {
     return tan(gradientAngle(theta));
   }
 
@@ -84,7 +84,7 @@ class ArchimedesSpiralFunctor : public PolarFunctor {
 
   virtual ~ArchimedesSpiralFunctor() { }
 
-  double exec(double theta) const {
+  double exec(double theta) const override {
     return a_*theta;
   }
 
@@ -92,7 +92,7 @@ class ArchimedesSpiralFunctor : public PolarFunctor {
     return theta + atan(theta);
   }
 
-  double gradient(double theta) const {
+  double gradient(double theta) const override {
     return tan(gradientAngle(theta));
   }
 

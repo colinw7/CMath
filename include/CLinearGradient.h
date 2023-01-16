@@ -17,7 +17,7 @@ class CLinearGradient : public CGenGradient {
    c_(lg.c_), s_(lg.s_), dmin_(lg.dmin_), dmax_(lg.dmax_) {
   }
 
-  CGenGradient *dup() const {
+  CGenGradient *dup() const override {
     return new CLinearGradient(*this);
   }
 
@@ -41,7 +41,7 @@ class CLinearGradient : public CGenGradient {
     return atan2(y2_ - y1_, x2_ - x1_);
   }
 
-  void init(double width, double height) const {
+  void init(double width, double height) const override {
     CLinearGradient *th = const_cast<CLinearGradient *>(this);
 
     double angle = getAngle();
@@ -74,7 +74,7 @@ class CLinearGradient : public CGenGradient {
     x2_ = x2; y2_ = y2;
   }
 
-  CRGBA getColor(double x, double y) const {
+  CRGBA getColor(double x, double y) const override {
     double d = distance(x, y);
 
     CRGBA rgba1, rgba2;

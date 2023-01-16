@@ -84,7 +84,7 @@ class CHyperboloid3D : public CShape3D {
     area_.setInvalid();
   }
 
-  CBBox3D getBBox() const {
+  CBBox3D getBBox() const override {
     CPoint3D p1(-rmax_, -rmax_, zmin_);
     CPoint3D p2( rmax_,  rmax_, zmax_);
 

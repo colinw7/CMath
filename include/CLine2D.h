@@ -53,7 +53,7 @@ class CLine2D : public CShape2D {
     return CPoint2D((p1_.x + p2_.x)/2, (p1_.y + p2_.y)/2);
   }
 
-  CBBox2D getBBox() const {
+  CBBox2D getBBox() const override {
     return CBBox2D(p1_, p2_);
   }
 
@@ -79,7 +79,7 @@ class CLine2D : public CShape2D {
     }
   }
 
-  bool inside(const CPoint2D &p) const {
+  bool inside(const CPoint2D &p) const override {
     return insideTol(p, 1E-6);
   }
 
@@ -91,11 +91,11 @@ class CLine2D : public CShape2D {
     return pointOn(p, getInsideTolerance(tol));
   }
 
-  void moveBy(const CPoint2D &p) {
+  void moveBy(const CPoint2D &p) override {
     p1_ += p; p2_ += p;
   }
 
-  void resizeBy(const CPoint2D &ll, const CPoint2D &ur) {
+  void resizeBy(const CPoint2D &ll, const CPoint2D &ur) override {
     if (p1_.x < p2_.x) {
       p1_.x += ll.x;
       p2_.x += ur.x;
@@ -115,7 +115,7 @@ class CLine2D : public CShape2D {
     }
   }
 
-  void rotateBy(double da, const CPoint2D &o) {
+  void rotateBy(double da, const CPoint2D &o) override {
     p1_ = CShape2D::rotatePoint(p1_, da, o);
     p2_ = CShape2D::rotatePoint(p2_, da, o);
   }

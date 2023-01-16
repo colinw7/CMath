@@ -200,7 +200,7 @@ class CPolygon2D : public CShape2D {
     arraySet_ = false;
   }
 
-  CBBox2D getBBox() const {
+  CBBox2D getBBox() const override {
     CBBox2D bbox;
 
     auto ps = points_.begin();
@@ -286,11 +286,11 @@ class CPolygon2D : public CShape2D {
     return CMathGeom2D::PointInsideEvenOdd(point, points_);
   }
 
-  bool inside(const CPoint2D &point) const {
+  bool inside(const CPoint2D &point) const override {
     return insideEvenOdd(point);
   }
 
-  void moveBy(const CPoint2D &p) {
+  void moveBy(const CPoint2D &p) override {
     auto ps = points_.begin();
     auto pe = points_.end  ();
 
@@ -300,7 +300,7 @@ class CPolygon2D : public CShape2D {
     arraySet_ = false;
   }
 
-  void resizeBy(const CPoint2D &ll, const CPoint2D &ur) {
+  void resizeBy(const CPoint2D &ll, const CPoint2D &ur) override {
     CBBox2D bbox = getBBox();
 
     double w = bbox.getWidth ();
@@ -325,7 +325,7 @@ class CPolygon2D : public CShape2D {
     arraySet_ = false;
   }
 
-  void rotateBy(double da, const CPoint2D &o) {
+  void rotateBy(double da, const CPoint2D &o) override {
     auto ps = points_.begin();
     auto pe = points_.end  ();
 

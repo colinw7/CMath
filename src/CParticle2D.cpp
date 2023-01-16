@@ -4,16 +4,14 @@ CParticle2D *
 CParticleSystem2D::
 addParticle()
 {
-  typename ParticleList::iterator p1 = particles_.begin(), p2 = particles_.end();
-
-  for ( ; p1 != p2; ++p1)
+  for (auto p1 = particles_.begin(); p1 != particles_.end(); ++p1)
     if ((*p1)->isDead()) {
       (*p1)->init();
 
     return *p1;
   }
 
-  CParticle2D *particle = createParticle();
+  auto *particle = createParticle();
 
   particles_.push_back(particle);
 

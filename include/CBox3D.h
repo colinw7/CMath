@@ -21,7 +21,7 @@ class CBox3D : public CShape3D {
   double getYSize() const { return ry_; }
   double getZSize() const { return rz_; }
 
-  CBBox3D getBBox() const {
+  CBBox3D getBBox() const override {
     return CBBox3D(CShape3D::transformFrom(pmin_), CShape3D::transformFrom(pmax_));
   }
 

@@ -59,7 +59,7 @@ class CDisk3D : public CShape3D {
     area_.setInvalid();
   }
 
-  CBBox3D getBBox() const {
+  CBBox3D getBBox() const override {
     CPoint3D p1(-radius_, -radius_, height_);
     CPoint3D p2( radius_,  radius_, height_);
 
