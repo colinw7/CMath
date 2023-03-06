@@ -47,7 +47,7 @@ class CLine2D : public CShape2D {
   }
 
   bool isSegment() const { return segment_; }
-  void setSegment(bool b) { segment_ = b; }
+  CLine2D &setSegment(bool b) { segment_ = b; return *this; }
 
   CPoint2D getMid() {
     return CPoint2D((p1_.x + p2_.x)/2, (p1_.y + p2_.y)/2);
