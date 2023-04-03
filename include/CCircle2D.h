@@ -32,26 +32,26 @@ class CCircle2D : public CShape2D {
 
   double area() { return M_PI*radius_*radius_; }
 
-  BBox getBBox() const {
+  BBox getBBox() const override {
     return BBox(center_.x - radius_, center_.y - radius_,
                 center_.x + radius_, center_.y + radius_);
   }
 
-  bool inside(const Point &p) const {
+  bool inside(const Point &p) const override {
     double d = p.distanceTo(center_);
 
     return (d < radius_);
   }
 
-  void moveBy(const Point &p) {
+  void moveBy(const Point &p) override {
     center_ += p;
   }
 
-  void resizeBy(const Point &ll, const Point &ur) {
+  void resizeBy(const Point &ll, const Point &ur) override {
     radius_ += std::max(ll.x, std::max(ll.y, std::max(ur.x, ur.y)));
   }
 
-  void rotateBy(double, const Point &) { }
+  void rotateBy(double, const Point &) override { }
 
   bool lineIntersect(const Line &line, Point &point1, Point &point2) const {
     uint   ni;

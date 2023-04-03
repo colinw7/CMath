@@ -151,7 +151,7 @@ class CDisk3D : public CShape3D {
   }
 
   void pointDetails(const CPoint3D &point, double *u, double *v,
-                    CVector3D *dpdu=0, CVector3D *dpdv=0) const {
+                    CVector3D *dpdu=nullptr, CVector3D *dpdv=nullptr) const {
     if (u) {
       double phi = getPhi(point);
 
