@@ -96,6 +96,24 @@ inline T clamp(const T &val, const T &low, const T &high) {
   return val;
 }
 
+inline double smoothstep(double edge0, double edge1, double x) {
+  auto t = clamp((x - edge0)/(edge1 - edge0), 0.0, 1.0);
+  return t*t*(3.0 - 2.0*t);
+}
+
+inline double step(double edge, double x) {
+  return (x < edge ? 0.0 : 1.0);
+}
+
+inline double mix(double x, double y, double a) {
+  return (x*(1.0 - a) + y*a);
+}
+
+inline double fract(double x) {
+  double i;
+  return modf(x, &i);
+}
+
 //------
 
 inline double Deg2Rad(double d) { return M_PI*d/180.0; }
@@ -116,7 +134,7 @@ inline double normalizeAngle(double a, bool isEnd=false) {
 
 //------
 
-inline std::string scaledNumberString(double r, int ndp=3) {
+inline std::string scaledNumberString(double r, int ndp=-3) {
   // (1,000) k, (1,000,000) M, (1,000,000,000) G, (1,000,000,000,000) T
   // (0.001) m, (0.000 001) µ, (0.000 000 001) n, (0.000 000 000 001) p
 
@@ -126,6 +144,9 @@ inline std::string scaledNumberString(double r, int ndp=3) {
 
   int n = int(std::log10(r));
 
+  auto ndp1 = std::abs(ndp);
+  auto pad  = (ndp > 0);
+
   auto realToString = [&](double r1) {
     auto s = std::to_string(r1);
 
@@ -133,20 +154,27 @@ inline std::string scaledNumberString(double r, int ndp=3) {
 
     auto p = s.find('.');
 
-    if (ndp > 0) {
+    if (ndp1 > 0) {
       if (p == std::string::npos) {
         s += ".";
 
         p = s.find('.');
       }
 
-      while (int(len - p) <= ndp) {
+      while (int(len - p) <= ndp1) {
         s += "0";
 
         ++len;
       }
 
-      return s.substr(0, p + size_t(ndp) + 1);
+      auto len1 = p + size_t(ndp1) + 1;
+
+      if (! pad) {
+        while (s[len1 - 1] == '0' &&  s[len1 - 2] != '.')
+          --len1;
+      }
+
+      return s.substr(0, len1);
     }
     else {
       if (p == std::string::npos)
@@ -158,7 +186,7 @@ inline std::string scaledNumberString(double r, int ndp=3) {
 
   if (n >= 0) {
     if      (n <  3) return realToString(r                )      ;
-    else if (n <  6) return realToString(r/         1000.0) + "k";
+    else if (n <  6) return realToString(r/         1000.0) + "K";
     else if (n <  9) return realToString(r/      1000000.0) + "M";
     else if (n < 12) return realToString(r/   1000000000.0) + "G";
     else             return realToString(r/1000000000000.0) + "T";
