@@ -140,7 +140,7 @@ inline std::string scaledNumberString(double r, int ndp=-3) {
 
   if (r == 0.0) return "0"; // TODO: epsilon
 
-  if (r < 0) return "-" + scaledNumberString(-r);
+  if (r < 0) return "-" + scaledNumberString(-r, ndp);
 
   int n = int(std::log10(r));
 
