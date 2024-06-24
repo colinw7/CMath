@@ -10,7 +10,7 @@ class CParticle2D;
 
 class CParticleSystem2D {
  public:
-  typedef std::vector<CParticle2D *> ParticleList;
+  using ParticleList = std::vector<CParticle2D *>;
 
  public:
   CParticleSystem2D() { }
@@ -24,6 +24,10 @@ class CParticleSystem2D {
   const CVector2D &getGravityVector() const { return gravity_; }
 
   const ParticleList &getParticles() const { return particles_; }
+
+  size_t numParticles() const { return particles_.size(); }
+
+  CParticle2D *particle(size_t i) const { return particles_[i]; }
 
   CParticle2D *addParticle();
 
@@ -62,13 +66,13 @@ class CParticle2D {
     acceleration_.zero();
   }
 
-  ACCESSOR(Mass        ,      double, mass)
+  ACCESSOR(Mass        , double   , mass)
   ACCESSOR(Position    , CVector2D, position)
   ACCESSOR(Velocity    , CVector2D, velocity)
   ACCESSOR(Acceleration, CVector2D, acceleration)
-  ACCESSOR(Age         , uint  , age)
-  ACCESSOR(Color       , CRGBA , color)
-  ACCESSOR(State       , State , state)
+  ACCESSOR(Age         , uint     , age)
+  ACCESSOR(Color       , CRGBA    , color)
+  ACCESSOR(State       , State    , state)
 
   void setPosition(double x, double y) {
     position_ = CVector2D(x, y);
