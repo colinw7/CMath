@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-// Template class to extract largest rectange from array of values DATA of type VALUE
+// Template class to extract largest rectangle from array of values DATA of type VALUE
 //
 // DATA must support the getValue(int ix, int iy) method.
 template<typename DATA, typename VALUE>
