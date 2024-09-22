@@ -7,39 +7,9 @@
 #include <CVector3D.h>
 #include <COptVal.h>
 
+class CLine3D;
+
 class CShape3D {
- protected:
-  struct TRange {
-    bool   set;
-    double tmin;
-    double tmax;
-
-    TRange() { set = false; }
-
-    bool isOutside(double t) {
-      return (! set || (t < tmin || t > tmax));
-    }
-
-    void update(double t) {
-      if (! set) {
-        tmin = t;
-        tmax = t;
-
-        set = true;
-      }
-      else {
-        tmin = std::min(t, tmin);
-        tmax = std::max(t, tmax);
-      }
-    }
-  };
-
-  CPoint3D            translate_;  //! Translate
-  CPoint3D            scale_    ;  //! Scale
-  CPoint3D            rotate_   ;  //! Rotate
-  COptValT<CMatrix3D> transform_;  //! Transform
-  COptValT<CMatrix3D> itransform_; //! Inverse Transform
-
  public:
   CShape3D() :
    translate_(0,0,0), scale_(1,1,1), rotate_(0,0,0), transform_(), itransform_() {
@@ -115,6 +85,42 @@ class CShape3D {
 
     return itransform_.getValue();
   }
+
+  virtual bool intersect(const CLine3D &, double *, double *) const { return false; }
+
+ protected:
+  struct TRange {
+    bool   set  { false };
+    double tmin { 0.0 };
+    double tmax { 0.0 };
+
+    TRange() { }
+
+    bool isOutside(double t) {
+      return (! set || (t < tmin || t > tmax));
+    }
+
+    void update(double t) {
+      if (! set) {
+        tmin = t;
+        tmax = t;
+
+        set = true;
+      }
+      else {
+        tmin = std::min(t, tmin);
+        tmax = std::max(t, tmax);
+      }
+    }
+  };
+
+  using OptMatrix = COptValT<CMatrix3D>;
+
+  CPoint3D  translate_;  //! Translate
+  CPoint3D  scale_    ;  //! Scale
+  CPoint3D  rotate_   ;  //! Rotate
+  OptMatrix transform_;  //! Transform
+  OptMatrix itransform_; //! Inverse Transform
 };
 
 #endif
