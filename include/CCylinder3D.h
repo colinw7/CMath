@@ -66,7 +66,7 @@ class CCylinder3D : public CShape3D {
     return CBBox3D(CShape3D::transformFrom(p1), CShape3D::transformFrom(p2));
   }
 
-  bool intersect(const CLine3D &line, double *tmin, double *tmax) const {
+  bool intersect(const CLine3D &line, double *tmin, double *tmax) const override {
     // Solve
     //
     //  x^2 + y^2 - r^2 = 0 at ray (o + t*d)

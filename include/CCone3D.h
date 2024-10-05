@@ -57,7 +57,7 @@ class CCone3D : public CShape3D {
     return CBBox3D(CShape3D::transformFrom(p1), CShape3D::transformFrom(p2));
   }
 
-  bool intersect(const CLine3D &line, double *tmin, double *tmax) const {
+  bool intersect(const CLine3D &line, double *tmin, double *tmax) const override {
     // solve
     //  k = (r/h)^2
     //

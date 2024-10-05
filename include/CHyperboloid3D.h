@@ -91,7 +91,7 @@ class CHyperboloid3D : public CShape3D {
     return CBBox3D(CShape3D::transformFrom(p1), CShape3D::transformFrom(p2));
   }
 
-  bool intersect(const CLine3D &line, double *tmin, double *tmax) const {
+  bool intersect(const CLine3D &line, double *tmin, double *tmax) const override {
     CPoint3D p1 = CShape3D::transformTo(line.start());
     CPoint3D p2 = CShape3D::transformTo(line.end  ());
 

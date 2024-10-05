@@ -21,6 +21,12 @@ class CMatrix3D {
   };
 
  public:
+  static CMatrix3D identity() {
+    CMatrix3D m; m.setIdentity(); return m;
+  }
+
+  //---
+
   // constructor/destructor
   CMatrix3D() { }
 
@@ -202,13 +208,20 @@ class CMatrix3D {
 
   //------
 
+  bool isIdentity() {
+    return (m00_ == 1 && m01_ == 0 && m02_ == 0 && m03_ == 0 &&
+            m10_ == 0 && m11_ == 1 && m12_ == 0 && m13_ == 0 &&
+            m20_ == 0 && m21_ == 0 && m22_ == 1 && m23_ == 0 &&
+            m30_ == 0 && m31_ == 0 && m32_ == 0 && m33_ == 1);
+  }
+
   void setIdentity() {
     setInnerIdentity();
 
     setOuterIdentity();
   }
 
-  //----------
+  //------
 
   static CMatrix3D translation(double tx, double ty, double tz) {
     CMatrix3D m;

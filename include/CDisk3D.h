@@ -66,7 +66,7 @@ class CDisk3D : public CShape3D {
     return CBBox3D(CShape3D::transformFrom(p1), CShape3D::transformFrom(p2));
   }
 
-  bool intersect(const CLine3D &line, double *t) const {
+  bool intersect(const CLine3D &line, double *tmin, double *tmax) const override {
     // Solve
     //
     //  z = h at line (o + t*d)
@@ -90,10 +90,13 @@ class CDisk3D : public CShape3D {
     if (fabs(rd.getZ()) < 1E-7)
       return false;
 
-    *t = (height_ - ro.getZ())/rd.getZ();
+    auto t = (height_ - ro.getZ())/rd.getZ();
 
-    if (! checkPoint(l.point(*t)))
+    if (! checkPoint(l.point(t)))
       return false;
+
+    *tmin = t;
+    *tmax = t;
 
     return true;
   }

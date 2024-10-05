@@ -71,19 +71,24 @@ class CSquare3D : public CShape3D {
     return CBBox3D(CShape3D::transformFrom(p1), CShape3D::transformFrom(p2));
   }
 
-  bool intersect(const CLine3D &line, double *t) const {
+  bool intersect(const CLine3D &line, double *tmin, double *tmax) const override {
     CPoint3D p1 = CShape3D::transformTo(line.start());
     CPoint3D p2 = CShape3D::transformTo(line.end  ());
 
     CLine3D l(p1, p2);
 
-    if (! plane_.intersect(l, t))
+    double t;
+
+    if (! plane_.intersect(l, &t))
       return false;
 
-    CPoint3D p = l.point(*t);
+    CPoint3D p = l.point(t);
 
     if (! CMathGeom2D::PointInsideConvex(p.x, p.y, xp_, yp_, 4))
       return false;
+
+    *tmin = t;
+    *tmax = t;
 
     return true;
   }

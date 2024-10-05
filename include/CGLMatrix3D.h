@@ -114,14 +114,10 @@ class CGLMatrix3D {
 
   // output
   void print(std::ostream &os) const {
-    os << "((" << m00_ << "," << m01_ << "," <<
-                  m02_ << "," << m03_ << "),";
-    os << " (" << m10_ << "," << m11_ << "," <<
-                  m12_ << "," << m13_ << "),";
-    os << " (" << m20_ << "," << m21_ << "," <<
-                  m22_ << "," << m23_ << "),";
-    os << " (" << m30_ << "," << m31_ << "," <<
-                  m32_ << "," << m33_ << "))";
+    os << "((" << m00_ << "," << m01_ << "," << m02_ << "," << m03_ << "),";
+    os << " (" << m10_ << "," << m11_ << "," << m12_ << "," << m13_ << "),";
+    os << " (" << m20_ << "," << m21_ << "," << m22_ << "," << m23_ << "),";
+    os << " (" << m30_ << "," << m31_ << "," << m32_ << "," << m33_ << "))";
   }
 
   friend std::ostream &operator<<(std::ostream &os, const CGLMatrix3D &matrix) {
@@ -208,15 +204,13 @@ class CGLMatrix3D {
             m30_ == 0 && m31_ == 0 && m32_ == 0 && m33_ == 1);
   }
 
-  //------
-
   void setIdentity() {
     setInnerIdentity();
 
     setOuterIdentity();
   }
 
-  //---
+  //------
 
   static CGLMatrix3D translation(float tx, float ty, float tz) {
     CGLMatrix3D m;
@@ -771,7 +765,7 @@ class CGLMatrix3D {
 
     float w = m30_*xi + m31_*yi + m32_*zi + m33_;
 
-    if (w > 1E-6) {
+    if (std::abs(w) > 1E-6) {
       float iw = 1.0f/w;
 
       *xo *= iw;
@@ -794,7 +788,7 @@ class CGLMatrix3D {
     float z = m20_*float(ipoint.x) + m21_*float(ipoint.y) + m22_*float(ipoint.z) + m23_;
     float w = m30_*float(ipoint.x) + m31_*float(ipoint.y) + m32_*float(ipoint.z) + m33_;
 
-    float iw = (fabs(w) > 1E-6 ? 1.0f/w : 1.0f);
+    float iw = (std::abs(w) > 1E-6 ? 1.0f/w : 1.0f);
 
     opoint.x = x*iw;
     opoint.y = y*iw;
@@ -809,7 +803,7 @@ class CGLMatrix3D {
     float z = m20_*float(ipoint.x) + m21_*float(ipoint.y) + m22_*float(ipoint.z) + m23_;
     float w = m30_*float(ipoint.x) + m31_*float(ipoint.y) + m32_*float(ipoint.z) + m33_;
 
-    float iw = (fabs(w) > 1E-6 ? 1.0f/w : 1.0f);
+    float iw = (std::abs(w) > 1E-6 ? 1.0f/w : 1.0f);
 
     opoint.x = x*iw;
     opoint.y = y*iw;
@@ -853,7 +847,7 @@ class CGLMatrix3D {
 
     float w = m03_*xi + m13_*yi + m23_*zi + m33_;
 
-    float iw = (fabs(w) > 1E-6 ? 1.0f/w : 1.0f);
+    float iw = (std::abs(w) > 1E-6 ? 1.0f/w : 1.0f);
 
     *xo *= iw;
     *yo *= iw;
@@ -875,7 +869,7 @@ class CGLMatrix3D {
 
     float w = float(m03_*ipoint.x + m13_*ipoint.y + m23_*ipoint.z + m33_);
 
-    float iw = (fabs(w) > 1E-6 ? 1.0f/w : 1.0f);
+    float iw = (std::abs(w) > 1E-6 ? 1.0f/w : 1.0f);
 
     opoint *= iw;
   }

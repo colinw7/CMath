@@ -111,7 +111,7 @@ class CTriangle3D : public CShape3D {
     return true;
   }
 
-  bool intersect(const CLine3D &line, double *t) const {
+  bool intersect(const CLine3D &line, double *tmin, double *tmax) const override {
     CPoint3D p1 = CShape3D::transformTo(line.start());
     CPoint3D p2 = CShape3D::transformTo(line.end  ());
 
@@ -145,7 +145,10 @@ class CTriangle3D : public CShape3D {
       return false;
 
     // Compute intersection param
-    *t = e2.dotProduct(s2)*idenom;
+    auto t = e2.dotProduct(s2)*idenom;
+
+    *tmin = t;
+    *tmax = t;
 
     return true;
   }
