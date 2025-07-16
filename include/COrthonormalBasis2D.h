@@ -7,7 +7,7 @@
 class COrthonormalBasis2D {
  public:
   COrthonormalBasis2D() :
-   u_(1,0), v_(0,1), m_(u_,v_) {
+   u_(1, 0), v_(0, 1), m_(u_, v_) {
   }
 
   COrthonormalBasis2D(const CVector2D &u, const CVector2D &v) :
@@ -21,7 +21,7 @@ class COrthonormalBasis2D {
   const CMatrix2D &getMatrix() const { return m_; }
 
   void reset() {
-    setUV(CVector2D(1,0),CVector2D(0,1));
+    setUV(CVector2D(1, 0), CVector2D(0, 1));
   }
 
   void setUV(const CVector2D &u, const CVector2D &v) {

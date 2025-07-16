@@ -42,7 +42,7 @@ class CLinearGradient : public CGenGradient {
   }
 
   void init(double width, double height) const override {
-    CLinearGradient *th = const_cast<CLinearGradient *>(this);
+    auto *th = const_cast<CLinearGradient *>(this);
 
     double angle = getAngle();
 
@@ -56,7 +56,7 @@ class CLinearGradient : public CGenGradient {
     StopList::const_iterator p2 = endStops  ();
 
     for ( ; p1 != p2; ++p1) {
-      CGradientStop *stop = const_cast<CGradientStop *>(&(*p1));
+      auto *stop = const_cast<CGradientStop *>(&(*p1));
 
       stop->setOffset1(stop->getOffset()*(dmax_ - dmin_) + dmin_);
     }

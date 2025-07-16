@@ -6,7 +6,8 @@
 #include <CLine3D.h>
 #include <CPoint3D.h>
 #include <CMathGen.h>
-#include <COptVal.h>
+
+#include <optional>
 
 /*! Cylinder of specified radius (r) and specified height (h)
  *
@@ -23,6 +24,9 @@
 
 class CCylinder3D : public CShape3D {
  public:
+  using OptReal = std::optional<double>;
+
+ public:
   CCylinder3D(double radius=double(1), double height=double(1)) :
    radius_(radius), height_(height) {
     setZLimit(0, height_);
@@ -35,7 +39,7 @@ class CCylinder3D : public CShape3D {
   void setRadius(double radius) {
     radius_ = radius;
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   double getHeight() const { return height_; }
@@ -43,20 +47,20 @@ class CCylinder3D : public CShape3D {
   void setHeight(double height) {
     height_ = height;
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   void setZLimit(double zmin, double zmax) {
     zmin_ = std::min(std::max(std::min(zmin, zmax), 0.0), height_);
     zmax_ = std::min(std::max(std::max(zmin, zmax), 0.0), height_);
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   void setPhiLimit(double phi_max) {
     phi_max_ = CMathGen::DegToRad(std::min(std::max(phi_max, 0.0), 360.0));
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   CBBox3D getBBox() const override {
@@ -148,15 +152,15 @@ class CCylinder3D : public CShape3D {
   }
 
   double getArea() const {
-    if (! area_.isValid()) {
+    if (! area_) {
       double area = (zmax_ - zmin_)*phi_max_*radius_;
 
-      CCylinder3D *th = const_cast<CCylinder3D *>(this);
+      auto *th = const_cast<CCylinder3D *>(this);
 
-      th->area_.setValue(area);
+      th->area_ = area;
     }
 
-    return area_.getValue();
+    return area_.value();
   }
 
  private:
@@ -207,7 +211,7 @@ class CCylinder3D : public CShape3D {
   double   zmin_    { 0.0 }, zmax_ { 0.0 }; //! Height Range
   double   phi_max_ { 0.0 };                //! Angle/Sweep Max
 
-  COptReal area_;
+  OptReal area_;
 };
 
 #endif

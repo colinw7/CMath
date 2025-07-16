@@ -7,7 +7,8 @@
 #include <CPoint3D.h>
 #include <CVector2D.h>
 #include <CMathGen.h>
-#include <COptVal.h>
+
+#include <optional>
 
 /*! Sphere of specified radius centered at origin
  *
@@ -23,8 +24,11 @@
 
 class CSphere3D : public CShape3D {
  public:
-  CSphere3D(double radius=double(1)) :
-   radius_(radius), zmin_(), zmax_(), phi_max_(), theta_min_(), theta_max_(), area_() {
+  using OptReal = std::optional<double>;
+
+ public:
+  CSphere3D(double radius=1.0) :
+   radius_(radius) {
     setZLimit(-radius_, radius_);
 
     setPhiLimit(360.0);
@@ -35,7 +39,7 @@ class CSphere3D : public CShape3D {
   void setRadius(double radius) {
     radius_ = radius;
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   void setZLimit(double zmin, double zmax) {
@@ -45,13 +49,13 @@ class CSphere3D : public CShape3D {
     theta_min_ = acos(std::min(std::max(zmin_/radius_, -1.0), 1.0));
     theta_max_ = acos(std::min(std::max(zmax_/radius_, -1.0), 1.0));
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   void setPhiLimit(double phi_max) {
     phi_max_ = CMathGen::DegToRad(std::min(std::max(phi_max, 0.0), 360.0));
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   CBBox3D getBBox() const override {
@@ -143,15 +147,15 @@ class CSphere3D : public CShape3D {
   }
 
   double getArea() const {
-    if (! area_.isValid()) {
+    if (! area_) {
       double area = phi_max_*radius_*(zmax_ - zmin_);
 
-      CSphere3D *th = const_cast<CSphere3D *>(this);
+      auto *th = const_cast<CSphere3D *>(this);
 
-      th->area_.setValue(area);
+      th->area_ = area;
     }
 
-    return area_.getValue();
+    return area_.value();
   }
 
  private:
@@ -227,13 +231,14 @@ class CSphere3D : public CShape3D {
   }
 
  private:
-  double   radius_;      //! Radius R
-  double   zmin_, zmax_; //! Height Limits
-  double   phi_max_;     //! Angle/Sweep Limit
+  double  radius_  { 1.0 };   //! Radius R
+  double  zmin_    { -1.0 };  //! Height Min
+  double  zmax_    { -1.0 };  //! Height Max
+  double  phi_max_ { 360.0 }; //! Angle/Sweep Limit
 
-  double   theta_min_, theta_max_; // Temporaries
+  double theta_min_ { 0.0 }, theta_max_ { 0.0 }; // Temporaries
 
-  COptReal area_;
+  OptReal area_;
 };
 
 #endif

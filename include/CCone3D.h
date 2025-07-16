@@ -6,7 +6,8 @@
 #include <CLine3D.h>
 #include <CPoint3D.h>
 #include <CMathGen.h>
-#include <COptVal.h>
+
+#include <optional>
 
 /*! Cone of specified center (cx, cy, cz), radius (r) and height (h)
  *
@@ -23,7 +24,10 @@
 
 class CCone3D : public CShape3D {
  public:
-  CCone3D(double radius=double(1), double height=double(1)) :
+  using OptReal = std::optional<double>;
+
+ public:
+  CCone3D(double radius=1.0, double height=1.0) :
    radius_(radius), height_(height) {
     setPhiLimit(360.0);
   }
@@ -33,7 +37,7 @@ class CCone3D : public CShape3D {
   void setRadius(double radius) {
     radius_ = radius;
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   double getHeight() const { return height_; }
@@ -41,13 +45,13 @@ class CCone3D : public CShape3D {
   void setHeight(double height) {
     height_ = height;
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   void setPhiLimit(double phi_max) {
     phi_max_ = CMathGen::DegToRad(std::min(std::max(phi_max, 0.0), 360.0));
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   CBBox3D getBBox() const override {
@@ -133,7 +137,7 @@ class CCone3D : public CShape3D {
   }
 
   double getArea() const {
-    if (! area_.isValid()) {
+    if (! area_) {
       double h2 = height_*height_;
       double r2 = radius_*radius_;
 
@@ -141,10 +145,10 @@ class CCone3D : public CShape3D {
 
       CCone3D *th = const_cast<CCone3D *>(this);
 
-      th->area_.setValue(area);
+      th->area_ = area;
     }
 
-    return area_.getValue();
+    return area_.value();
   }
 
  private:
@@ -194,13 +198,13 @@ class CCone3D : public CShape3D {
   }
 
  private:
-  double   radius_; //! Radius r
-  double   height_; //! Height h
+  double radius_ { 1.0 }; //! Radius r
+  double height_ { 1.0 }; //! Height h
 
   // limits
-  double   phi_max_; //! Angle/Sweep Max
+  double phi_max_ { 360.0 }; //! Angle/Sweep Max
 
-  COptReal area_;
+  std::optional<double> area_;
 };
 
 #endif

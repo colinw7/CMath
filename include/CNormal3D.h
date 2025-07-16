@@ -64,6 +64,10 @@ class CNormal3D {
 
   //------
 
+  CVector3D getVector() const { return CVector3D(x_, y_, z_); }
+
+  //------
+
   double length() const {
     if (normalized_)
       return 1.0 ;

@@ -6,7 +6,8 @@
 #include <CLine3D.h>
 #include <CPoint3D.h>
 #include <CMathGen.h>
-#include <COptVal.h>
+
+#include <optional>
 
 /*! Disk of specified radius (r), specified z (h)
  *  and specified inner radius (ri) centered at origin
@@ -24,6 +25,9 @@
 
 class CDisk3D : public CShape3D {
  public:
+  using OptReal = std::optional<double>;
+
+ public:
   CDisk3D(double radius=double(1), double height=double(0), double inner_radius=double(0)) :
    radius_(radius), height_(height), inner_radius_(inner_radius) {
     setPhiLimit(360.0);
@@ -34,7 +38,7 @@ class CDisk3D : public CShape3D {
   void setRadius(double radius) {
     radius_ = radius;
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   double getHeight() const { return height_; }
@@ -42,7 +46,7 @@ class CDisk3D : public CShape3D {
   void setHeight(double height) {
     height_ = height;
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   double getInnerRadius() const { return inner_radius_; }
@@ -50,13 +54,13 @@ class CDisk3D : public CShape3D {
   void setInnerRadius(double radius) {
     inner_radius_ = radius;
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   void setPhiLimit(double phi_max) {
     phi_max_ = CMathGen::DegToRad(std::min(std::max(phi_max, 0.0), 360.0));
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   CBBox3D getBBox() const override {
@@ -127,15 +131,15 @@ class CDisk3D : public CShape3D {
   }
 
   double getArea() const {
-    if (! area_.isValid()) {
+    if (! area_) {
       double area = phi_max_*0.5*(radius_*radius_ - inner_radius_*inner_radius_);
 
-      CDisk3D *th = const_cast<CDisk3D *>(this);
+      auto *th = const_cast<CDisk3D *>(this);
 
-      th->area_.setValue(area);
+      th->area_ = area;
     }
 
-    return area_.getValue();
+    return area_.value();
   }
 
  private:
@@ -200,7 +204,7 @@ class CDisk3D : public CShape3D {
   // limits
   double   phi_max_; //! Angle/Sweep Max
 
-  COptReal area_;
+  OptReal area_;
 };
 
 #endif

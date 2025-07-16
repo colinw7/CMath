@@ -6,7 +6,8 @@
 #include <CLine3D.h>
 #include <CPoint3D.h>
 #include <CMathGen.h>
-#include <COptVal.h>
+
+#include <optional>
 
 /*! Paraboloid of specified center (cx, cy, cz), radius (r) and height (h)
  *
@@ -23,6 +24,9 @@
 
 class CParaboloid3D : public CShape3D {
  public:
+  using OptReal = std::optional<double>;
+
+ public:
   CParaboloid3D(double radius=double(1), double zmin=double(0), double zmax=double(1)) :
    radius_(radius) {
     setZRange(zmin, zmax);
@@ -35,7 +39,7 @@ class CParaboloid3D : public CShape3D {
   void setRadius(double radius) {
     radius_ = radius;
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   double getZMin() const { return zmin_; }
@@ -45,13 +49,13 @@ class CParaboloid3D : public CShape3D {
     zmin_ = std::min(zmin, zmax);
     zmax_ = std::max(zmin, zmax);
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   void setPhiLimit(double phi_max) {
     phi_max_ = CMathGen::DegToRad(std::min(std::max(phi_max, 0.0), 360.0));
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   CBBox3D getBBox() const override {
@@ -120,16 +124,15 @@ class CParaboloid3D : public CShape3D {
   }
 
   double getArea() const {
-    if (! area_.isValid()) {
-      double area = phi_max_/12.0*(pow(1 + 4*zmin_, 1.5) -
-                              pow(1 + 4*zmax_, 1.5));
+    if (! area_) {
+      double area = phi_max_/12.0*(pow(1 + 4*zmin_, 1.5) - pow(1 + 4*zmax_, 1.5));
 
-      CParaboloid3D *th = const_cast<CParaboloid3D *>(this);
+      auto *th = const_cast<CParaboloid3D *>(this);
 
-      th->area_.setValue(area);
+      th->area_ = area;
     }
 
-    return area_.getValue();
+    return area_.value();
   }
 
  private:
@@ -176,10 +179,10 @@ class CParaboloid3D : public CShape3D {
   }
 
  private:
-  double   radius_  { 0.0 };                //! Radius r
-  double   zmin_    { 0.0 }, zmax_ { 0.0 }; //!
-  double   phi_max_ { 0.0 };                //! Angle/Sweep Max
-  COptReal area_;
+  double  radius_  { 0.0 };                //! Radius r
+  double  zmin_    { 0.0 }, zmax_ { 0.0 }; //!
+  double  phi_max_ { 0.0 };                //! Angle/Sweep Max
+  OptReal area_;
 };
 
 #endif

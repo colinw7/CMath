@@ -4,6 +4,7 @@
 #include <CMathGen.h>
 #include <CPoint3D.h>
 #include <CVector3D.h>
+#include <CBBox2D.h>
 
 class CBBox3D {
  public:
@@ -24,8 +25,8 @@ class CBBox3D {
   }
 
   CBBox3D(double x1, double y1, double z1, double x2, double y2, double z2) {
-    pmin_ = CPoint3D(std::min(x1,x2),std::min(y1,y2),std::min(z1,z2));
-    pmax_ = CPoint3D(std::max(x1,x2),std::max(y1,y2),std::max(z1,z2));
+    pmin_ = CPoint3D(std::min(x1, x2), std::min(y1, y2), std::min(z1, z2));
+    pmax_ = CPoint3D(std::max(x1, x2), std::max(y1, y2), std::max(z1, z2));
 
     set_ = true;
   }
@@ -211,6 +212,11 @@ class CBBox3D {
     return radius.length();
   }
 
+  void move(const CPoint3D &d) {
+    pmin_ += d;
+    pmax_ += d;
+  }
+
   void scale(double factor) {
     CPoint3D center = getCenter();
 
@@ -218,9 +224,13 @@ class CBBox3D {
     pmax_ = center + CVector3D(center, pmax_)*factor;
   }
 
+  CBBox2D xyBBox() const {
+    return CBBox2D(CPoint2D(pmin_.x, pmin_.y), CPoint2D(pmax_.x, pmax_.y));
+  }
+
  public:
   bool lineInteracts(const CPoint3D &l1, const CPoint3D &l2) const {
-    // while line outside (no overlap)
+    // whole line outside (no overlap)
     if (l1.x < pmin_.x && l2.x < pmin_.x) return false;
     if (l1.x > pmax_.x && l2.x > pmax_.x) return false;
     if (l1.y < pmin_.y && l2.y < pmin_.y) return false;

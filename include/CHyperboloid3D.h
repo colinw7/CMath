@@ -6,7 +6,8 @@
 #include <CLine3D.h>
 #include <CPoint3D.h>
 #include <CMathGen.h>
-#include <COptVal.h>
+
+#include <optional>
 
 #ifdef CHYPERBOLOID_NAN
 #include <NaN.h>
@@ -31,6 +32,9 @@
  */
 
 class CHyperboloid3D : public CShape3D {
+ public:
+  using OptReal = std::optional<double>;
+
  public:
   CHyperboloid3D(const CPoint3D &point1=CPoint3D(0,0,0), const CPoint3D &point2=CPoint3D(1,1,1)) {
     setPoints(point1, point2);
@@ -75,13 +79,13 @@ class CHyperboloid3D : public CShape3D {
       ++num_iters;
     } while (num_iters < 1000 && ! validReal(a_));
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   void setPhiLimit(double phi_max) {
     phi_max_ = CMathGen::DegToRad(std::min(std::max(phi_max, 0.0), 360.0));
 
-    area_.setInvalid();
+    area_ = OptReal();
   }
 
   CBBox3D getBBox() const override {
@@ -148,7 +152,7 @@ class CHyperboloid3D : public CShape3D {
   }
 
   double getArea() const {
-    if (! area_.isValid()) {
+    if (! area_) {
       double p1x2 = point1_.x*point1_.x;
       double p1y2 = point1_.y*point1_.y;
       double p1z2 = point1_.z*point1_.z;
@@ -177,12 +181,12 @@ class CHyperboloid3D : public CShape3D {
          p1x2*(-4.0*p1y2 + 2.0*p12y + 5.0*p2y2 + 2.0*dp12z2) -
          2.0*p12x*(p2x2 - p1y2 + 5.0*p12y - p2y2 - p1z2 + 2.0*p12z - p2z2));
 
-      CHyperboloid3D *th = const_cast<CHyperboloid3D *>(this);
+      auto *th = const_cast<CHyperboloid3D *>(this);
 
-      th->area_.setValue(area);
+      th->area_ = area;
     }
 
-    return area_.getValue();
+    return area_.value();
   }
 
  private:
@@ -254,7 +258,7 @@ class CHyperboloid3D : public CShape3D {
   double   zmin_    { 0.0 }, zmax_ { 0.0 }; //! Height Range
   double   rmax_    { 0.0 };                //!
   double   a_       { 0.0 }, c_ { 0.0 };
-  COptReal area_;
+  OptReal  area_;
 };
 
 #endif

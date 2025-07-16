@@ -98,7 +98,7 @@ class CTransform2D {
 
   const CMatrix2D &getIMatrix() const {
     if (! inverse_set_) {
-      CTransform2D *th = const_cast<CTransform2D *>(this);
+      auto *th = const_cast<CTransform2D *>(this);
 
       nmatrix_.invert(th->imatrix_);
 

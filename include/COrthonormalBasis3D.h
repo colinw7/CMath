@@ -10,7 +10,7 @@ class COrthonormalBasis3D {
  public:
   // create default
   COrthonormalBasis3D() :
-   u_(1,0,0), v_(0,1,0), w_(0,0,1), m_(u_,v_,w_) {
+   u_(1, 0, 0), v_(0, 1, 0), w_(0, 0, 1), m_(u_, v_, w_) {
   }
 
   // create from three orthogonal vectors
@@ -29,7 +29,7 @@ class COrthonormalBasis3D {
 
   // set to default
   void reset() {
-    setUVW(CVector3D(1,0,0),CVector3D(0,1,0),CVector3D(0,0,1));
+    setUVW(CVector3D(1, 0, 0), CVector3D(0, 1, 0), CVector3D(0, 0, 1));
   }
 
   // set to three orthogonal vectors
@@ -49,7 +49,7 @@ class COrthonormalBasis3D {
     u = u_; v = v_; w = w_;
   }
 
-  // initialize from u,v othogonal vectors (generate w)
+  // initialize from u, v othogonal vectors (generate w)
   void initFromUV(const CVector3D &u, const CVector3D &v) {
     CVector3D u1 = u.unit();
     CVector3D w1 = u.crossProduct(v).unit();
@@ -58,7 +58,7 @@ class COrthonormalBasis3D {
     setUVW(u1, v1, w1);
   }
 
-  // initialize from v,w othogonal vectors (generate u)
+  // initialize from v, w othogonal vectors (generate u)
   void initFromVW(const CVector3D &v, const CVector3D &w) {
     CVector3D v1 = v.unit();
     CVector3D u1 = v.crossProduct(w).unit();
@@ -67,7 +67,7 @@ class COrthonormalBasis3D {
     setUVW(u1, v1, w1);
   }
 
-  // initialize from w,u othogonal vectors (generate v)
+  // initialize from w, u othogonal vectors (generate v)
   void initFromWU(const CVector3D &w, const CVector3D &u) {
     CVector3D w1 = w.unit();
     CVector3D v1 = w.crossProduct(u).unit();
@@ -76,7 +76,7 @@ class COrthonormalBasis3D {
     setUVW(u1, v1, w1);
   }
 
-  // initialize from w,v othogonal vectors (generate u)
+  // initialize from w, v othogonal vectors (generate u)
   void initFromWV(const CVector3D &w, const CVector3D &v) {
     CVector3D w1 = w.unit();
     CVector3D u1 = v.crossProduct(w).unit();
@@ -85,7 +85,7 @@ class COrthonormalBasis3D {
     setUVW(u1, v1, w1);
   }
 
-  // initialize from v,u othogonal vectors (generate w)
+  // initialize from v, u othogonal vectors (generate w)
   void initFromVU(const CVector3D &v, const CVector3D &u) {
     CVector3D v1 = v.unit();
     CVector3D w1 = u.crossProduct(v).unit();
@@ -94,7 +94,7 @@ class COrthonormalBasis3D {
     setUVW(u1, v1, w1);
   }
 
-  // initialize from u,w othogonal vectors (generate v)
+  // initialize from u, w othogonal vectors (generate v)
   void initFromUW(const CVector3D &u, const CVector3D &w) {
     CVector3D u1 = u.unit();
     CVector3D v1 = w.crossProduct(u).unit();
@@ -106,14 +106,14 @@ class COrthonormalBasis3D {
   // initialize from u othogonal vector (generate v and w)
   void initFromU(const CVector3D &u) {
     CVector3D u1 = u.unit();
-    CVector3D v1 = CVector3D(0,1,0);
+    CVector3D v1 = CVector3D(0, 1, 0);
 
     double vu = v1.dotProduct(u1);
 
     v1 = (v1 - vu*u1).unit();
 
     if (v1.isZero()) {
-      v1 = CVector3D(0,0,1);
+      v1 = CVector3D(0, 0, 1);
 
       vu = v1.dotProduct(u1);
 
@@ -129,14 +129,14 @@ class COrthonormalBasis3D {
   // initialize from v othogonal vector (generate u and w)
   void initFromV(const CVector3D &v) {
     CVector3D v1 = v.unit();
-    CVector3D w1 = CVector3D(0,0,1);
+    CVector3D w1 = CVector3D(0, 0, 1);
 
     double wv = w1.dotProduct(v1);
 
     w1 = (w1 - wv*v1).unit();
 
     if (w1.isZero()) {
-      w1 = CVector3D(1,0,0);
+      w1 = CVector3D(1, 0, 0);
 
       wv = w1.dotProduct(v1);
 
@@ -152,14 +152,14 @@ class COrthonormalBasis3D {
   // initialize from w othogonal vector (generate u and v)
   void initFromW(const CVector3D &w) {
     CVector3D w1 = w.unit();
-    CVector3D u1 = CVector3D(1,0,0);
+    CVector3D u1 = CVector3D(1, 0, 0);
 
     double uw = u1.dotProduct(w1);
 
     u1 = (u1 - uw*w1).unit();
 
     if (u1.isZero()) {
-      u1 = CVector3D(0,1,0);
+      u1 = CVector3D(0, 1, 0);
 
       uw = u1.dotProduct(w1);
 

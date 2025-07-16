@@ -377,7 +377,7 @@ class CMatrixStack2D {
 
   const CMatrix2D &getMatrix() const {
     if (! mValid_) {
-      CMatrixStack2D *th = const_cast<CMatrixStack2D *>(this);
+      auto *th = const_cast<CMatrixStack2D *>(this);
 
       th->m_.setIdentity();
 

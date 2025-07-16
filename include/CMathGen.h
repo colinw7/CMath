@@ -3,7 +3,9 @@
 
 #include <CIPoint2D.h>
 //#include <NaN.h>
+#include <vector>
 #include <cmath>
+#include <cassert>
 #include <sys/types.h>
 
 // Fast conversion from a IEEE 32-bit floating point number F in [0,1] to a
@@ -231,6 +233,59 @@ namespace CMathGen {
   template <typename T, typename ... Args>
   T max(T a, T b, Args ... args) {
      return max(max(a,b), args...);
+  }
+
+  //---
+
+  template <typename T>
+  std::pair<int, T> mapIntoRangeSet(const T &value, const std::vector<T> &rangeSet) {
+    using RVal = std::pair<int, T>;
+
+    auto nr = rangeSet.size();
+    assert(nr != 0);
+
+    const T &min = rangeSet[0];
+    if (nr == 1) return RVal(0, min);
+
+    const T &max = rangeSet[nr - 1];
+    if (min >= max) return RVal(-1, value);
+
+    auto v  = (value - min)/(max - min);
+    auto iv = (v >= 0 ? int(v) : int(v - 1));
+    auto v1 = value - T(iv)*(max - min);
+
+    T rmin = min;
+    T rmax = rmin;
+
+    size_t ir = 0;
+
+    for ( ; ir < nr; ++ir) {
+      rmax = rangeSet[ir + 1];
+      if (rmin >= rmax) return RVal(-1, value);
+
+      if (v1 >= rmin && v1 < rmax)
+        break;
+
+      rmin = rmax;
+    }
+
+    auto f = (v1 - rmin)/(rmax - rmin);
+
+    return RVal(int(ir), f);
+  }
+
+  template <typename T, typename U=double>
+  std::pair<bool, T> interpRangeSet(int ir, const U &f, const std::vector<T> &rangeSet) {
+    using RVal = std::pair<bool, T>;
+
+    auto nr = rangeSet.size();
+    if (nr == 0)
+      return RVal(false, T());;
+
+    if (ir < 0 || ir >= int(nr - 1))
+      return RVal(false, T());;
+
+    return RVal(true, rangeSet[ir] + f*(rangeSet[ir + 1] - rangeSet[ir]));
   }
 }
 

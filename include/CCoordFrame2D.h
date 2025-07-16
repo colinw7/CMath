@@ -8,18 +8,18 @@
 class CCoordFrame2D {
  public:
   CCoordFrame2D() :
-   origin_(0,0), basis_() {
+   origin_(0, 0), basis_() {
   }
 
   explicit
-  CCoordFrame2D(const CPoint2D &origin, const CVector2D &u=CVector2D(1,0),
-                const CVector2D &v=CVector2D(0,1)) :
+  CCoordFrame2D(const CPoint2D &origin, const CVector2D &u=CVector2D(1, 0),
+                const CVector2D &v=CVector2D(0, 1)) :
    origin_(origin), basis_(u, v) {
   }
 
   explicit
-  CCoordFrame2D(const CVector2D &origin, const CVector2D &u=CVector2D(1,0),
-                const CVector2D &v=CVector2D(0,1)) :
+  CCoordFrame2D(const CVector2D &origin, const CVector2D &u=CVector2D(1, 0),
+                const CVector2D &v=CVector2D(0, 1)) :
    origin_(origin), basis_(u, v) {
   }
 
@@ -94,7 +94,7 @@ class CCoordFrame2D {
     basis_.rotate(a);
   }
 
-  /// Reset to (0,0) origin and (1,0),(0,1) basis
+  /// Reset to (0, 0) origin and (1, 0), (0, 1) basis
   void reset() {
     origin_.zero();
 

@@ -5,17 +5,14 @@
 #include <CMatrix3D.h>
 #include <CPoint3D.h>
 #include <CVector3D.h>
-#include <COptVal.h>
+
+#include <optional>
 
 class CLine3D;
 
 class CShape3D {
  public:
-  CShape3D() :
-   translate_(0,0,0), scale_(1,1,1), rotate_(0,0,0), transform_(), itransform_() {
-    transform_ .setInvalid();
-    itransform_.setInvalid();
-  }
+  CShape3D() { }
 
   virtual ~CShape3D() { }
 
@@ -24,22 +21,22 @@ class CShape3D {
   void translate(const CPoint3D &d) {
     translate_ += d;
 
-    transform_ .setInvalid();
-    itransform_.setInvalid();
+    transform_  = OptMatrix();
+    itransform_ = OptMatrix();
   }
 
   void scale(const CPoint3D &s) {
     scale_ *= s;
 
-    transform_ .setInvalid();
-    itransform_.setInvalid();
+    transform_  = OptMatrix();
+    itransform_ = OptMatrix();
   }
 
   void rotate(const CPoint3D &r) {
     rotate_ += r;
 
-    transform_ .setInvalid();
-    itransform_.setInvalid();
+    transform_  = OptMatrix();
+    itransform_ = OptMatrix();
   }
 
   const CPoint3D &getTranslate() const { return translate_; }
@@ -63,27 +60,27 @@ class CShape3D {
   }
 
   const CMatrix3D &getTransform() const {
-    if (! transform_.isValid()) {
-      CShape3D *th = const_cast<CShape3D *>(this);
+    if (! transform_) {
+      auto *th = const_cast<CShape3D *>(this);
 
-      th->transform_.setValue(CMatrix3D::translation(translate_.x, translate_.y, translate_.z)*
-                              CMatrix3D::rotation   (rotate_   .x, rotate_   .y, rotate_   .z)*
-                              CMatrix3D::scale      (scale_    .x, scale_    .y, scale_    .z));
+      th->transform_ = CMatrix3D::translation(translate_.x, translate_.y, translate_.z)*
+                       CMatrix3D::rotation   (rotate_   .x, rotate_   .y, rotate_   .z)*
+                       CMatrix3D::scale      (scale_    .x, scale_    .y, scale_    .z);
     }
 
-    return transform_.getValue();
+    return transform_.value();
   }
 
   const CMatrix3D &getITransform() const {
-    if (! itransform_.isValid()) {
-      const CMatrix3D &transform = getTransform();
+    if (! itransform_) {
+      const auto &transform = getTransform();
 
-      CShape3D *th = const_cast<CShape3D *>(this);
+      auto *th = const_cast<CShape3D *>(this);
 
-      th->itransform_.setValue(transform.inverse());
+      th->itransform_ = transform.inverse();
     }
 
-    return itransform_.getValue();
+    return itransform_.value();
   }
 
   virtual bool intersect(const CLine3D &, double *, double *) const { return false; }
@@ -114,13 +111,13 @@ class CShape3D {
     }
   };
 
-  using OptMatrix = COptValT<CMatrix3D>;
+  using OptMatrix = std::optional<CMatrix3D>;
 
-  CPoint3D  translate_;  //! Translate
-  CPoint3D  scale_    ;  //! Scale
-  CPoint3D  rotate_   ;  //! Rotate
-  OptMatrix transform_;  //! Transform
-  OptMatrix itransform_; //! Inverse Transform
+  CPoint3D  translate_ { 0.0, 0.0, 0.0 }; //! Translate
+  CPoint3D  scale_     { 1.0, 1.0, 1.0 }; //! Scale
+  CPoint3D  rotate_    { 0.0, 0.0, 0.0 }; //! Rotate
+  OptMatrix transform_;                   //! Transform
+  OptMatrix itransform_;                  //! Inverse Transform
 };
 
 #endif

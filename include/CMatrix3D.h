@@ -83,11 +83,17 @@ class CMatrix3D {
 
       setBottomIdentity();
     }
-    else if (n == 16)
+    else if (n == 16) {
+#if 0
+      // byte order
+      memcpy(&m00_, m, 16*sizeof(double));
+#else
       setValues(m[ 0], m[ 1], m[ 2], m[ 3],
                 m[ 4], m[ 5], m[ 6], m[ 7],
                 m[ 8], m[ 9], m[10], m[11],
                 m[12], m[13], m[14], m[15]);
+#endif
+    }
     else
       assert(false && "Invalid size");
   }
@@ -123,7 +129,7 @@ class CMatrix3D {
 
   //------
 
-  // output
+  // output (data order)
   void print(std::ostream &os) const {
     os << "((" << m00_ << "," << m01_ << "," << m02_ << "," << m03_ << "),";
     os << " (" << m10_ << "," << m11_ << "," << m12_ << "," << m13_ << "),";
@@ -204,9 +210,9 @@ class CMatrix3D {
     return lhs.cmp(rhs) >= 0;
   }
 
-  // TODO: isZero(), isIdentity()
-
   //------
+
+  // TODO: isZero()
 
   bool isIdentity() {
     return (m00_ == 1 && m01_ == 0 && m02_ == 0 && m03_ == 0 &&
@@ -229,6 +235,16 @@ class CMatrix3D {
     m.setTranslation(tx, ty, tz);
 
     return m;
+  }
+
+  CMatrix3D &translated(double tx, double ty, double tz) {
+    CMatrix3D m;
+
+    m.setTranslation(tx, ty, tz);
+
+    *this *= m;
+
+    return *this;
   }
 
   void setTranslation(double tx, double ty, double tz) {
@@ -275,6 +291,16 @@ class CMatrix3D {
     m.setScale(sx, sy, sz);
 
     return m;
+  }
+
+  CMatrix3D &scaled(double sx, double sy, double sz) {
+    CMatrix3D m;
+
+    m.setScale(sx, sy, sz);
+
+    *this *= m;
+
+    return *this;
   }
 
   void setScale(double s) {
@@ -328,6 +354,24 @@ class CMatrix3D {
     return m;
   }
 
+  static CMatrix3D rotation(double theta, const CVector3D &u) {
+    CMatrix3D m;
+
+    m.setRotation(theta, u);
+
+    return m;
+  }
+
+  CMatrix3D &rotated(double theta, const CVector3D &u) {
+    CMatrix3D m;
+
+    m.setRotation(theta, u);
+
+    *this *= m;
+
+    return *this;
+  }
+
   void setRotation(CMathGen::AxisType3D axis, double angle,
                    CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     if (handedness == CMathGen::RIGHT_HANDEDNESS)
@@ -342,12 +386,12 @@ class CMatrix3D {
     double theta2 = 0.5*theta;
 
     // rotate around the line
-    double w = cos(theta2);
+    double w = std::cos(theta2);
 
-    //TODO: shouldn't have to normalize u
-    CVector3D v = u*sin(theta2);
+    // TODO: shouldn't have to normalize u
+    CVector3D v = u*std::sin(theta2);
 
-    //assign matrix
+    // assign matrix
     double x = v.getX(); double y = v.getY(); double z = v.getZ();
 
     double x2 = 2.0*x; double y2 = 2.0*y; double z2 = 2.0*z;
@@ -363,8 +407,8 @@ class CMatrix3D {
     setValues(a, b, c, d, e, f, g, h, i, 0.0, 0.0, 0.0);
   }
 
-  void setRotationTranslation(CMathGen::AxisType3D axis,
-                              double angle, double tx, double ty, double tz,
+  void setRotationTranslation(CMathGen::AxisType3D axis, double angle,
+                              double tx, double ty, double tz,
                               CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     if (handedness == CMathGen::RIGHT_HANDEDNESS)
       setInnerRotationRHS(axis, angle);
@@ -423,8 +467,8 @@ class CMatrix3D {
 
     CVector3D a = axis.normalized();
 
-    double c = ::cos(angle);
-    double s = ::sin(angle);
+    double c = std::cos(angle);
+    double s = std::sin(angle);
 
     double c1 = 1.0 - c;
 
@@ -463,7 +507,7 @@ class CMatrix3D {
   void setLookAt(const CPoint3D &eye, const CVector3D &dir) {
     CVector3D dir1 = dir.normalized();
 
-    CVector3D up(0,0,1);
+    CVector3D up(0, 0, 1);
 
     CVector3D up1 = up - (up.dotProduct(dir1))*dir1;
 
@@ -590,50 +634,47 @@ class CMatrix3D {
       v[ 0] = m00_; v[ 1] = m01_; v[ 2] = m02_;
       v[ 3] = m10_; v[ 4] = m11_; v[ 5] = m12_;
       v[ 6] = m20_; v[ 7] = m21_; v[ 8] = m22_;
-      v[ 9] = m03_; v[10] = m13_; v[11] = m23_;
+      v[ 9] = m03_; v[10] = m13_; v[11] = m23_; // tx, ty, tz
     }
     else if (n == 16) {
+#if 0
+      // data order
+      memcpy(v, &m00_, 16*sizeof(double);
+#else
       v[ 0] = m00_; v[ 1] = m01_; v[ 2] = m02_; v[ 3] = m03_;
       v[ 4] = m10_; v[ 5] = m11_; v[ 6] = m12_; v[ 7] = m13_;
       v[ 8] = m20_; v[ 9] = m21_; v[10] = m22_; v[11] = m23_;
       v[12] = m30_; v[13] = m31_; v[14] = m32_; v[15] = m33_;
+#endif
     }
     else
       assert(false && "Invalid size");
   }
 
   void getValuesI(double *v, int n) const {
-    if      (n == 9) {
-      v[0] = m00_; v[1] = m10_; v[2] = m20_;
-      v[3] = m01_; v[4] = m11_; v[5] = m21_;
-      v[6] = m02_; v[7] = m12_; v[8] = m22_;
-    }
-    else if (n == 12) {
-      v[ 0] = m00_; v[ 1] = m10_; v[ 2] = m20_;
-      v[ 3] = m01_; v[ 4] = m11_; v[ 5] = m21_;
-      v[ 6] = m02_; v[ 7] = m12_; v[ 8] = m22_;
-      v[ 9] = m03_; v[10] = m13_; v[11] = m23_;
-    }
-    else if (n == 16) {
-      v[ 0] = m00_; v[ 1] = m10_; v[ 2] = m20_; v[ 3] = m30_;
-      v[ 4] = m01_; v[ 5] = m11_; v[ 6] = m21_; v[ 7] = m31_;
-      v[ 8] = m02_; v[ 9] = m12_; v[10] = m22_; v[11] = m32_;
-      v[12] = m03_; v[13] = m13_; v[14] = m23_; v[15] = m33_;
-    }
-    else
-      assert(false && "Invalid size");
+    assert(n == 16);
+
+    // transposed
+    v[ 0] = m00_; v[ 1] = m10_; v[ 2] = m20_; v[ 3] = m30_;
+    v[ 4] = m01_; v[ 5] = m11_; v[ 6] = m21_; v[ 7] = m31_;
+    v[ 8] = m02_; v[ 9] = m12_; v[10] = m22_; v[11] = m32_;
+    v[12] = m03_; v[13] = m13_; v[14] = m23_; v[15] = m33_;
   }
 
   //---------
 
-  const double *getData() const {
-    return &m00_;
+  const double *getData() const { return &m00_; }
+
+  void setData(double *data) {
+    memcpy(&m00_, data, 16*sizeof(double));
   }
+
+  //---------
 
   void setColumn(int c, double x, double y, double z) {
     assert(c < 4);
 
-    double *m = &(&m00_)[c];
+    double *m = columnData(c);
 
     m[0] = x, m[4] = y, m[8] = z;
   }
@@ -645,7 +686,7 @@ class CMatrix3D {
   void setColumn(int c, const CVector3D &vector) {
     assert(c < 4);
 
-    double *m = &(&m00_)[c];
+    double *m = columnData(c);
 
     vector.getXYZ(&m[0], &m[4], &m[8]);
   }
@@ -653,7 +694,7 @@ class CMatrix3D {
   void getColumn(int c, double *x, double *y, double *z) {
     assert(c < 4);
 
-    double *m = &(&m00_)[c];
+    double *m = columnData(c);
 
     if (x) *x = m[0];
     if (y) *y = m[4];
@@ -663,7 +704,7 @@ class CMatrix3D {
   void getColumn(int c, CPoint3D &point) {
     assert(c < 4);
 
-    double *m = &(&m00_)[c];
+    double *m = columnData(c);
 
     point.x = m[0];
     point.y = m[4];
@@ -673,7 +714,7 @@ class CMatrix3D {
   void getColumn(int c, CVector3D &vector) {
     assert(c < 4);
 
-    double *m = &(&m00_)[c];
+    double *m = columnData(c);
 
     vector = CVector3D(m[0], m[4], m[8]);
   }
@@ -684,12 +725,16 @@ class CMatrix3D {
     getColumn(2, w);
   }
 
+  double *columnData(int c) {
+    return &(&m00_)[c];
+  }
+
   //---------
 
   void setRow(int r, double x, double y, double z) {
     assert(r < 4);
 
-    double *m = &(&m00_)[r*4];
+    double *m = rowData(r);
 
     m[0] = x, m[1] = y, m[2] = z;
   }
@@ -697,7 +742,7 @@ class CMatrix3D {
   void setRow(int r, const CPoint3D &point) {
     assert(r < 4);
 
-    double *m = &(&m00_)[r*4];
+    double *m = rowData(r);
 
     m[0] = point.x, m[1] = point.y, m[2] = point.z;
   }
@@ -705,7 +750,7 @@ class CMatrix3D {
   void setRow(int r, const CVector3D &vector) {
     assert(r < 4);
 
-    double *m = &(&m00_)[r*4];
+    double *m = rowData(r);
 
     vector.getXYZ(&m[0], &m[1], &m[2]);
   }
@@ -713,7 +758,7 @@ class CMatrix3D {
   void getRow(int r, double *x, double *y, double *z) {
     assert(r < 4);
 
-    double *m = &(&m00_)[r*4];
+    double *m = rowData(r);
 
     if (x) *x = m[0];
     if (y) *y = m[1];
@@ -723,7 +768,7 @@ class CMatrix3D {
   void getRow(int r, CPoint3D &point) {
     assert(r < 4);
 
-    double *m = &(&m00_)[r*4];
+    double *m = rowData(r);
 
     point.x = m[0];
     point.y = m[1];
@@ -733,14 +778,18 @@ class CMatrix3D {
   void getRow(int r, CVector3D &vector) {
     assert(r < 4);
 
-    double *m = &(&m00_)[r*4];
+    double *m = rowData(r);
 
     vector = CVector3D(m[0], m[1], m[2]);
   }
 
+  double *rowData(int r) {
+    return &(&m00_)[r*4];
+  }
+
   //---------
 
-  // CPoint3D can be expressed as a 1x4 matrix (x,y,z,1)
+  // CPoint3D can be expressed as a 1x4 matrix (x, y, z, 1)
   void multiplyPoint(double xi, double yi, double zi,
                     double *xo, double *yo, double *zo) const {
     *xo = m00_*xi + m01_*yi + m02_*zi + m03_;
@@ -779,7 +828,7 @@ class CMatrix3D {
                  m02_*ipoint.x + m12_*ipoint.y + m22_*ipoint.z);
   }
 
-  // CVector3D can be expressed as a 1x4 matrix (x,y,z,0)
+  // CVector3D can be expressed as a 1x4 matrix (x, y, z, 0)
   void multiplyVector(double xi, double yi, double zi,
                       double *xo, double *yo, double *zo) const {
     *xo = m00_*xi + m01_*yi + m02_*zi;
@@ -932,8 +981,15 @@ class CMatrix3D {
 
     double id = 1.0/d;
 
+#if 0
+    // TODO: wrong ?
     for (int i = 0; i < 9; ++i)
       (&m00_)[i] *= id;
+#else
+    m00_ *= id; m01_ *= id; m02_ *= id;
+    m10_ *= id; m11_ *= id; m12_ *= id;
+    m20_ *= id; m21_ *= id; m22_ *= id;
+#endif
   }
 
   CMatrix3D normalized() {
@@ -1021,7 +1077,7 @@ class CMatrix3D {
 
     v.getXYZ(&d[3], &d[7], &d[11]);
 
-    CGaussianMatrix<3,4> matrix(d);
+    CGaussianMatrix<3, 4> matrix(d);
 
     if (! matrix.solve(d))
       return false;
@@ -1239,8 +1295,8 @@ class CMatrix3D {
   }
 
   void setInnerRotationRHS(CMathGen::AxisType3D axis, double angle) {
-    double c = ::cos(angle);
-    double s = ::sin(angle);
+    double c = std::cos(angle);
+    double s = std::sin(angle);
 
     if      (axis == CMathGen::X_AXIS_3D) {
       m00_ = 1.0; m01_ = 0.0; m02_ = 0.0;
@@ -1260,8 +1316,8 @@ class CMatrix3D {
   }
 
   void setInnerRotationLHS(CMathGen::AxisType3D axis, double angle) {
-    double c = ::cos(angle);
-    double s = ::sin(angle);
+    double c = std::cos(angle);
+    double s = std::sin(angle);
 
     if      (axis == CMathGen::X_AXIS_3D) {
       m00_ = 1.0; m01_ = 0.0; m02_ = 0.0;
@@ -1296,6 +1352,8 @@ class CMatrix3D {
     m30_ = 0.0, m31_ = 0.0, m32_ = 0.0, m33_ = 1.0;
   }
 
+  //---
+
   static double det3x3(double m00, double m01, double m02,
                        double m10, double m11, double m12,
                        double m20, double m21, double m22) {
@@ -1309,10 +1367,11 @@ class CMatrix3D {
   }
 
  private:
-  double m00_ { 0.0 }, m01_ { 0.0 }, m02_ { 0.0 }, m03_ { 0.0 };
-  double m10_ { 0.0 }, m11_ { 0.0 }, m12_ { 0.0 }, m13_ { 0.0 };
-  double m20_ { 0.0 }, m21_ { 0.0 }, m22_ { 0.0 }, m23_ { 0.0 };
-  double m30_ { 0.0 }, m31_ { 0.0 }, m32_ { 0.0 }, m33_ { 0.0 };
+  // row major ( m <row> <column> )
+  double m00_ { 0.0 }, m01_ { 0.0 }, m02_ { 0.0 }, m03_ { 0.0 }; // row 0
+  double m10_ { 0.0 }, m11_ { 0.0 }, m12_ { 0.0 }, m13_ { 0.0 }; // row 1
+  double m20_ { 0.0 }, m21_ { 0.0 }, m22_ { 0.0 }, m23_ { 0.0 }; // row 2
+  double m30_ { 0.0 }, m31_ { 0.0 }, m32_ { 0.0 }, m33_ { 0.0 }; // row 3
 };
 
 #endif

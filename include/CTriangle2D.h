@@ -31,9 +31,9 @@ class CTriangle2D {
   }
 
   void getBarycentrics(const CPoint2D &point, double *u, double *v) const {
-    CVector2D v1 = CVector2D(point  , point3_);
-    CVector2D v2 = CVector2D(point3_, point1_);
-    CVector2D v3 = CVector2D(point3_, point2_);
+    auto v1 = CVector2D(point  , point3_);
+    auto v2 = CVector2D(point3_, point1_);
+    auto v3 = CVector2D(point3_, point2_);
 
     double a, b, c, d, e, f;
 

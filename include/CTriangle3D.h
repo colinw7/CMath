@@ -4,21 +4,17 @@
 #include <CShape3D.h>
 #include <CLine3D.h>
 #include <CVector2D.h>
-#include <COptVal.h>
 #include <CPolygonOrientation.h>
 #include <CMathGeom2D.h>
 
-class CTriangle3D : public CShape3D {
- private:
-  CPoint3D            point1_, point2_, point3_;
-  COptValT<CVector3D> normal_;
-  COptValT<CVector3D> normal1_, normal2_, normal3_;
+#include <optional>
 
+class CTriangle3D : public CShape3D {
  public:
   // constructor/destructor
-  CTriangle3D(const CPoint3D &point1=CPoint3D(0,0,0),
-              const CPoint3D &point2=CPoint3D(1,0,0),
-              const CPoint3D &point3=CPoint3D(0.5,1,0)) :
+  CTriangle3D(const CPoint3D &point1=CPoint3D(0.0, 0.0, 0.0),
+              const CPoint3D &point2=CPoint3D(1.0, 0.0, 0.0),
+              const CPoint3D &point3=CPoint3D(0.5, 1.0, 0.0)) :
    point1_(point1), point2_(point2), point3_(point3) {
   }
 
@@ -182,14 +178,14 @@ class CTriangle3D : public CShape3D {
   CVector3D pointNormal(const CPoint3D &point) const {
     CVector3D n;
 
-    if (normal1_.isValid() && normal2_.isValid() && normal3_.isValid()) {
+    if (normal1_ && normal2_ && normal3_) {
       double u, v;
 
       getBarycentrics(point, &u, &v);
 
       double w = 1 - u - v;
 
-      n = u*normal1_.getValue() + v*normal2_.getValue() + w*normal3_.getValue();
+      n = u*normal1_.value() + v*normal2_.value() + w*normal3_.value();
     }
     else
       n = getNormal();
@@ -198,16 +194,16 @@ class CTriangle3D : public CShape3D {
   }
 
   const CVector3D &getNormal() const {
-    if (! normal_.isValid()) {
-      CTriangle3D *th = const_cast<CTriangle3D *>(this);
+    if (! normal_) {
+      auto *th = const_cast<CTriangle3D *>(this);
 
-      CVector3D p01 = CVector3D(point1_, point2_);
-      CVector3D p02 = CVector3D(point1_, point3_);
+      auto p01 = CVector3D(point1_, point2_);
+      auto p02 = CVector3D(point1_, point3_);
 
-      th->normal_.setValue(CVector3D::crossProduct(p01, p02).unit());
+      th->normal_ = CVector3D::crossProduct(p01, p02).unit();
     }
 
-    return normal_.getValue();
+    return normal_.value();
   }
 
   CVector2D pointToSurfaceVector(const CPoint3D &p) const {
@@ -217,6 +213,13 @@ class CTriangle3D : public CShape3D {
 
     return CVector2D(u, v);
   }
+
+ private:
+  using OptVector = std::optional<CVector3D>;
+
+  CPoint3D  point1_, point2_, point3_;
+  OptVector normal_;
+  OptVector normal1_, normal2_, normal3_;
 };
 
 #endif

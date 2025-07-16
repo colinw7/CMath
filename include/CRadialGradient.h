@@ -40,7 +40,7 @@ class CRadialGradient : public CGenGradient {
   void setFocus(double fx, double fy) { fx_ = fx; fy_ = fy; }
 
   void init(double width, double height) const override {
-    CRadialGradient *th = const_cast<CRadialGradient *>(this);
+    auto *th = const_cast<CRadialGradient *>(this);
 
     th->cx1_ = cx_*width ;
     th->cy1_ = cy_*height;

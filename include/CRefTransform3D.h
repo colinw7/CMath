@@ -5,7 +5,7 @@
 #include <CPoint3D.h>
 #include <CVector3D.h>
 #include <CMathGen.h>
-#include <mmeory>
+#include <memory>
 
 class CRefTransform3D {
  private:
@@ -113,8 +113,7 @@ class CRefTransform3D {
     return CRefTransform3D(m, im);
   }
 
-  CRefTransform3D lookAt(const Point &eye, const Point &center,
-                          const Vector &up) {
+  CRefTransform3D lookAt(const Point &eye, const Point &center, const Vector &up) {
     Matrix m, im;
 
     m.lookAt(eye, center, up);

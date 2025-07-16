@@ -2,16 +2,17 @@
 #define CGLMatrix3D_H
 
 #include <CMathGen.h>
+#include <CMatrix3D.h>
 #include <CPoint3D.h>
 #include <CGLVector3D.h>
 #include <cstring>
 
 /* Homogeneous 3D Matrix for OpenGL */
 
-/* / m00 m01 m02 m03 \ */
-/* | m10 m11 m12 m13 | */
-/* | m20 m21 m22 m23 | */
-/* \ m30 m31 m32 m33 / */
+/* / m00 m01 m20 m30 \ */
+/* | m01 m11 m21 m31 | */
+/* | m02 m12 m22 m32 | */
+/* \ m03 m13 m23 m33 / */
 
 class CGLMatrix3D {
  public:
@@ -83,11 +84,17 @@ class CGLMatrix3D {
 
       setBottomIdentity();
     }
-    else if (n == 16)
-      setValues(m[ 0], m[ 1], m[ 2], m[ 3],
-                m[ 4], m[ 5], m[ 6], m[ 7],
-                m[ 8], m[ 9], m[10], m[11],
-                m[12], m[13], m[14], m[15]);
+    else if (n == 16) {
+#if 0
+      // byte order
+      memcpy(&m00_, m, 16*sizeof(float));
+#else
+      setValues(m[ 0], m[ 4], m[ 8], m[12],
+                m[ 1], m[ 5], m[ 9], m[13],
+                m[ 2], m[ 6], m[10], m[14],
+                m[ 3], m[ 7], m[11], m[15]);
+#endif
+    }
     else
       assert(false && "Invalid size");
   }
@@ -95,6 +102,10 @@ class CGLMatrix3D {
   CGLMatrix3D(CMathGen::AxisType3D axis, float angle,
               CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     setRotation(axis, angle, handedness);
+  }
+
+  CGLMatrix3D *dup() const {
+    return new CGLMatrix3D(*this);
   }
 
   //------
@@ -118,6 +129,14 @@ class CGLMatrix3D {
     os << " (" << m10_ << "," << m11_ << "," << m12_ << "," << m13_ << "),";
     os << " (" << m20_ << "," << m21_ << "," << m22_ << "," << m23_ << "),";
     os << " (" << m30_ << "," << m31_ << "," << m32_ << "," << m33_ << "))";
+  }
+
+  // output (data order)
+  void printData(std::ostream &os) const {
+    os << "((" << m00_ << "," << m10_ << "," << m20_ << "," << m30_ << "),";
+    os << " (" << m01_ << "," << m11_ << "," << m21_ << "," << m31_ << "),";
+    os << " (" << m02_ << "," << m12_ << "," << m22_ << "," << m32_ << "),";
+    os << " (" << m03_ << "," << m13_ << "," << m23_ << "," << m33_ << "))";
   }
 
   friend std::ostream &operator<<(std::ostream &os, const CGLMatrix3D &matrix) {
@@ -193,9 +212,9 @@ class CGLMatrix3D {
     return lhs.cmp(rhs) >= 0;
   }
 
-  // TODO: isZero(), isIdentity()
-
   //------
+
+  // TODO: isZero()
 
   bool isIdentity() {
     return (m00_ == 1 && m01_ == 0 && m02_ == 0 && m03_ == 0 &&
@@ -262,6 +281,14 @@ class CGLMatrix3D {
     return *this;
   }
 
+  CGLMatrix3D &translate(float x, float y, float z) {
+    m03_ += x;
+    m13_ += y;
+    m23_ += z;
+
+    return *this;
+  }
+
   //---
 
   static CGLMatrix3D scale(float sx, float sy, float sz) {
@@ -293,6 +320,8 @@ class CGLMatrix3D {
 
     setOuterIdentity();
   }
+
+  //---
 
   void setScaleTranslation(float s, float tx, float ty, float tz) {
     setInnerScale(s, s, s);
@@ -338,13 +367,13 @@ class CGLMatrix3D {
     return *this;
   }
 
-  CGLMatrix3D setRotation(float theta, const CGLVector3D &u) {
+  CGLMatrix3D &setRotation(float theta, const CGLVector3D &u) {
     float theta2 = 0.5f*theta;
 
     // rotate around the line
     float w = std::cos(theta2);
 
-    //TODO: shouldn't have to normalize u
+    // TODO: shouldn't have to normalize u
     CGLVector3D v = u.normalized()*std::sin(theta2);
 
     // assign matrix
@@ -390,7 +419,7 @@ class CGLMatrix3D {
   }
 
   CGLMatrix3D &setXYZRotation(const CGLVector3D &angles,
-                      CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
+                              CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     CGLMatrix3D xmatrix(CMathGen::X_AXIS_3D, angles.getX(), handedness);
     CGLMatrix3D ymatrix(CMathGen::Y_AXIS_3D, angles.getY(), handedness);
     CGLMatrix3D zmatrix(CMathGen::Z_AXIS_3D, angles.getZ(), handedness);
@@ -400,8 +429,8 @@ class CGLMatrix3D {
     return *this;
   }
 
-  CGLMatrix3D &setGenRotation(float x1, float y1, float z1, float x2, float y2, float z2,
-                              float angle,
+  CGLMatrix3D &setGenRotation(float x1, float y1, float z1,
+                              float x2, float y2, float z2, float angle,
                               CMathGen::Handedness handedness=CMathGen::RIGHT_HANDEDNESS) {
     CGLMatrix3D matrix1, matrix2, matrix3, matrix4, matrix5, matrix6, matrix7;
 
@@ -438,12 +467,9 @@ class CGLMatrix3D {
 
     float c1 = 1.0f - c;
 
-    float axx = a.getX()*a.getX();
-    float axy = a.getX()*a.getY();
-    float axz = a.getX()*a.getZ();
-    float ayy = a.getY()*a.getY();
-    float ayz = a.getY()*a.getZ();
-    float azz = a.getZ()*a.getZ();
+    float axx = a.getX()*a.getX(); float axy = a.getX()*a.getY(); float axz = a.getX()*a.getZ();
+                                   float ayy = a.getY()*a.getY(); float ayz = a.getY()*a.getZ();
+                                                                  float azz = a.getZ()*a.getZ();
 
     float axs = a.getX()*s; float ays = a.getY()*s; float azs = a.getZ()*s;
 
@@ -462,36 +488,6 @@ class CGLMatrix3D {
   }
 
   //---
-
-  // NOTE: does not match setLookAt code below (OpenGL specific ?)
-  static CGLMatrix3D lookAt(const CGLVector3D &eye, const CGLVector3D &center,
-                            const CGLVector3D &up) {
-    CGLVector3D f(center.x() - eye.x(), center.y() - eye.y(), center.z() - eye.z());
-
-    auto up1 = up;
-
-    f  .normalize();
-    up1.normalize();
-
-    CGLVector3D s = f.crossProduct(up1);
-    CGLVector3D u = s.crossProduct(f);
-
-    f = -f;
-
-    CGLMatrix3D m;
-
-    m.setColumn(0, s);
-    m.setColumn(1, u);
-    m.setColumn(2, f);
-
-    auto ex = s.dotProduct(eye);
-    auto ey = u.dotProduct(eye);
-    auto ez = f.dotProduct(eye);
-
-    m.setOuterTranslate(-ex, -ey, -ez);
-
-    return m;
-  }
 
   void setLookAt(const CPoint3D &eye, const CPoint3D &center) {
     CGLVector3D dir(eye, center);
@@ -513,6 +509,36 @@ class CGLMatrix3D {
     CGLVector3D up1 = up - (up.dotProduct(dir1))*dir1;
 
     setLookAt(eye, dir1, up1);
+  }
+
+  // NOTE: does not match setLookAt code below (OpenGL specific ?)
+  static CGLMatrix3D lookAt(const CGLVector3D &eye, const CGLVector3D &center,
+                            const CGLVector3D &up) {
+    CGLVector3D dir(center.x() - eye.x(), center.y() - eye.y(), center.z() - eye.z());
+
+    auto up1 = up;
+
+    dir.normalize();
+    up1.normalize();
+
+    CGLVector3D right = dir.crossProduct(up1);
+    CGLVector3D newUp = right.crossProduct(dir);
+
+    dir = -dir;
+
+    CGLMatrix3D m;
+
+    m.setColumn(0, right);
+    m.setColumn(1, newUp);
+    m.setColumn(2, dir  );
+
+    auto ex = right.dotProduct(eye);
+    auto ey = newUp.dotProduct(eye);
+    auto ez = dir  .dotProduct(eye);
+
+    m.setOuterTranslate(-ex, -ey, -ez);
+
+    return m;
   }
 
   void setLookAt(const CPoint3D &eye, const CGLVector3D &dir, const CGLVector3D &up) {
@@ -564,6 +590,8 @@ class CGLMatrix3D {
 
     *angle3 = CMathGen::atan2(-dx*w, dy*dz);
   }
+
+  //---
 
   void setValues(float m00, float m01, float m02,
                  float m10, float m11, float m12,
@@ -636,71 +664,110 @@ class CGLMatrix3D {
       v[ 0] = m00_; v[ 1] = m01_; v[ 2] = m02_;
       v[ 3] = m10_; v[ 4] = m11_; v[ 5] = m12_;
       v[ 6] = m20_; v[ 7] = m21_; v[ 8] = m22_;
-      v[ 9] = m03_; v[10] = m13_; v[11] = m23_;
+      v[ 9] = m03_; v[10] = m13_; v[11] = m23_; // tx, ty, tz
     }
     else if (n == 16) {
+#if 0
+      // data order
+      memcpy(v, &m00_, 16*sizeof(float);
+#else
       v[ 0] = m00_; v[ 1] = m01_; v[ 2] = m02_; v[ 3] = m03_;
       v[ 4] = m10_; v[ 5] = m11_; v[ 6] = m12_; v[ 7] = m13_;
       v[ 8] = m20_; v[ 9] = m21_; v[10] = m22_; v[11] = m23_;
       v[12] = m30_; v[13] = m31_; v[14] = m32_; v[15] = m33_;
+#endif
     }
     else
       assert(false && "Invalid size");
+  }
+
+  void getValuesI(float *v, int n) const {
+    assert(n == 16);
+
+    // transposed
+    v[ 0] = m00_; v[ 1] = m10_; v[ 2] = m20_; v[ 3] = m30_;
+    v[ 4] = m01_; v[ 5] = m11_; v[ 6] = m21_; v[ 7] = m31_;
+    v[ 8] = m02_; v[ 9] = m12_; v[10] = m22_; v[11] = m32_;
+    v[12] = m03_; v[13] = m13_; v[14] = m23_; v[15] = m33_;
   }
 
   //---------
 
   const float *getData() const { return &m00_; }
 
+  void setData(float *data) {
+    memcpy(&m00_, data, 16*sizeof(float));
+  }
+
+  //---------
+
   void setColumn(uint c, float x, float y, float z) {
     assert(c < 4);
 
-    float *m = &(&m00_)[c];
+    float *m = columnData(c);
 
-    m[0] = x, m[4] = y, m[8] = z;
+//  m[0] = x, m[4] = y, m[8] = z;
+    m[0] = x, m[1] = y, m[2] = z;
   }
 
   void setColumn(uint c, float x, float y, float z, float w) {
     assert(c < 4);
 
-    float *m = &(&m00_)[c];
+    float *m = columnData(c);
 
-    m[0] = x, m[4] = y, m[8] = z, m[12] = w;
+//  m[0] = x, m[4] = y, m[8] = z, m[12] = w;
+    m[0] = x, m[1] = y, m[2] = z, m[ 3] = w;
   }
 
   void setColumn(uint c, const CGLVector3D &vector) {
     assert(c < 4);
 
-    float *m = &(&m00_)[c];
+    float *m = columnData(c);
 
-    float x, y, z;
-
-    vector.getXYZ(&x, &y, &z);
-
-    m[0] = float(x);
-    m[4] = float(y);
-    m[8] = float(z);
+//  vector.getXYZ(&m[0], &m[4], &m[8]);
+    vector.getXYZ(&m[0], &m[1], &m[2]);
   }
 
   void getColumn(uint c, float *x, float *y, float *z) {
     assert(c < 4);
 
-    float *m = &(&m00_)[c];
+    float *m = columnData(c);
 
+#if 0
     if (x) *x = m[0];
     if (y) *y = m[4];
     if (z) *z = m[8];
+#else
+    if (x) *x = m[0];
+    if (y) *y = m[1];
+    if (z) *z = m[2];
+#endif
   }
 
   void getColumn(uint c, float *x, float *y, float *z, float *w) {
     assert(c < 4);
 
-    float *m = &(&m00_)[c];
+    float *m = columnData(c);
 
+#if 0
     if (x) *x = m[ 0];
     if (y) *y = m[ 4];
     if (z) *z = m[ 8];
     if (w) *w = m[12];
+#else
+    if (x) *x = m[0];
+    if (y) *y = m[1];
+    if (z) *z = m[2];
+    if (w) *w = m[3];
+#endif
+  }
+
+  float *columnData(int c) {
+#if 0
+    return &(&m00_)[c];
+#else
+    return &(&m00_)[c*4];
+#endif
   }
 
   //---------
@@ -708,52 +775,70 @@ class CGLMatrix3D {
   void setRow(uint r, float x, float y, float z) {
     assert(r < 4);
 
-    float *m = &(&m00_)[r*4];
+    float *m = rowData(r);
 
-    m[0] = x, m[1] = y, m[2] = z;
+//  m[0] = x, m[1] = y, m[2] = z;
+    m[0] = x, m[4] = y, m[8] = z;
   }
 
   void setRow(uint r, float x, float y, float z, float w) {
     assert(r < 4);
 
-    float *m = &(&m00_)[r*4];
+    float *m = rowData(r);
 
-    m[0] = x, m[1] = y, m[2] = z, m[3] = w;
+//  m[0] = x, m[1] = y, m[2] = z, m[ 3] = w;
+    m[0] = x, m[4] = y, m[8] = z, m[12] = w;
   }
 
   void setRow(uint r, const CGLVector3D &vector) {
     assert(r < 4);
 
-    float *m = &(&m00_)[r*4];
+    float *m = rowData(r);
 
-    float x, y, z;
-
-    vector.getXYZ(&x, &y, &z);
-
-    m[0] = float(x);
-    m[1] = float(y);
-    m[3] = float(z);
+//  vector.getXYZ(&m[0], &m[1], &m[2]);
+    vector.getXYZ(&m[0], &m[4], &m[8]);
   }
 
   void getRow(uint r, float *x, float *y, float *z) {
     assert(r < 4);
 
-    float *m = &(&m00_)[r*4];
+    float *m = rowData(r);
 
+#if 0
     if (x) *x = m[0];
     if (y) *y = m[1];
     if (z) *z = m[2];
+#else
+    if (x) *x = m[0];
+    if (y) *y = m[4];
+    if (z) *z = m[8];
+#endif
   }
 
   void getRow(uint r, float *x, float *y, float *z, float *w) {
     assert(r < 4);
 
-    float *m = &(&m00_)[r*4];
+    float *m = rowData(r);
 
+#if 0
     if (x) *x = m[0];
     if (y) *y = m[1];
     if (z) *z = m[2];
     if (w) *w = m[3];
+#else
+    if (x) *x = m[0];
+    if (y) *y = m[4];
+    if (z) *z = m[8];
+    if (w) *w = m[12];
+#endif
+  }
+
+  float *rowData(int r) {
+#if 0
+    return &(&m00_)[r*4];
+#else
+    return &(&m00_)[r];
+#endif
   }
 
   //---------
@@ -886,14 +971,6 @@ class CGLMatrix3D {
     ovector.setXYZ(ox, oy, oz);
   }
 
-  CGLMatrix3D &translate(float x, float y, float z) {
-    m03_ += x;
-    m13_ += y;
-    m23_ += z;
-
-    return *this;
-  }
-
   //------
 
   CGLMatrix3D &transpose() {
@@ -997,12 +1074,14 @@ class CGLMatrix3D {
        m03_*det3x3(m10_, m11_, m12_, m20_, m21_, m22_, m30_, m31_, m32_));
   }
 
+  //---
+
   void normalize() {
     float d = determinant();
 
     float id = 1.0f/d;
 
-    for (int i = 0; i < 9; ++i)
+    for (int i = 0; i < 16; ++i)
       (&m00_)[i] *= id;
   }
 
@@ -1066,8 +1145,15 @@ class CGLMatrix3D {
 
     float id = 1.0f/d;
 
+#if 0
+    // TODO: wrong ?
     for (int i = 0; i < 9; ++i)
       (&m00_)[i] *= id;
+#else
+    m00_ *= id; m01_ *= id; m02_ *= id;
+    m10_ *= id; m11_ *= id; m12_ *= id;
+    m20_ *= id; m21_ *= id; m22_ *= id;
+#endif
   }
 
   //------
@@ -1231,7 +1317,7 @@ class CGLMatrix3D {
     return *this;
   }
 
-  CGLMatrix3D operator*(float s) {
+  CGLMatrix3D operator*(float s) const {
     CGLMatrix3D c = *this;
 
     c *= s;
@@ -1299,9 +1385,9 @@ class CGLMatrix3D {
   void setValue(uint i, uint j, float value) {
     assert(i < 4 && j < 4);
 
-    float *m = &(&m00_)[4*j + i];
+    float &m = (&m00_)[4*j + i];
 
-    *m = value;
+    m = value;
   }
 
   float getValue(uint i) const {
@@ -1407,6 +1493,15 @@ class CGLMatrix3D {
     return *this;
   }
 
+  static CGLMatrix3D ortho(float left, float right, float bottom, float top,
+                           float near, float far) {
+    CGLMatrix3D m;
+
+    m.buildOrtho(left, right, bottom, top, near, far);
+
+    return m;
+  }
+
   void buildOrtho(float left, float right, float bottom, float top, float near, float far) {
     float w = right - left  ; float iw = 1.0f/w;
     float h = top   - bottom; float ih = 1.0f/h;
@@ -1462,9 +1557,9 @@ class CGLMatrix3D {
   }
 
   void setInnerScale(float sx, float sy, float sz) {
-    m00_ = sx , m01_ = 0.0, m02_ = 0.0;
-    m10_ = 0.0, m11_ = sy , m12_ = 0.0;
-    m20_ = 0.0, m21_ = 0.0, m22_ = sz ;
+    m00_ = sx  , m01_ = 0.0f, m02_ = 0.0f;
+    m10_ = 0.0f, m11_ = sy  , m12_ = 0.0f;
+    m20_ = 0.0f, m21_ = 0.0f, m22_ = sz  ;
   }
 
   void setInnerRotationRHS(CMathGen::AxisType3D axis, float angle) {
@@ -1472,19 +1567,19 @@ class CGLMatrix3D {
     float s = std::sin(angle);
 
     if      (axis == CMathGen::X_AXIS_3D) {
-      m00_ = 1.0f; m01_ = 0.0; m02_ = 0.0;
-      m10_ = 0.0f; m11_ =   c; m12_ =   s;
-      m20_ = 0.0f; m21_ =  -s; m22_ =   c;
+      m00_ = 1.0f; m01_ = 0.0f; m02_ = 0.0f;
+      m10_ = 0.0f; m11_ =    c; m12_ =    s;
+      m20_ = 0.0f; m21_ =   -s; m22_ =    c;
     }
     else if (axis == CMathGen::Y_AXIS_3D) {
-      m00_ =   c; m01_ = 0.0f; m02_ =  -s;
-      m10_ = 0.0; m11_ = 1.0f; m12_ = 0.0;
-      m20_ =   s; m21_ = 0.0f; m22_ =   c;
+      m00_ =    c; m01_ = 0.0f; m02_ =   -s;
+      m10_ = 0.0f; m11_ = 1.0f; m12_ = 0.0f;
+      m20_ =    s; m21_ = 0.0f; m22_ =    c;
     }
     else {
-      m00_ =   c; m01_ =   s; m02_ = 0.0f;
-      m10_ =  -s; m11_ =   c; m12_ = 0.0f;
-      m20_ = 0.0; m21_ = 0.0; m22_ = 1.0f;
+      m00_ =    c; m01_ =    s; m02_ = 0.0f;
+      m10_ =   -s; m11_ =    c; m12_ = 0.0f;
+      m20_ = 0.0f; m21_ = 0.0f; m22_ = 1.0f;
     }
   }
 
@@ -1493,24 +1588,24 @@ class CGLMatrix3D {
     float s = std::sin(angle);
 
     if      (axis == CMathGen::X_AXIS_3D) {
-      m00_ = 1.0f; m01_ = 0.0; m02_ = 0.0;
-      m10_ = 0.0f; m11_ =   c; m12_ =  -s;
-      m20_ = 0.0f; m21_ =   s; m22_ =   c;
+      m00_ = 1.0f; m01_ = 0.0f; m02_ = 0.0f;
+      m10_ = 0.0f; m11_ =    c; m12_ =   -s;
+      m20_ = 0.0f; m21_ =    s; m22_ =    c;
     }
     else if (axis == CMathGen::Y_AXIS_3D) {
-      m00_ =   c; m01_ = 0.0f; m02_ =   s;
-      m10_ = 0.0; m11_ = 1.0f; m12_ = 0.0;
-      m20_ =  -s; m21_ = 0.0f; m22_ =   c;
+      m00_ =    c; m01_ = 0.0f; m02_ =    s;
+      m10_ = 0.0f; m11_ = 1.0f; m12_ = 0.0f;
+      m20_ =   -s; m21_ = 0.0f; m22_ =    c;
     }
     else {
-      m00_ =   c; m01_ =  -s; m02_ = 0.0f;
-      m10_ =   s; m11_ =   c; m12_ = 0.0f;
-      m20_ = 0.0; m21_ = 0.0; m22_ = 1.0f;
+      m00_ =    c; m01_ =   -s; m02_ = 0.0f;
+      m10_ =    s; m11_ =    c; m12_ = 0.0f;
+      m20_ = 0.0f; m21_ = 0.0f; m22_ = 1.0f;
     }
   }
 
   void setOuterIdentity() {
-    m03_ = 0.0; m13_ = 0.0; m23_ = 0.0;
+    m03_ = 0.0f; m13_ = 0.0f; m23_ = 0.0f;
 
     setBottomIdentity();
   }
@@ -1522,8 +1617,10 @@ class CGLMatrix3D {
   }
 
   void setBottomIdentity() {
-    m30_ = 0.0, m31_ = 0.0, m32_ = 0.0, m33_ = 1.0f;
+    m30_ = 0.0f, m31_ = 0.0f, m32_ = 0.0f, m33_ = 1.0f;
   }
+
+  //---
 
   static float det3x3(float a, float b, float c, float d, float e,
                       float f, float g, float h, float i) {
@@ -1534,12 +1631,35 @@ class CGLMatrix3D {
     return a*c - b*d;
   }
 
+  //---
+
+ public:
+  CMatrix3D toCMatrix() const {
+    return CMatrix3D(m00_, m01_, m02_, m03_,
+                     m10_, m11_, m12_, m13_,
+                     m20_, m21_, m22_, m23_,
+                     m30_, m31_, m32_, m33_);
+  }
+
+  static CGLMatrix3D fromCMatrix(const CMatrix3D &m) {
+    double v[16];
+    m.getValues(&v[0], 16);
+
+    auto m1 = CGLMatrix3D(float(v[ 0]), float(v[ 1]), float(v[ 2]), float(v[ 3]),
+                          float(v[ 4]), float(v[ 5]), float(v[ 6]), float(v[ 7]),
+                          float(v[ 8]), float(v[ 9]), float(v[10]), float(v[11]),
+                          float(v[12]), float(v[13]), float(v[14]), float(v[15]));
+
+    return m1;
+  }
+
  private:
-  // transposed data order
-  float m00_ { 0.0 }, m10_ { 0.0 }, m20_ { 0.0 }, m30_ { 0.0 };
-  float m01_ { 0.0 }, m11_ { 0.0 }, m21_ { 0.0 }, m31_ { 0.0 };
-  float m02_ { 0.0 }, m12_ { 0.0 }, m22_ { 0.0 }, m32_ { 0.0 };
-  float m03_ { 0.0 }, m13_ { 0.0 }, m23_ { 0.0 }, m33_ { 0.0 };
+  // column major ( m <column> <row> )
+  //   transposed data order to CMatrix3D
+  float m00_ { 0.0 }, m10_ { 0.0 }, m20_ { 0.0 }, m30_ { 0.0 }; // column 0
+  float m01_ { 0.0 }, m11_ { 0.0 }, m21_ { 0.0 }, m31_ { 0.0 }; // column 1
+  float m02_ { 0.0 }, m12_ { 0.0 }, m22_ { 0.0 }, m32_ { 0.0 }; // column 2
+  float m03_ { 0.0 }, m13_ { 0.0 }, m23_ { 0.0 }, m33_ { 0.0 }; // column 3
 };
 
 #endif

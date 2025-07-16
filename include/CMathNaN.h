@@ -51,15 +51,15 @@ typedef union {
 #define IsPosNaN(X)  (((dnan *)&(X))->nan_parts.sign == 0 && IsNaN(X))
 #define IsNegNaN(X)  (((dnan *)&(X))->nan_parts.sign == 1 && IsNaN(X))
 
-#define SetNaN(X)    (((dnan *)&(X))->nan_parts.exponent = 0x7ff,\
+#define SetNaN(X)    (((dnan *)&(X))->nan_parts.exponent = 0x7ff, \
                       ((dnan *)&(X))->inf_parts.bits = 1)
-#define SetPosInf(X) (((dnan *)&(X))->nan_parts.exponent = 0x7ff,\
+#define SetPosInf(X) (((dnan *)&(X))->nan_parts.exponent = 0x7ff, \
                       ((dnan *)&(X))->inf_parts.bits =\
                       ((dnan *)&(X))->inf_parts.fraction_low =\
                       ((dnan *)&(X))->nan_parts.sign = 0)
-#define SetNegInf(X) (((dnan *)&(X))->nan_parts.exponent =  0x7ff,\
+#define SetNegInf(X) (((dnan *)&(X))->nan_parts.exponent =  0x7ff, \
                       ((dnan *)&(X))->inf_parts.bits =\
-                      ((dnan *)&(X))->inf_parts.fraction_low = 0,\
+                      ((dnan *)&(X))->inf_parts.fraction_low = 0, \
                       ((dnan *)&(X))->nan_parts.sign = 1)
 
 /* GETNaNPC gets the leftmost 32 bits of the fraction part */
@@ -102,12 +102,12 @@ typedef union {
 #define IsPosNaNF(X)  (((fnan *)&(X))->nan_parts.sign == 0 && IsNaNF(X))
 #define IsNegNaNF(X)  (((fnan *)&(X))->nan_parts.sign == 1 && IsNaNF(X))
 
-#define SetNaNF(X)    (((fnan *)&(X))->nan_parts.exponent = 0xff,\
+#define SetNaNF(X)    (((fnan *)&(X))->nan_parts.exponent = 0xff, \
                        ((fnan *)&(X))->nan_parts.bits = 1)
-#define SetPosInfF(X) (((fnan *)&(X))->nan_parts.exponent = 0xff,\
+#define SetPosInfF(X) (((fnan *)&(X))->nan_parts.exponent = 0xff, \
                        ((fnan *)&(X))->nan_parts.bits =\
                        ((fnan *)&(X))->nan_parts.sign = 0)
-#define SetNegInfF(X) (((fnan *)&(X))->nan_parts.exponent = 0xff,\
+#define SetNegInfF(X) (((fnan *)&(X))->nan_parts.exponent = 0xff, \
                        ((fnan *)&(X))->nan_parts.bits =\
                        ((fnan *)&(X))->nan_parts.sign = 1)
 

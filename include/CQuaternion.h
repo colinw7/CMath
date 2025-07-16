@@ -175,7 +175,8 @@ class CQuaternion {
   int cmp(const CQuaternion &rhs) const {
     double dw = w_ - rhs.w_;
 
-    if (dw != 0) return int(dw);
+    if (dw != 0)
+      return (dw > 0.0 ? 1 : -1);
 
     return v_.cmp(rhs.v_);
   }
@@ -359,9 +360,9 @@ class CQuaternion {
 
   void fromAxes(const CPoint3D *axis) {
     CMatrix3D matrix(axis[0].x, axis[0].y, axis[0].z,
-                  axis[1].x, axis[1].y, axis[1].z,
-                  axis[2].x, axis[2].y, axis[2].z,
-                  0.0, 0.0, 0.0);
+                     axis[1].x, axis[1].y, axis[1].z,
+                     axis[2].x, axis[2].y, axis[2].z,
+                     0.0, 0.0, 0.0);
 
     fromRotationMatrix(matrix);
   }
@@ -596,6 +597,28 @@ inline double dotProduct(const CQuaternion &lhs, const CQuaternion &rhs) {
 
 inline CQuaternion mul3(const CQuaternion &q1, const CQuaternion &q2, const CQuaternion &q3) {
   return (q1*q2)*q3;
+}
+
+//------
+
+namespace CMathGen {
+
+template <>
+std::pair<bool, CQuaternion>
+inline interpRangeSet<CQuaternion, double>(int ir, const double &f,
+                                           const std::vector<CQuaternion> &rangeSet) {
+  using RVal = std::pair<bool, CQuaternion>;
+
+  auto nr = rangeSet.size();
+  if (nr == 0)
+    return RVal(false, CQuaternion());
+
+  if (ir < 0 || ir >= int(nr - 1))
+    return RVal(false, CQuaternion());
+
+  return RVal(true, CQuaternion::slerp(f, rangeSet[ir], rangeSet[ir + 1]));
+}
+
 }
 
 #endif
