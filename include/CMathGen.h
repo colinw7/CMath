@@ -26,267 +26,269 @@
 }
 
 namespace CMathGen {
-  enum Handedness {
-    LEFT_HANDEDNESS,
-    RIGHT_HANDEDNESS
-  };
 
-  enum AxisType2D {
-    X_AXIS_2D = (1<<0),
-    Y_AXIS_2D = (1<<1),
+enum Handedness {
+  LEFT_HANDEDNESS,
+  RIGHT_HANDEDNESS
+};
 
-    XY_AXIS_2D = (X_AXIS_2D | Y_AXIS_2D)
-  };
+enum AxisType2D {
+  X_AXIS_2D = (1<<0),
+  Y_AXIS_2D = (1<<1),
 
-  enum AxisType3D {
-    X_AXIS_3D = (1<<0),
-    Y_AXIS_3D = (1<<1),
-    Z_AXIS_3D = (1<<2),
+  XY_AXIS_2D = (X_AXIS_2D | Y_AXIS_2D)
+};
 
-    XY_AXIS_3D = (X_AXIS_3D | Y_AXIS_3D),
-    XZ_AXIS_3D = (X_AXIS_3D | Z_AXIS_3D),
-    YZ_AXIS_3D = (Y_AXIS_3D | Z_AXIS_3D),
+enum AxisType3D {
+  X_AXIS_3D = (1<<0),
+  Y_AXIS_3D = (1<<1),
+  Z_AXIS_3D = (1<<2),
 
-    XYZ_AXIS_3D = (X_AXIS_3D | Y_AXIS_3D | Z_AXIS_3D)
-  };
+  XY_AXIS_3D = (X_AXIS_3D | Y_AXIS_3D),
+  XZ_AXIS_3D = (X_AXIS_3D | Z_AXIS_3D),
+  YZ_AXIS_3D = (Y_AXIS_3D | Z_AXIS_3D),
 
-  enum AxisOrder3D {
-    XYZ_AXIS_3D_ORDER,
-    XZY_AXIS_3D_ORDER,
-    YXZ_AXIS_3D_ORDER,
-    YZX_AXIS_3D_ORDER,
-    ZXY_AXIS_3D_ORDER,
-    ZYX_AXIS_3D_ORDER
-  };
+  XYZ_AXIS_3D = (X_AXIS_3D | Y_AXIS_3D | Z_AXIS_3D)
+};
 
-  enum IntersectType {
-    INTERSECT_NONE    = 0,
-    INTERSECT_ALL     = (1<<0),
-    INTERSECT_INSIDE  = (1<<1),
-    INTERSECT_OUTSIDE = (1<<2),
-    INTERSECT_VALID   = (INTERSECT_INSIDE | INTERSECT_OUTSIDE)
-  };
+enum AxisOrder3D {
+  XYZ_AXIS_3D_ORDER,
+  XZY_AXIS_3D_ORDER,
+  YXZ_AXIS_3D_ORDER,
+  YZX_AXIS_3D_ORDER,
+  ZXY_AXIS_3D_ORDER,
+  ZYX_AXIS_3D_ORDER
+};
 
-  extern double EPSILON_E4;
-  extern double EPSILON_E5;
-  extern double EPSILON_E6;
+enum IntersectType {
+  INTERSECT_NONE    = 0,
+  INTERSECT_ALL     = (1<<0),
+  INTERSECT_INSIDE  = (1<<1),
+  INTERSECT_OUTSIDE = (1<<2),
+  INTERSECT_VALID   = (INTERSECT_INSIDE | INTERSECT_OUTSIDE)
+};
 
-  extern float EPSILON_E4_F;
-  extern float EPSILON_E5_F;
-  extern float EPSILON_E6_F;
+extern double EPSILON_E4;
+extern double EPSILON_E5;
+extern double EPSILON_E6;
 
-  double DSin(double angle);
-  double DCos(double angle);
-  double DTan(double angle);
+extern float EPSILON_E4_F;
+extern float EPSILON_E5_F;
+extern float EPSILON_E6_F;
 
-  int    fastDistance(int x, int y);
-  double fastDistance(double x, double y, double z);
+double DSin(double angle);
+double DCos(double angle);
+double DTan(double angle);
 
-  double pow(double real1, double real2);
-  double pow(long real1, long real2);
-  double ipow(double value, uint power);
+int    fastDistance(int x, int y);
+double fastDistance(double x, double y, double z);
 
-  double log(double real);
-  double log10(double real);
-  double logN(int base, double real);
+double pow(double real1, double real2);
+double pow(long real1, long real2);
+double ipow(double value, uint power);
 
-  bool isPowerOf(uint base, uint value);
-  bool isPowerOf2(uint value);
+double log(double real);
+double log10(double real);
+double logN(int base, double real);
 
-  uint numSetBits(uint x);
+bool isPowerOf(uint base, uint value);
+bool isPowerOf2(uint value);
 
-  uint clearLastBit(uint x);
+uint numSetBits(uint x);
 
-  double sqrt(double real);
+uint clearLastBit(uint x);
 
-  double acos(double x);
-  double asin(double x);
+double sqrt(double real);
 
-  double atan2(double x, double y);
-  float  atan2(float x, float y);
+double acos(double x);
+double asin(double x);
 
-  long   modulus(long   x, long   y);
-  double modulus(double x, double y);
+double atan2(double x, double y);
+float  atan2(float x, float y);
 
-  int sign(long x);
-  int sign(double x);
+long   modulus(long   x, long   y);
+double modulus(double x, double y);
 
-  uint  GetHCF(uint a, uint b);
-  ulong GetHCF(ulong a, ulong b);
-  uint  GetLCM(uint a, uint b);
-  ulong GetLCM(ulong a, ulong b);
+int sign(long x);
+int sign(double x);
 
-  double DegToRad(double deg);
-  double RadToDeg(double rad);
+uint  GetHCF(uint a, uint b);
+ulong GetHCF(ulong a, ulong b);
+uint  GetLCM(uint a, uint b);
+ulong GetLCM(ulong a, ulong b);
 
-  bool isInteger(double d);
+double DegToRad(double deg);
+double RadToDeg(double rad);
 
-  bool cmp(double a, double b, double prec=1E-5);
+bool isInteger(double d);
 
-  uint   twosCompliment(int value);
-  ushort twosCompliment(short value);
+bool cmp(double a, double b, double prec=1E-5);
 
-  bool range(double *x, double *y, uint num_xy,
-             double *xmin, double *ymin, double *xmax, double *ymax);
+uint   twosCompliment(int value);
+ushort twosCompliment(short value);
 
-  double pythag(double a, double b);
+bool range(double *x, double *y, uint num_xy,
+           double *xmin, double *ymin, double *xmax, double *ymax);
 
-  float  FastInvSqrtF(float fValue);
-  double FastInvSqrt(double dValue);
-  double FastSin0(double fAngle);
-  double FastSin1(double fAngle);
-  double FastCos0(double fAngle);
-  double FastCos1(double fAngle);
-  double FastTan0(double fAngle);
-  double FastTan1(double fAngle);
-  double FastInvSin0(double fValue);
-  double FastInvSin1(double fValue);
-  double FastInvCos0(double fValue);
-  double FastInvCos1(double fValue);
-  double FastInvTan0(double fValue);
-  double FastInvTan1(double fValue);
+double pythag(double a, double b);
 
-  //-----
+float  FastInvSqrtF(float fValue);
+double FastInvSqrt(double dValue);
+double FastSin0(double fAngle);
+double FastSin1(double fAngle);
+double FastCos0(double fAngle);
+double FastCos1(double fAngle);
+double FastTan0(double fAngle);
+double FastTan1(double fAngle);
+double FastInvSin0(double fValue);
+double FastInvSin1(double fValue);
+double FastInvCos0(double fValue);
+double FastInvCos1(double fValue);
+double FastInvTan0(double fValue);
+double FastInvTan1(double fValue);
 
-  template<typename T>
-  T avg(T v1, T v2) {
-    return (v1 + v2)/2;
+//-----
+
+template<typename T>
+T avg(T v1, T v2) {
+  return (v1 + v2)/2;
+}
+
+//-----
+
+template<typename T>
+T clamp(T val, T low, T high) {
+  if (val < low ) return low;
+  if (val > high) return high;
+  return val;
+}
+
+//-----
+
+template<typename T>
+bool solveQuadratic(T a, T b, T c, T *r1, T *r2) {
+  if (a == 0.0) return false;
+
+  T b2_4ac = b*b - 4.0*a*c;
+
+  if (b2_4ac < 0) return false;
+
+  T sqrt_b2_4ac = ::sqrt(b2_4ac);
+
+  T q;
+
+  if (b < 0.0)
+    q = -0.5*(b - sqrt_b2_4ac);
+  else
+    q = -0.5*(b + sqrt_b2_4ac);
+
+  *r1 = q/a;
+  *r2 = c/q;
+
+  if (*r1 > *r2) std::swap(*r1, *r2);
+
+  return true;
+}
+
+//-----
+
+double mapToReal(char i);
+double mapToReal(unsigned char i);
+double mapToReal(short i);
+double mapToReal(ushort i);
+double mapToReal(int i);
+double mapToReal(uint i);
+double mapToReal(long i);
+double mapToReal(ulong i);
+
+//-----
+
+ulong  factorial(ushort f);
+double factorial(double f);
+
+ulong binomialCoeff(uint n, uint k);
+
+//-----
+
+void getXYVals(const CIPoint2D *points, uint npoints,
+               double **xvals, int *num_xvals,
+               double **yvals, int *num_yvals);
+
+void getXYVals(double *x, double *y, int num_xy,
+               double **xvals, int *num_xvals,
+               double **yvals, int *num_yvals);
+
+//-----
+
+double getNaN();
+
+double noise(double x, double y, double z);
+
+//-----
+
+template <typename T>
+T max(T a, T b) {
+  return (a > b ? a : b);
+}
+
+template <typename T, typename ... Args>
+T max(T a, T b, Args ... args) {
+   return max(max(a,b), args...);
+}
+
+//---
+
+template <typename T>
+std::pair<int, T> mapIntoRangeSet(const T &value, const std::vector<T> &rangeSet) {
+  using RVal = std::pair<int, T>;
+
+  auto nr = rangeSet.size();
+  assert(nr != 0);
+
+  const T &min = rangeSet[0];
+  if (nr == 1) return RVal(0, min);
+
+  const T &max = rangeSet[nr - 1];
+  if (min >= max) return RVal(-1, value);
+
+  auto v  = (value - min)/(max - min);
+  auto iv = (v >= 0 ? int(v) : int(v - 1));
+  auto v1 = value - T(iv)*(max - min);
+
+  T rmin = min;
+  T rmax = rmin;
+
+  size_t ir = 0;
+
+  for ( ; ir < nr; ++ir) {
+    rmax = rangeSet[ir + 1];
+    if (rmin >= rmax) return RVal(-1, value);
+
+    if (v1 >= rmin && v1 < rmax)
+      break;
+
+    rmin = rmax;
   }
 
-  //-----
+  auto f = (v1 - rmin)/(rmax - rmin);
 
-  template<typename T>
-  T clamp(T val, T low, T high) {
-    if (val < low ) return low;
-    if (val > high) return high;
-    return val;
-  }
+  return RVal(int(ir), f);
+}
 
-  //-----
+template <typename T, typename U=double>
+std::pair<bool, T> interpRangeSet(int ir, const U &f, const std::vector<T> &rangeSet) {
+  using RVal = std::pair<bool, T>;
 
-  template<typename T>
-  bool solveQuadratic(T a, T b, T c, T *r1, T *r2) {
-    if (a == 0.0) return false;
+  auto nr = rangeSet.size();
+  if (nr == 0)
+    return RVal(false, T());
 
-    T b2_4ac = b*b - 4.0*a*c;
+  if (ir < 0 || ir >= int(nr - 1))
+    return RVal(false, T());
 
-    if (b2_4ac < 0) return false;
+  return RVal(true, rangeSet[ir] + f*(rangeSet[ir + 1] - rangeSet[ir]));
+}
 
-    T sqrt_b2_4ac = ::sqrt(b2_4ac);
-
-    T q;
-
-    if (b < 0.0)
-      q = -0.5*(b - sqrt_b2_4ac);
-    else
-      q = -0.5*(b + sqrt_b2_4ac);
-
-    *r1 = q/a;
-    *r2 = c/q;
-
-    if (*r1 > *r2) std::swap(*r1, *r2);
-
-    return true;
-  }
-
-  //-----
-
-  double mapToReal(char i);
-  double mapToReal(unsigned char i);
-  double mapToReal(short i);
-  double mapToReal(ushort i);
-  double mapToReal(int i);
-  double mapToReal(uint i);
-  double mapToReal(long i);
-  double mapToReal(ulong i);
-
-  //-----
-
-  ulong  factorial(ushort f);
-  double factorial(double f);
-
-  ulong binomialCoeff(uint n, uint k);
-
-  //-----
-
-  void getXYVals(const CIPoint2D *points, uint npoints,
-                 double **xvals, int *num_xvals,
-                 double **yvals, int *num_yvals);
-
-  void getXYVals(double *x, double *y, int num_xy,
-                 double **xvals, int *num_xvals,
-                 double **yvals, int *num_yvals);
-
-  //-----
-
-  double getNaN();
-
-  double noise(double x, double y, double z);
-
-  //-----
-
-  template <typename T>
-  T max(T a, T b) {
-    return (a > b ? a : b);
-  }
-
-  template <typename T, typename ... Args>
-  T max(T a, T b, Args ... args) {
-     return max(max(a,b), args...);
-  }
-
-  //---
-
-  template <typename T>
-  std::pair<int, T> mapIntoRangeSet(const T &value, const std::vector<T> &rangeSet) {
-    using RVal = std::pair<int, T>;
-
-    auto nr = rangeSet.size();
-    assert(nr != 0);
-
-    const T &min = rangeSet[0];
-    if (nr == 1) return RVal(0, min);
-
-    const T &max = rangeSet[nr - 1];
-    if (min >= max) return RVal(-1, value);
-
-    auto v  = (value - min)/(max - min);
-    auto iv = (v >= 0 ? int(v) : int(v - 1));
-    auto v1 = value - T(iv)*(max - min);
-
-    T rmin = min;
-    T rmax = rmin;
-
-    size_t ir = 0;
-
-    for ( ; ir < nr; ++ir) {
-      rmax = rangeSet[ir + 1];
-      if (rmin >= rmax) return RVal(-1, value);
-
-      if (v1 >= rmin && v1 < rmax)
-        break;
-
-      rmin = rmax;
-    }
-
-    auto f = (v1 - rmin)/(rmax - rmin);
-
-    return RVal(int(ir), f);
-  }
-
-  template <typename T, typename U=double>
-  std::pair<bool, T> interpRangeSet(int ir, const U &f, const std::vector<T> &rangeSet) {
-    using RVal = std::pair<bool, T>;
-
-    auto nr = rangeSet.size();
-    if (nr == 0)
-      return RVal(false, T());;
-
-    if (ir < 0 || ir >= int(nr - 1))
-      return RVal(false, T());;
-
-    return RVal(true, rangeSet[ir] + f*(rangeSet[ir + 1] - rangeSet[ir]));
-  }
 }
 
 #endif

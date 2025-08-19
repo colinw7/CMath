@@ -832,6 +832,8 @@ class CGLVector3D {
 
   //------
 
+  void flipYZ() { std::swap(y_, z_); }
+
  private:
   float x_ { 0.0f };
   float y_ { 0.0f };
