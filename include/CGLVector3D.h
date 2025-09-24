@@ -6,6 +6,7 @@
 #include <CMathGen.h>
 #include <CMathUtil.h>
 #include <CPoint3D.h>
+#include <CVector3D.h>
 #include <CMathMacros.h>
 
 class CGLVector3D {
@@ -209,6 +210,11 @@ class CGLVector3D {
   // to point
   CPoint3D point() const {
     return CPoint3D(x_, y_, z_);
+  }
+
+  // to vector
+  CVector3D vector() const {
+    return CVector3D(x_, y_, z_);
   }
 
   //------

@@ -186,28 +186,18 @@ class CBBox3D {
       return CMathGen::Z_AXIS_3D;
   }
 
-  CPoint3D getCenter() const {
-    return 0.5*(pmin_ + pmax_);
-  }
+  CPoint3D getCenter() const { return 0.5*(pmin_ + pmax_); }
 
-  CVector3D getSize() const {
-    return CVector3D(pmin_, pmax_);
-  }
+  CVector3D getSize() const { return CVector3D(pmin_, pmax_); }
 
-  double getXSize() const {
-    return (pmax_.x - pmin_.x);
-  }
+  double getXSize() const { return (pmax_.x - pmin_.x); }
+  double getYSize() const { return (pmax_.y - pmin_.y); }
+  double getZSize() const { return (pmax_.z - pmin_.z); }
 
-  double getYSize() const {
-    return (pmax_.y - pmin_.y);
-  }
-
-  double getZSize() const {
-    return (pmax_.z - pmin_.z);
-  }
+  double getMaxSize() const { return std::max(std::max(getXSize(), getYSize()), getZSize()); }
 
   double getRadius() const {
-    CVector3D radius = 0.5*getSize();
+    auto radius = 0.5*getSize();
 
     return radius.length();
   }
@@ -218,7 +208,7 @@ class CBBox3D {
   }
 
   void scale(double factor) {
-    CPoint3D center = getCenter();
+    auto center = getCenter();
 
     pmin_ = center + CVector3D(center, pmin_)*factor;
     pmax_ = center + CVector3D(center, pmax_)*factor;
@@ -244,7 +234,7 @@ class CBBox3D {
   // returns true if line (l1, l2) intersects with the box (pmin_, pmax_)
   // returns intersection point in pi
   bool lineIntersect(const CPoint3D &l1, const CPoint3D &l2, CPoint3D &pi) const {
-    // while line outside (no overlap)
+    // whole line outside (no overlap)
     if (l1.x < pmin_.x && l2.x < pmin_.x) return false;
     if (l1.x > pmax_.x && l2.x > pmax_.x) return false;
     if (l1.y < pmin_.y && l2.y < pmin_.y) return false;

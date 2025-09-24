@@ -337,6 +337,15 @@ class CGLMatrix3D {
 
   //---
 
+  static CGLMatrix3D rotation(CMathGen::AxisType3D axis, float angle,
+                              CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
+    CGLMatrix3D m;
+
+    m.setRotation(axis, angle, handedness);
+
+    return m;
+  }
+
   static CGLMatrix3D rotation(float theta, const CGLVector3D &u) {
     CGLMatrix3D m;
 
@@ -490,13 +499,13 @@ class CGLMatrix3D {
   //---
 
   void setLookAt(const CPoint3D &eye, const CPoint3D &center) {
-    CGLVector3D dir(eye, center);
+    CGLVector3D dir(eye, center); // center - eye
 
     setLookAt(eye, dir);
   }
 
   void setLookAt(const CPoint3D &eye, const CPoint3D &center, const CGLVector3D &up) {
-    CGLVector3D dir(eye, center);
+    CGLVector3D dir(eye, center); // center - eye
 
     setLookAt(eye, dir, up);
   }
@@ -514,7 +523,8 @@ class CGLMatrix3D {
   // NOTE: does not match setLookAt code below (OpenGL specific ?)
   static CGLMatrix3D lookAt(const CGLVector3D &eye, const CGLVector3D &center,
                             const CGLVector3D &up) {
-    CGLVector3D dir(center.x() - eye.x(), center.y() - eye.y(), center.z() - eye.z());
+    CGLVector3D dir(eye, center); // center - eye
+    //CGLVector3D dir(center.x() - eye.x(), center.y() - eye.y(), center.z() - eye.z());
 
     auto up1 = up;
 
@@ -844,19 +854,19 @@ class CGLMatrix3D {
   //---------
 
   void multiplyPoint(float xi, float yi, float zi, float *xo, float *yo, float *zo) const {
+    // wi = 1.0
     *xo = m00_*xi + m01_*yi + m02_*zi + m03_;
     *yo = m10_*xi + m11_*yi + m12_*zi + m13_;
     *zo = m20_*xi + m21_*yi + m22_*zi + m23_;
 
+    // set wo to 1.0
     float w = m30_*xi + m31_*yi + m32_*zi + m33_;
 
-    if (std::abs(w) > 1E-6) {
-      float iw = 1.0f/w;
+    float iw = (std::abs(w) > 1E-6 ? 1.0f/w : 1.0f);
 
-      *xo *= iw;
-      *yo *= iw;
-      *zo *= iw;
-    }
+    *xo *= iw;
+    *yo *= iw;
+    *zo *= iw;
   }
 
   void multiplyPoint(float xi, float yi, float zi, float wi,
@@ -873,6 +883,7 @@ class CGLMatrix3D {
     float z = m20_*float(ipoint.x) + m21_*float(ipoint.y) + m22_*float(ipoint.z) + m23_;
     float w = m30_*float(ipoint.x) + m31_*float(ipoint.y) + m32_*float(ipoint.z) + m33_;
 
+    // set w to 1.0
     float iw = (std::abs(w) > 1E-6 ? 1.0f/w : 1.0f);
 
     opoint.x = x*iw;
@@ -888,6 +899,7 @@ class CGLMatrix3D {
     float z = m20_*float(ipoint.x) + m21_*float(ipoint.y) + m22_*float(ipoint.z) + m23_;
     float w = m30_*float(ipoint.x) + m31_*float(ipoint.y) + m32_*float(ipoint.z) + m33_;
 
+    // set w to 1.0
     float iw = (std::abs(w) > 1E-6 ? 1.0f/w : 1.0f);
 
     opoint.x = x*iw;
@@ -897,16 +909,23 @@ class CGLMatrix3D {
     return opoint;
   }
 
+  void multiplyVector(float xi, float yi, float zi,
+                      float *xo, float *yo, float *zo) const {
+    *xo = m00_*xi + m01_*yi + m02_*zi;
+    *yo = m10_*xi + m11_*yi + m12_*zi;
+    *zo = m20_*xi + m21_*yi + m22_*zi;
+  }
+
   void multiplyVector(const CGLVector3D &ivector, CGLVector3D &ovector) const {
-    float ix, iy, iz;
+    float xi, yi, zi;
 
-    ivector.getXYZ(&ix, &iy, &iz);
+    ivector.getXYZ(&xi, &yi, &zi);
 
-    float ox = m00_*ix + m01_*iy + m02_*iz + m03_;
-    float oy = m10_*ix + m11_*iy + m12_*iz + m13_;
-    float oz = m20_*ix + m21_*iy + m22_*iz + m23_;
+    float xo = m00_*xi + m01_*yi + m02_*zi;
+    float yo = m10_*xi + m11_*yi + m12_*zi;
+    float zo = m20_*xi + m21_*yi + m22_*zi;
 
-    ovector.setXYZ(ox, oy, oz);
+    ovector.setXYZ(xo, yo, zo);
   }
 
   CGLVector3D multiplyVector(const CGLVector3D &ivector) const {
@@ -916,11 +935,11 @@ class CGLMatrix3D {
 
     ivector.getXYZ(&ix, &iy, &iz);
 
-    float ox = m00_*ix + m01_*iy + m02_*iz + m03_;
-    float oy = m10_*ix + m11_*iy + m12_*iz + m13_;
-    float oz = m20_*ix + m21_*iy + m22_*iz + m23_;
+    float xo = m00_*ix + m01_*iy + m02_*iz;
+    float yo = m10_*ix + m11_*iy + m12_*iz;
+    float zo = m20_*ix + m21_*iy + m22_*iz;
 
-    ovector.setXYZ(ox, oy, oz);
+    ovector.setXYZ(xo, yo, zo);
 
     return ovector;
   }
@@ -930,6 +949,7 @@ class CGLMatrix3D {
     *yo = m01_*xi + m11_*yi + m21_*zi;
     *zo = m02_*xi + m12_*yi + m22_*zi;
 
+    // set w to 1.0
     float w = m03_*xi + m13_*yi + m23_*zi + m33_;
 
     float iw = (std::abs(w) > 1E-6 ? 1.0f/w : 1.0f);
@@ -952,6 +972,7 @@ class CGLMatrix3D {
     opoint.y = m01_*ipoint.x + m11_*ipoint.y + m21_*ipoint.z;
     opoint.z = m02_*ipoint.x + m12_*ipoint.y + m22_*ipoint.z;
 
+    // set w to 1.0
     float w = float(m03_*ipoint.x + m13_*ipoint.y + m23_*ipoint.z + m33_);
 
     float iw = (std::abs(w) > 1E-6 ? 1.0f/w : 1.0f);
@@ -964,11 +985,11 @@ class CGLMatrix3D {
 
     ivector.getXYZ(&ix, &iy, &iz);
 
-    float ox = m00_*ix + m10_*iy + m20_*iz;
-    float oy = m01_*ix + m11_*iy + m21_*iz;
-    float oz = m02_*ix + m12_*iy + m22_*iz;
+    float xo = m00_*ix + m10_*iy + m20_*iz;
+    float yo = m01_*ix + m11_*iy + m21_*iz;
+    float zo = m02_*ix + m12_*iy + m22_*iz;
 
-    ovector.setXYZ(ox, oy, oz);
+    ovector.setXYZ(xo, yo, zo);
   }
 
   //------

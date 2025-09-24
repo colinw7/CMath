@@ -7,19 +7,22 @@
 /// Coordinate Frame
 class CCoordFrame3D {
  public:
-  CCoordFrame3D() :
-   origin_(0,0,0), basis_() {
+  static bool validate(const CVector3D &u, const CVector3D &v, const CVector3D &w) {
+    return COrthonormalBasis3D::validate(u, v, w);
   }
 
+ public:
+  CCoordFrame3D() { }
+
   explicit
-  CCoordFrame3D(const CPoint3D &origin, const CVector3D &u=CVector3D(1,0,0),
-                const CVector3D &v=CVector3D(0,1,0), const CVector3D &w=CVector3D(0,0,1)) :
+  CCoordFrame3D(const CPoint3D &origin, const CVector3D &u=CVector3D(1, 0, 0),
+                const CVector3D &v=CVector3D(0, 1, 0), const CVector3D &w=CVector3D(0, 0, 1)) :
    origin_(origin), basis_(u, v, w) {
   }
 
   explicit
-  CCoordFrame3D(const CVector3D &origin, const CVector3D &u=CVector3D(1,0,0),
-                const CVector3D &v=CVector3D(0,1,0), const CVector3D &w=CVector3D(0,0,1)) :
+  CCoordFrame3D(const CVector3D &origin, const CVector3D &u=CVector3D(1, 0, 0),
+                const CVector3D &v=CVector3D(0, 1, 0), const CVector3D &w=CVector3D(0, 0, 1)) :
    origin_(origin), basis_(u, v, w) {
   }
 
@@ -40,8 +43,8 @@ class CCoordFrame3D {
   }
 
   void init() {
-    origin_ = CPoint3D(0,0,0);
-    basis_  = COrthonormalBasis3D(CVector3D(1,0,0), CVector3D(0,1,0), CVector3D(0,0,1));
+    origin_ = CPoint3D(0, 0, 0);
+    basis_  = COrthonormalBasis3D(CVector3D(1, 0, 0), CVector3D(0, 1, 0), CVector3D(0, 0, 1));
   }
 
   const CVector3D &getOrigin() const { return origin_; }
@@ -54,8 +57,8 @@ class CCoordFrame3D {
   void setOrigin(const CVector3D &origin) { origin_ = origin; }
 
   void setBasis(const CVector3D &u, const CVector3D &v, const CVector3D &w) {
-    if (u.isZero() || v.isZero() || w.isZero()) {
-      std::cerr << "Invalid Basis" << std::endl;
+    if (! validate(u, v, w)) {
+      std::cerr << "Invalid Basis\n";
       return;
     }
 
@@ -128,7 +131,7 @@ class CCoordFrame3D {
     basis_.rotate(v);
   }
 
-  /// Reset to (0,0,0) origin and (1,0,0),(0,1,0),(0,0,1) basis
+  /// Reset to (0, 0, 0) origin and (1, 0, 0), (0, 1, 0), (0, 0, 1) basis
   void reset() {
     origin_.zero();
 
@@ -169,7 +172,7 @@ class CCoordFrame3D {
   }
 
  private:
-  CVector3D           origin_;
+  CVector3D           origin_ { 0, 0, 0 };
   COrthonormalBasis3D basis_;
 };
 

@@ -235,6 +235,20 @@ class CPoint3D {
 
   //------
 
+  double distanceSqrTo(const CPoint3D &rhs) const {
+    double dx = x - rhs.x;
+    double dy = y - rhs.y;
+    double dz = z - rhs.z;
+
+    return (dx*dx + dy*dy + dz*dz);
+  }
+
+  double distanceTo(const CPoint3D &rhs) const {
+    return std::sqrt(distanceSqrTo(rhs));
+  }
+
+  //------
+
   // comparison
   int cmp(const CPoint3D &v) const {
     if      (x < v.x) return -1;

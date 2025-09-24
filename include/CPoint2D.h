@@ -224,7 +224,7 @@ class CPoint2D {
   }
 
   double distanceTo(const CPoint2D &rhs) const {
-    return sqrt(distanceSqrTo(rhs));
+    return std::sqrt(distanceSqrTo(rhs));
   }
 
   //-----

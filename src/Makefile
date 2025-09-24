@@ -36,6 +36,7 @@ CMathRand.cpp \
 CMathRound.cpp \
 COffsetBezier.cpp \
 CParticle2D.cpp \
+CParticle3D.cpp \
 CPrime.cpp \
 CRigidBody.cpp \
 CTriangulate2D.cpp \
