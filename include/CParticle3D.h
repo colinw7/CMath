@@ -36,10 +36,14 @@ class CParticleSystem3D {
   int maxParticles() const { return maxParticles_; }
   void setMaxParticles(int n) { maxParticles_ = n; }
 
+  int maxAge() const { return maxAge_; }
+  void setMaxAge(int n) { maxAge_ = n; }
+
  private:
-  CVector3D    gravity_;
+  CVector3D    gravity_      { 0, 9.81, 0 };
   ParticleList particles_;
   int          maxParticles_ { -1 };
+  int          maxAge_       { -1 };
 };
 
 //---

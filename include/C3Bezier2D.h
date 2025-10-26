@@ -168,12 +168,12 @@ class C3Bezier2D {
 
   double gradientStart() const {
     //return CMathGen::atan2(p2_.x - p1_.x, p2_.y - p1_.y);
-    return atan2(p2_.y - p1_.y, p2_.x - p1_.x);
+    return std::atan2(p2_.y - p1_.y, p2_.x - p1_.x);
   }
 
   double gradientEnd() const {
     //return CMathGen::atan2(p4_.x - p3_.x, p4_.y - p3_.y);
-    return atan2(p4_.y - p3_.y, p4_.x - p3_.x);
+    return std::atan2(p4_.y - p3_.y, p4_.x - p3_.x);
   }
 
   double gradient(double t) const {
@@ -186,7 +186,7 @@ class C3Bezier2D {
     CPoint2D p = (p2_ - p1_)*uu + 2.0*(p3_ - p2_)*tu + (p4_ - p3_)*tt;
 
     //double g = CMathGen::atan2(p.x, p.y);
-    double g = atan2(p.y, p.x);
+    double g = std::atan2(p.y, p.x);
 
     return g;
   }
@@ -207,6 +207,14 @@ class C3Bezier2D {
     bbox.add(p2_);
     bbox.add(p3_);
     bbox.add(p4_);
+  }
+
+  //---
+
+  CBBox2D getBBox() const {
+    CBBox2D bbox;
+    getHullBBox(bbox);
+    return bbox;
   }
 
   //---

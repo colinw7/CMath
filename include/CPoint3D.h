@@ -9,6 +9,10 @@
 
 class CPoint3D {
  public:
+  static CPoint3D makeZero() { return CPoint3D(0.0, 0.0, 0.0); }
+
+  //---
+
   CPoint3D() = default;
 
   CPoint3D(double x1, double y1, double z1) :
