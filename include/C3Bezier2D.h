@@ -69,6 +69,11 @@ class C3Bezier2D {
 
   //---
 
+  bool isBreak() const { return break_; }
+  void setBreak(bool b) { break_ = b; }
+
+  //---
+
   void calc(double t, double *x, double *y) const {
     CPoint2D p;
 
@@ -626,6 +631,7 @@ class C3Bezier2D {
 
  private:
   CPoint2D p1_, p2_, p3_, p4_;
+  bool     break_ { false };
 };
 
 #endif

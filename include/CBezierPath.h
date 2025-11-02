@@ -123,8 +123,10 @@ class CBezierPath {
                    double innerRadius, double outerRadius,
                    double innerRoundness, double outerRoundness,
                    double rotation) {
-    assert(innerRoundness >= 0.0 && innerRoundness <= 1.0);
-    assert(outerRoundness >= 0.0 && outerRoundness <= 1.0);
+    //assert(innerRoundness >= 0.0 && innerRoundness <= 1.0);
+    //assert(outerRoundness >= 0.0 && outerRoundness <= 1.0);
+    innerRoundness = CMathUtil::clamp(innerRoundness, 0.0, 1.0);
+    outerRoundness = CMathUtil::clamp(outerRoundness, 0.0, 1.0);
 
     CBezierPath bezierPath;
 
@@ -143,16 +145,16 @@ class CBezierPath {
     for (int i = 0; i < numPoints; ++i) {
       PolyPoint pi, po;
 
-      pi.angle = 2*i*da + M_PI/2.0 + rotation;
-      po.angle = pi.angle + da;
+      po.angle = 2*i*da + M_PI/2.0 + rotation;
+      pi.angle = po.angle + da;
 
       auto ci = std::cos(pi.angle); auto si = std::sin(pi.angle);
       auto co = std::cos(po.angle); auto so = std::sin(po.angle);
 
-      auto xo = center.x + ci*outerRadius;
-      auto yo = center.y + si*outerRadius;
-      auto xi = center.x + co*innerRadius;
-      auto yi = center.y + so*innerRadius;
+      auto xo = center.x + co*outerRadius;
+      auto yo = center.y + so*outerRadius;
+      auto xi = center.x + ci*innerRadius;
+      auto yi = center.y + si*innerRadius;
 
       pi.point = CPoint2D(xi, yi);
       po.point = CPoint2D(xo, yo);
@@ -172,6 +174,93 @@ class CBezierPath {
         auto g = CVector2D(center, p.point).perpendicular().normalized();
 
         auto r = (p.inner ? innerRoundness : outerRoundness);
+
+        auto p1 = p.point + g*r*d;
+        auto p2 = p.point - g*r*d;
+
+        p.lpoint = p1;
+        p.rpoint = p2;
+      }
+
+      rounded = true;
+    }
+
+    if (rounded) {
+      const auto &p = points[points.size() - 1];
+
+      bezierPath.moveTo(p.point);
+
+      for (size_t i1 = points.size() - 1, i2 = 0; i2 < points.size(); i1 = i2++) {
+        const auto &p1 = points[i1];
+        const auto &p2 = points[i2];
+
+        bezierPath.cubicTo(p1.rpoint, p2.lpoint, p2.point);
+      }
+    }
+    else {
+      int i = 0;
+
+      for (const auto &p : points) {
+        if (i == 0)
+          bezierPath.moveTo(p.point);
+        else
+          bezierPath.lineTo(p.point);
+
+        ++i;
+      }
+
+      bezierPath.lineTo(points[0].point);
+    }
+
+    bezierPath.close();
+
+    for (const auto &b : bezierPath.beziers_)
+      beziers_.push_back(b);
+  }
+
+  void addPolygon(const CPoint2D &center, int numPoints,
+                  double outerRadius, double outerRoundness,
+                  double rotation) {
+    //assert(outerRoundness >= 0.0 && outerRoundness <= 1.0);
+    outerRoundness = CMathUtil::clamp(outerRoundness, 0.0, 1.0);
+
+    CBezierPath bezierPath;
+
+    auto da = (numPoints > 0 ? 2.0*M_PI/numPoints : 0);
+
+    struct PolyPoint {
+      CPoint2D point;
+      double   angle { 0.0 };
+      CPoint2D lpoint;
+      CPoint2D rpoint;
+    };
+
+    std::vector<PolyPoint> points;
+
+    for (int i = 0; i < numPoints; ++i) {
+      PolyPoint po;
+
+      po.angle = i*da + M_PI/2.0 + rotation;
+
+      auto co = std::cos(po.angle); auto so = std::sin(po.angle);
+
+      auto xo = center.x + co*outerRadius;
+      auto yo = center.y + so*outerRadius;
+
+      po.point = CPoint2D(xo, yo);
+
+      points.push_back(po);
+    }
+
+    bool rounded = false;
+
+    if (outerRoundness > 0.0) {
+      auto d = points[0].point.distanceTo(points[1].point)/2.0;
+
+      for (auto &p : points) {
+        auto g = CVector2D(center, p.point).perpendicular().normalized();
+
+        auto r = outerRoundness;
 
         auto p1 = p.point + g*r*d;
         auto p2 = p.point - g*r*d;
@@ -249,6 +338,8 @@ class CBezierPath {
     for (const auto &b : beziers_) {
       auto bl = b.arcLength();
 
+      auto isBreak = b.isBreak();
+
       l2 = l1 + bl;
 
       if (! inside) {
@@ -271,12 +362,19 @@ class CBezierPath {
             C3Bezier2D bezier3, bezier4;
             bezier2.split(te, bezier3, bezier4);
 
+            if (isBreak)
+              bezier3.setBreak(true);
+
             beziers.push_back(bezier3);
 
             break;
           }
-          else
+          else {
+            if (isBreak)
+              bezier2.setBreak(true);
+
             beziers.push_back(bezier2);
+          }
         }
       }
       else {
@@ -286,18 +384,32 @@ class CBezierPath {
           C3Bezier2D bezier1, bezier2;
           b.split(te, bezier1, bezier2);
 
+          if (isBreak)
+            bezier1.setBreak(true);
+
           beziers.push_back(bezier1);
 
           break;
         }
-        else
+        else {
           beziers.push_back(b);
+        }
       }
 
       l1 = l2;
     }
 
     return CBezierPath(beziers);
+  }
+
+  void combine(const CBezierPath &bezierPath) {
+    auto n = beziers_.size();
+
+    if (n > 0)
+      beziers_[n - 1].setBreak(true);
+
+    for (const auto &b : bezierPath.beziers_)
+      beziers_.push_back(b);
   }
 
   //---
