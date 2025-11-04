@@ -791,7 +791,7 @@ class CMatrix3D {
 
   // CPoint3D can be expressed as a 1x4 matrix (x, y, z, 1)
   void multiplyPoint(double xi, double yi, double zi,
-                    double *xo, double *yo, double *zo) const {
+                     double *xo, double *yo, double *zo) const {
     *xo = m00_*xi + m01_*yi + m02_*zi + m03_;
     *yo = m10_*xi + m11_*yi + m12_*zi + m13_;
     *zo = m20_*xi + m21_*yi + m22_*zi + m23_;
@@ -805,8 +805,8 @@ class CMatrix3D {
 
   CPoint3D multiplyPoint(const CPoint3D &ipoint) const {
     return CPoint3D(m00_*ipoint.x + m01_*ipoint.y + m02_*ipoint.z + m03_,
-                 m10_*ipoint.x + m11_*ipoint.y + m12_*ipoint.z + m13_,
-                 m20_*ipoint.x + m21_*ipoint.y + m22_*ipoint.z + m23_);
+                    m10_*ipoint.x + m11_*ipoint.y + m12_*ipoint.z + m13_,
+                    m20_*ipoint.x + m21_*ipoint.y + m22_*ipoint.z + m23_);
   }
 
   void preMultiplyPoint(double xi, double yi, double zi,
@@ -824,8 +824,8 @@ class CMatrix3D {
 
   CPoint3D preMultiplyPoint(const CPoint3D &ipoint) const {
     return CPoint3D(m00_*ipoint.x + m10_*ipoint.y + m20_*ipoint.z,
-                 m01_*ipoint.x + m11_*ipoint.y + m21_*ipoint.z,
-                 m02_*ipoint.x + m12_*ipoint.y + m22_*ipoint.z);
+                    m01_*ipoint.x + m11_*ipoint.y + m21_*ipoint.z,
+                    m02_*ipoint.x + m12_*ipoint.y + m22_*ipoint.z);
   }
 
   // CVector3D can be expressed as a 1x4 matrix (x, y, z, 0)

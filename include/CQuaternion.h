@@ -380,6 +380,7 @@ class CQuaternion {
                      &tx, &ty, &tz);
   }
 
+  // x=yaw, y=pitch, z=roll
   void fromEulerZYX(double theta_z, double theta_y, double theta_x) {
     double cos_z_2 = 0.5*std::cos(theta_z);
     double cos_y_2 = 0.5*std::cos(theta_y);
@@ -466,7 +467,7 @@ class CQuaternion {
   }
 
   static CQuaternion slerpExtraSpins(double t, const CQuaternion &p,
-                                      const CQuaternion &q, int nspins) {
+                                     const CQuaternion &q, int nspins) {
     double c = p.dotProduct(q);
 
     double angle = acos(c);
@@ -487,8 +488,8 @@ class CQuaternion {
   }
 
   static CQuaternion squad(double t, const CQuaternion &p,
-                            const CQuaternion &a, const CQuaternion &b,
-                            const CQuaternion &q) {
+                           const CQuaternion &a, const CQuaternion &b,
+                           const CQuaternion &q) {
     CQuaternion slerpp = slerp(t, p, q);
     CQuaternion slerpq = slerp(t, a, b);
 
@@ -497,12 +498,14 @@ class CQuaternion {
     return slerp(tslerp, slerpp, slerpq);
   }
 
+  // return quaternion to change direction (vector) from v0 to v1.
+  // minimizes axis/rotation
   static CQuaternion rotationArc(const CVector3D &v0, const CVector3D &v1) {
     CQuaternion q;
 
     CVector3D c = v0.crossProduct(v1);
-    double      d = v0.dotProduct(v1);
-    double      s = std::sqrt((1.0 + d)*2.0);
+    double    d = v0.dotProduct(v1);
+    double    s = std::sqrt((1.0 + d)*2.0);
 
     double s1 = 1.0/s;
 

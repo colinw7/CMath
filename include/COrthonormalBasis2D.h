@@ -12,7 +12,7 @@ class COrthonormalBasis2D {
 
   COrthonormalBasis2D(const CVector2D &u, const CVector2D &v) :
    u_(u), v_(v), m_(u_, v_) {
-    if (! validate()) { std::cerr << "Invalid Basis" << std::endl; assert(false); }
+    if (! validate()) { std::cerr << "Invalid Basis\n"; assert(false); }
   }
 
   const CVector2D &getU() const { return u_; }
@@ -31,7 +31,7 @@ class COrthonormalBasis2D {
       m_ = CMatrix2D(u_, v_);
     }
     else {
-      std::cerr << "Invalid Basis" << std::endl; assert(false);
+      std::cerr << "Invalid Basis\n"; assert(false);
     }
   }
 

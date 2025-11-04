@@ -151,22 +151,14 @@ class CSymmetricMatrix3D {
   const double &operator[](unsigned int i) const { return (&m00_)[i]; }
 
   friend std::ostream &operator<<(std::ostream &os, const CSymmetricMatrix3D &matrix) {
-    os << "(" << matrix.m00_ << "," <<
-                 matrix.m01_ << "," <<
-                 matrix.m02_ << "," <<
-                 matrix.m03_ << ")" << std::endl;
-    os << "(" << matrix.m10_ << "," <<
-                 matrix.m11_ << "," <<
-                 matrix.m12_ << "," <<
-                 matrix.m13_ << ")" << std::endl;
-    os << "(" << matrix.m20_ << "," <<
-                 matrix.m21_ << "," <<
-                 matrix.m22_ << "," <<
-                 matrix.m23_ << ")" << std::endl;
-    os << "(" << matrix.m30_ << "," <<
-                 matrix.m31_ << "," <<
-                 matrix.m32_ << "," <<
-                 matrix.m33_ << ")" << std::endl;
+    os << "(" << matrix.m00_ << "," << matrix.m01_ << "," <<
+                 matrix.m02_ << "," << matrix.m03_ << ")\n";
+    os << "(" << matrix.m10_ << "," << matrix.m11_ << "," <<
+                 matrix.m12_ << "," << matrix.m13_ << ")\n";
+    os << "(" << matrix.m20_ << "," << matrix.m21_ << "," <<
+                 matrix.m22_ << "," << matrix.m23_ << ")\n";
+    os << "(" << matrix.m30_ << "," << matrix.m31_ << "," <<
+                 matrix.m32_ << "," << matrix.m33_ << ")\n";
 
     return os;
   }

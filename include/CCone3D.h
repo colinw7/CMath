@@ -36,26 +36,23 @@ class CCone3D : public CShape3D {
 
   void setRadius(double radius) {
     radius_ = radius;
-
-    area_ = OptReal();
+    area_   = OptReal();
   }
 
   double getHeight() const { return height_; }
 
   void setHeight(double height) {
     height_ = height;
-
-    area_ = OptReal();
+    area_   = OptReal();
   }
 
   void setPhiLimit(double phi_max) {
     phi_max_ = CMathGen::DegToRad(std::min(std::max(phi_max, 0.0), 360.0));
-
-    area_ = OptReal();
+    area_    = OptReal();
   }
 
   CBBox3D getBBox() const override {
-    CPoint3D p1(-radius_, -radius_,       0);
+    CPoint3D p1(-radius_, -radius_,     0.0);
     CPoint3D p2( radius_,  radius_, height_);
 
     return CBBox3D(CShape3D::transformFrom(p1), CShape3D::transformFrom(p2));
@@ -75,8 +72,8 @@ class CCone3D : public CShape3D {
     //  y = ro.y + t*rd.y
     //  z = ro.z + t*rd.z
 
-    CPoint3D p1 = CShape3D::transformTo(line.start());
-    CPoint3D p2 = CShape3D::transformTo(line.end  ());
+    auto p1 = CShape3D::transformTo(line.start());
+    auto p2 = CShape3D::transformTo(line.end  ());
 
     CLine3D l(p1, p2);
 
@@ -112,10 +109,9 @@ class CCone3D : public CShape3D {
   }
 
   CVector3D pointNormal(const CPoint3D &point) const {
-    CPoint3D p = CShape3D::transformTo(point);
+    auto p = CShape3D::transformTo(point);
 
     CVector3D dpdu, dpdv;
-
     pointDetails(p, nullptr, nullptr, &dpdu, &dpdv);
 
     dpdu = CShape3D::transformFrom(dpdu);
@@ -130,7 +126,6 @@ class CCone3D : public CShape3D {
     CPoint3D p = CShape3D::transformTo(point);
 
     double u, v;
-
     pointDetails(p, &u, &v);
 
     return CVector2D(u, v);

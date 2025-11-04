@@ -10,7 +10,7 @@ ArcToBeziers(double x, double y, double rx, double ry,
 
   a_to_b.calc(x, y, rx, ry, angle1, angle2);
 
-  uint num_beziers = a_to_b.getNumBeziers();
+  auto num_beziers = a_to_b.getNumBeziers();
 
   beziers.resize(num_beziers);
 

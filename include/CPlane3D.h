@@ -40,21 +40,6 @@ class CPlane3D {
 
   //------
 
-  // copy operations
-  CPlane3D(const CPlane3D &rhs) :
-   point_(rhs.point_), normal_(rhs.normal_), c_(rhs.c_) {
-  }
-
-  CPlane3D &operator=(const CPlane3D &rhs) {
-    point_  = rhs.point_;
-    normal_ = rhs.normal_;
-    c_      = rhs.c_;
-
-    return *this;
-  }
-
-  //------
-
   // output
   void print(std::ostream &os) const {
     os << "(" << point_ << ") (" << normal_ << ") (" << c_ << ")";
@@ -71,7 +56,7 @@ class CPlane3D {
   // accessors
   const CPoint3D  &getPoint   () const { return point_ ; }
   const CVector3D &getNormal  () const { return normal_; }
-  double             getConstant() const { return c_     ; }
+  double           getConstant() const { return c_     ; }
 
   double value(const CPoint3D &point) const {
     return (normal_.dotProduct(point - point_));

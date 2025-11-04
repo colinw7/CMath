@@ -27,7 +27,7 @@ class CCylinder3D : public CShape3D {
   using OptReal = std::optional<double>;
 
  public:
-  CCylinder3D(double radius=double(1), double height=double(1)) :
+  CCylinder3D(double radius=1.0, double height=1.0) :
    radius_(radius), height_(height) {
     setZLimit(0, height_);
 
@@ -204,12 +204,12 @@ class CCylinder3D : public CShape3D {
   }
 
  private:
-  double   radius_ { 1.0 }; //! Radius r
-  double   height_ { 1.0 }; //! Height h
+  double radius_ { 1.0 }; //! Radius r
+  double height_ { 1.0 }; //! Height h
 
   // limits
-  double   zmin_    { 0.0 }, zmax_ { 0.0 }; //! Height Range
-  double   phi_max_ { 0.0 };                //! Angle/Sweep Max
+  double zmin_    { 0.0 }, zmax_ { 0.0 }; //! Height Range
+  double phi_max_ { 0.0 };                //! Angle/Sweep Max
 
   OptReal area_;
 };

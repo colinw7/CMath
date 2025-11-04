@@ -578,9 +578,9 @@ class CMatrix3x3 {
   //------
 
   void print(std::ostream &os) const {
-    os << "(" << m00_ << "," << m01_ << "," << m02_ << ")" << std::endl;
-    os << "(" << m10_ << "," << m11_ << "," << m12_ << ")" << std::endl;
-    os << "(" << m20_ << "," << m21_ << "," << m22_ << ")" << std::endl;
+    os << "(" << m00_ << "," << m01_ << "," << m02_ << ")\n";
+    os << "(" << m10_ << "," << m11_ << "," << m12_ << ")\n";
+    os << "(" << m20_ << "," << m21_ << "," << m22_ << ")\n";
   }
 
   friend std::ostream &operator<<(std::ostream &os, const CMatrix3x3 &matrix) {

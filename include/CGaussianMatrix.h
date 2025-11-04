@@ -19,9 +19,9 @@ class CGaussianMatrix {
   }
 
   void print(std::ostream &os) const {
-    os << m[0][0] <<" "<< m[0][1] <<" "<< m[0][2] <<" "<< m[0][3] << std::endl;
-    os << m[1][0] <<" "<< m[1][1] <<" "<< m[1][2] <<" "<< m[1][3] << std::endl;
-    os << m[2][0] <<" "<< m[2][1] <<" "<< m[2][2] <<" "<< m[2][3] << std::endl;
+    os << m[0][0] <<" "<< m[0][1] <<" "<< m[0][2] <<" "<< m[0][3] << "\n";
+    os << m[1][0] <<" "<< m[1][1] <<" "<< m[1][2] <<" "<< m[1][3] << "\n";
+    os << m[2][0] <<" "<< m[2][1] <<" "<< m[2][2] <<" "<< m[2][3] << "\n";
   }
 
   friend std::ostream &operator<<(std::ostream &os, const CGaussianMatrix &matrix) {
@@ -41,7 +41,7 @@ class CGaussianMatrix {
   }
 
   bool solve(double *res) {
-    //std::cout << *this << std::endl;
+    //std::cout << *this << "\n";
 
     // Gaussian elimination
 
@@ -66,7 +66,7 @@ class CGaussianMatrix {
       // if zero insoluable
 
       if (ma < 1E-6) {
-        std::cerr << "Insoluable" << std::endl;
+        std::cerr << "Insoluable\n";
         return false;
       }
 
@@ -75,7 +75,7 @@ class CGaussianMatrix {
       if (mx != p)
         swapRows(p, mx);
 
-      //std::cout << *this << std::endl;
+      //std::cout << *this << "\n";
 
       //----------
 
@@ -85,7 +85,7 @@ class CGaussianMatrix {
 
       scaleRow(p, f);
 
-      //std::cout << *this << std::endl;
+      //std::cout << *this << "\n";
 
       //----------
 
@@ -98,10 +98,10 @@ class CGaussianMatrix {
           m[r][c] -= m[p][c]*f1;
       }
 
-      //std::cout << *this << std::endl;
+      //std::cout << *this << "\n";
     }
 
-    //std::cout << "Back Subst" << std::endl;
+    //std::cout << "Back Subst\n";
 
     for (int r = ROWS - 2; r >= 0; --r) {
       for (int c = r + 1; c < int(COLS - 1); ++c) {
@@ -111,7 +111,7 @@ class CGaussianMatrix {
       }
     }
 
-    //std::cout << *this << std::endl;
+    //std::cout << *this << "\n";
 
     for (uint r = 0; r < ROWS; ++r)
       res[r] = m[r][COLS - 1];

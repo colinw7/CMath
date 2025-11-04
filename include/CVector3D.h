@@ -129,7 +129,7 @@ class CVector3D {
     if (normalized_)
       return 1.0;
 
-    return ::sqrt(lengthSqr());
+    return std::sqrt(lengthSqr());
   }
 
   double fastLength() const {
@@ -596,12 +596,12 @@ class CVector3D {
     }
 
     if (::fabs(vector1.x_) > ::fabs(vector1.y_)) {
-      double ilen = 1.0/::sqrt(vector1.x_*vector1.x_ + vector1.z_*vector1.z_);
+      double ilen = 1.0/std::sqrt(vector1.x_*vector1.x_ + vector1.z_*vector1.z_);
 
       *vector2 = CVector3D(-vector1.z_*ilen, 0.0, vector1.x_*ilen);
     }
     else {
-      double ilen = 1.0/::sqrt(vector1.y_*vector1.y_ + vector1.z_*vector1.z_);
+      double ilen = 1.0/std::sqrt(vector1.y_*vector1.y_ + vector1.z_*vector1.z_);
 
       *vector2 = CVector3D(0.0, vector1.z_*ilen, -vector1.y_*ilen);
     }

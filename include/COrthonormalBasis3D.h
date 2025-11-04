@@ -9,14 +9,12 @@
 class COrthonormalBasis3D {
  public:
   // create default
-  COrthonormalBasis3D() :
-   u_(1, 0, 0), v_(0, 1, 0), w_(0, 0, 1), m_(u_, v_, w_) {
-  }
+  COrthonormalBasis3D() { }
 
   // create from three orthogonal vectors
   COrthonormalBasis3D(const CVector3D &u, const CVector3D &v, const CVector3D &w) :
    u_(u), v_(v), w_(w), m_(u_, v_, w_) {
-    if (! validate()) { std::cerr << "Invalid Basis" << std::endl; assert(false); }
+    if (! validate()) { std::cerr << "Invalid Basis\n"; assert(false); }
   }
 
   // get vector components
@@ -40,7 +38,7 @@ class COrthonormalBasis3D {
       m_ = CMatrix3D(u_, v_, w_);
     }
     else {
-      std::cerr << "Invalid Basis" << std::endl; assert(false);
+      std::cerr << "Invalid Basis\n"; assert(false);
     }
   }
 
@@ -304,10 +302,12 @@ class COrthonormalBasis3D {
 
  private:
   /// Basis Vectors
-  CVector3D u_, v_, w_;
+  CVector3D u_ { 1, 0, 0 };
+  CVector3D v_ { 0, 1, 0 };
+  CVector3D w_ { 0, 0, 1 };
 
   /// CMatrix3D containing Basis Vectors as columns
-  CMatrix3D m_;
+  CMatrix3D m_ { u_, v_, w_ };
 };
 
 #endif

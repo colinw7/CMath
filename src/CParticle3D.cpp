@@ -62,6 +62,7 @@ void
 CParticleSystem3D::
 age()
 {
-  for (auto *particle : getParticles())
+  for (auto *particle : getParticles()) {
     particle->incAge();
+  }
 }

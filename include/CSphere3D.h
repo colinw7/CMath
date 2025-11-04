@@ -46,8 +46,8 @@ class CSphere3D : public CShape3D {
     zmin_ = std::min(std::max(std::min(zmin, zmax), -radius_), radius_);
     zmax_ = std::min(std::max(std::max(zmin, zmax), -radius_), radius_);
 
-    theta_min_ = acos(std::min(std::max(zmin_/radius_, -1.0), 1.0));
-    theta_max_ = acos(std::min(std::max(zmax_/radius_, -1.0), 1.0));
+    theta_min_ = std::acos(std::min(std::max(zmin_/radius_, -1.0), 1.0));
+    theta_max_ = std::acos(std::min(std::max(zmax_/radius_, -1.0), 1.0));
 
     area_ = OptReal();
   }
@@ -180,7 +180,11 @@ class CSphere3D : public CShape3D {
       *u = phi/phi_max_;
     }
 
-    double theta     = acos(point.z/radius_);
+    double theta = 0.0;
+
+    if (std::abs(point.z <= radius_))
+      theta = std::acos(point.z/radius_);
+
     double theta_len = theta_max_ - theta_min_;
 
     if (v)
@@ -200,18 +204,15 @@ class CSphere3D : public CShape3D {
           double cos_phi = point.x*izradius;
           double sin_phi = point.y*izradius;
 
-          *dpdv = theta_len*CVector3D( point.z*cos_phi,
-                                    point.z*sin_phi,
-                                   -radius_*sin(theta));
+          *dpdv = theta_len*CVector3D(point.z*cos_phi, point.z*sin_phi, -radius_*std::sin(theta));
         }
       }
       else {
         double cos_phi = 0;
         double sin_phi = 1;
 
-        CVector3D tdpdv = theta_len*CVector3D( point.z*cos_phi,
-                                         point.z*sin_phi,
-                                        -radius_*sin(theta));
+        auto tdpdv =
+          theta_len*CVector3D(point.z*cos_phi, point.z*sin_phi, -radius_*std::sin(theta));
 
         if (dpdv)
           *dpdv = tdpdv;
@@ -223,7 +224,7 @@ class CSphere3D : public CShape3D {
   }
 
   double getPhi(const CPoint3D &point) const {
-    double phi = atan2(point.y, point.x);
+    double phi = std::atan2(point.y, point.x);
 
     if (phi < 0.0) phi += 2.0*M_PI;
 

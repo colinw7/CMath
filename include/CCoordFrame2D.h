@@ -49,7 +49,7 @@ class CCoordFrame2D {
 
   void setBasis(const CVector2D &u, const CVector2D &v) {
     if (u.isZero() || v.isZero()) {
-      std::cerr << "Invalid Basis" << std::endl;
+      std::cerr << "Invalid Basis\n";
       return;
     }
 

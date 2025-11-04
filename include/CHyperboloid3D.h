@@ -13,7 +13,7 @@
 #include <NaN.h>
 #endif
 
-/*! Hyperboloid betweem specified points and sweep phi
+/*! Hyperboloid between specified points and sweep phi
  *
  * a*x^2 + a*y^2 - c*c^2 = 1
  *
@@ -36,7 +36,8 @@ class CHyperboloid3D : public CShape3D {
   using OptReal = std::optional<double>;
 
  public:
-  CHyperboloid3D(const CPoint3D &point1=CPoint3D(0,0,0), const CPoint3D &point2=CPoint3D(1,1,1)) {
+  CHyperboloid3D(const CPoint3D &point1=CPoint3D(0, 0, 0),
+                 const CPoint3D &point2=CPoint3D(1, 1, 1)) {
     setPoints(point1, point2);
 
     setPhiLimit(360.0);
@@ -46,8 +47,8 @@ class CHyperboloid3D : public CShape3D {
     point1_ = point1;
     point2_ = point2;
 
-    double rad1 = sqrt(point1.x*point1.x + point1.y*point1.y);
-    double rad2 = sqrt(point2.x*point2.x + point2.y*point2.y);
+    double rad1 = std::sqrt(point1.x*point1.x + point1.y*point1.y);
+    double rad2 = std::sqrt(point2.x*point2.x + point2.y*point2.y);
 
     rmax_ = std::max(rad1, rad2);
     zmin_ = std::min(point1.z, point2.z);
@@ -59,22 +60,25 @@ class CHyperboloid3D : public CShape3D {
     if (point2_.z == 0.0)
       std::swap(point1_, point2_);
 
-    CPoint3D pp = point1_;
+    auto point = point1_;
+
+    auto dpoint = 2.0*(point2_ - point1_);
+
+    auto xy2 = point2_.x*point2_.x + point2_.y*point2_.y;
+    auto z22 = point2_.z*point2_.z;
 
     uint num_iters = 0;
 
-    double xy1, xy2;
-
     do {
-      pp += 2.0*(point2_ - point1_);
+      point += dpoint;
 
-      xy1 = pp.x*pp.x + pp.y*pp.y;
-      xy2 = point2_.x*point2_.x + point2_.y*point2_.y;
+      auto xy1 = point.x*point.x + point.y*point.y;
+      auto z12 = point.z*point.z;
 
-      a_ = (1.0/xy1 - (pp.z*pp.z)/(xy1*point2_.z*point2_.z))/
-           (1.0 - (xy2*pp.z*pp.z)/(xy1*point2_.z*point2_.z));
+      auto xy1z22 = xy1*z22;
 
-      c_ = (a_*xy2 - 1.0)/(point2_.z*point2_.z);
+      a_ = (1.0/xy1 - z12/xy1z22)/(1.0 - xy2*z12/xy1z22);
+      c_ = (a_*xy2 - 1.0)/z22;
 
       ++num_iters;
     } while (num_iters < 1000 && ! validReal(a_));
@@ -108,9 +112,9 @@ class CHyperboloid3D : public CShape3D {
     double rox = ro.getX(); double roy = ro.getY(); double roz = ro.getZ();
     double rdx = rd.getX(); double rdy = rd.getY(); double rdz = rd.getZ();
 
-    double a = a_*rdx*rdx + a_*rdy*rdy - c_*rdz*rdz;
+    double a =      a_*rdx*rdx + a_*rdy*rdy - c_*rdz*rdz;
     double b = 2.0*(a_*rdx*rox + a_*rdy*roy - c_*rdz*roz);
-    double c = a_*rox*rox + a_*roy*roy - c_*roz*roz - 1.0;
+    double c =      a_*rox*rox + a_*roy*roy - c_*roz*roz - 1.0;
 
     if (! CMathGen::solveQuadratic(a, b, c, tmin, tmax))
       return false;
@@ -217,14 +221,14 @@ class CHyperboloid3D : public CShape3D {
       *dpdu = CVector3D(-phi_max_*point.y, phi_max_*point.x, 0.0);
 
     if (dpdv) {
-      double cosphi = cos(phi);
-      double sinphi = sin(phi);
+      double cosphi = std::cos(phi);
+      double sinphi = std::sin(phi);
 
       *dpdv = CVector3D((point2_.x - point1_.x)*cosphi -
-                     (point2_.y - point1_.y)*sinphi,
-                     (point2_.x - point1_.x)*sinphi +
-                     (point2_.y - point1_.y)*cosphi,
-                     point2_.z - point1_.z);
+                        (point2_.y - point1_.y)*sinphi,
+                        (point2_.x - point1_.x)*sinphi +
+                        (point2_.y - point1_.y)*cosphi,
+                        point2_.z - point1_.z);
     }
   }
 
@@ -233,7 +237,7 @@ class CHyperboloid3D : public CShape3D {
 
     CPoint3D pr = (1.0 - v)*point1_ + v*point2_;
 
-    double phi = atan2(pr.x*point.y - pr.y*point.x, pr.x*point.x + pr.y*point.y);
+    double phi = std::atan2(pr.x*point.y - pr.y*point.x, pr.x*point.x + pr.y*point.y);
 
     if (phi < 0.0) phi += 2.0*M_PI;
 
@@ -252,13 +256,14 @@ class CHyperboloid3D : public CShape3D {
 #endif
 
  private:
-  CPoint3D point1_;                         //! CPoint3D 1
-  CPoint3D point2_;                         //! CPoint3D 2
+  CPoint3D point1_  { 0, 0, 0 };            //! Point 1
+  CPoint3D point2_  { 1, 1, 1 };            //! Point 2
   double   phi_max_ { 0.0 };                //! Angle/Sweep Max
   double   zmin_    { 0.0 }, zmax_ { 0.0 }; //! Height Range
-  double   rmax_    { 0.0 };                //!
-  double   a_       { 0.0 }, c_ { 0.0 };
-  OptReal  area_;
+  double   rmax_    { 0.0 };                //! Radius Range
+  double   a_       { 0.0 };                //! Calculated coefficients
+  double   c_       { 0.0 };
+  OptReal  area_;                           //! Cached area
 };
 
 #endif

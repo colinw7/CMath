@@ -194,27 +194,10 @@ class CMatrixStack2D {
   //---
 
  public:
-  CMatrixStack2D() :
-   transformStack_(), mValid_(false), m_() {
-  }
+  CMatrixStack2D() { }
 
-  CMatrixStack2D(const CMatrixStack2D &m) :
-   transformStack_(m.transformStack_), mValid_(m.mValid_), m_(m.m_) {
-  }
-
-  CMatrixStack2D(const CMatrix2D &m) :
-   transformStack_() {
+  CMatrixStack2D(const CMatrix2D &m) {
     transformStack_.push_back(Transform(m));
-
-    mValid_ = false;
-  }
-
-  CMatrixStack2D &operator=(const CMatrixStack2D &m) {
-    transformStack_ = m.transformStack_;
-    mValid_         = m.mValid_;
-    m_              = m.m_;
-
-    return *this;
   }
 
   const TransformStack &transformStack() const { return transformStack_; }

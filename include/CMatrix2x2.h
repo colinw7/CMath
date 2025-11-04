@@ -404,8 +404,8 @@ class CMatrix2x2 {
   const double &operator[](unsigned int i) const { return (&m00_)[i]; }
 
   void print(std::ostream &os) const {
-    os << "(" << m00_ << "," << m01_ << ")" << std::endl;
-    os << "(" << m10_ << "," << m11_ << ")" << std::endl;
+    os << "(" << m00_ << "," << m01_ << ")\n";
+    os << "(" << m10_ << "," << m11_ << ")\n";
   }
 
   friend std::ostream &operator<<(std::ostream &os, const CMatrix2x2 &matrix) {

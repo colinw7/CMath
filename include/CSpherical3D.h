@@ -13,12 +13,12 @@ class CSpherical3D {
   }
 
   CSpherical3D(const Point &point) {
-    rho_   = ::sqrt(point.x*point.x + point.y*point.y + point.z*point.z);
-    theta_ = ::atan(point.y/point.x);
+    rho_   = std::sqrt(point.x*point.x + point.y*point.y + point.z*point.z);
+    theta_ = std::atan(point.y/point.x);
 
-    double r = ::sqrt(point.x*point.x + point.y*point.y);
+    double r = std::sqrt(point.x*point.x + point.y*point.y);
 
-    phi_ = ::asin(r/rho_);
+    phi_ = std::asin(r/rho_);
   }
 
   double getRho  () const { return rho_  ; }
@@ -32,33 +32,33 @@ class CSpherical3D {
   Point toPoint() const {
     double r = rho_*::sin(phi_);
 
-    Point(r   *::cos(theta_),
-          r   *::sin(theta_),
-          rho_*::cos(phi_));
+    Point(r   *std::cos(theta_),
+          r   *std::sin(theta_),
+          rho_*std::cos(phi_));
   }
 
   void toXYZ(double *x, double *y, double *z) {
     double r = rho_*::sin(phi_);
 
-    *x = r   *::cos(theta_);
-    *y = r   *::sin(theta_);
-    *z = rho_*::cos(phi_);
+    *x = r   *std::cos(theta_);
+    *y = r   *std::sin(theta_);
+    *z = rho_*std::cos(phi_);
   }
 
   static void xyzToRhoThetaPhi(double x, double y, double z,
                                double *rho, double *theta, double *phi) {
-    *rho   = ::sqrt(x*x + y*y + z*z);
-    *theta = ::atan(y/x);
+    *rho   = std::sqrt(x*x + y*y + z*z);
+    *theta = std::atan(y/x);
 
-    double r = ::sqrt(x*x + y*y);
+    double r = std::sqrt(x*x + y*y);
 
-    *phi = ::asin(r/(*rho_));
+    *phi = std::asin(r/(*rho_));
   }
 
  private:
-  double rho_;    // radius
-  double theta_;  // azimuth
-  double phi_;    // zenith
+  double rho_;   // radius
+  double theta_; // azimuth
+  double phi_;   // zenith
 };
 
 #endif

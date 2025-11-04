@@ -22,7 +22,7 @@ class C3Bezier2D {
     p1_ = bezier2.getFirstPoint();
     p4_ = bezier2.getLastPoint ();
 
-    const CPoint2D &p = bezier2.getControlPoint();
+    const auto &p = bezier2.getControlPoint();
 
     p2_ = (p1_ + 2*p)/3;
     p3_ = (2*p + p4_)/3;
@@ -107,7 +107,7 @@ class C3Bezier2D {
 
   bool interp(const CPoint2D &p, double *t) const {
     double t1 = (::fabs(p.x   - p1_.x) + ::fabs(p.y   - p1_.y))/
-           (::fabs(p4_.x - p1_.x) + ::fabs(p4_.y - p1_.y));
+                (::fabs(p4_.x - p1_.x) + ::fabs(p4_.y - p1_.y));
 
     CPoint2D pp;
 

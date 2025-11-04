@@ -26,3 +26,11 @@ createParticle()
 {
   return new CParticle2D(*this);
 }
+
+void
+CParticleSystem2D::
+step(double dt)
+{
+  for (auto *particle : getParticles())
+    particle->step(dt);
+}

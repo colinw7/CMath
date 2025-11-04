@@ -489,8 +489,7 @@ class CPolygon2D : public CShape2D {
                           const typename EarPointList::const_iterator &ep1,
                           const typename EarPointList::const_iterator &ep2,
                           const typename EarPointList::const_iterator &ep3) {
-    //std::cout << "Diagonal " <<
-    //             (*ep2).point << "->" << (*ep3).point << std::endl;
+    //std::cout << "Diagonal " << (*ep2).point << "->" << (*ep3).point << "\n";
 
     triangle_list.push_back(CTriangle2D((*ep1).point, (*ep2).point, (*ep3).point));
   }
