@@ -57,6 +57,8 @@ class CMatrixStack2D {
 
     CMatrixTransformType type() const { return type_; }
 
+    //---
+
     double angle() const {
       assert(type_ == CMatrixTransformType::ROTATE ||
              type_ == CMatrixTransformType::ROTATE_ORIGIN ||
@@ -66,52 +68,86 @@ class CMatrixStack2D {
       return value(0);
     }
 
-    double xscale() const {
-      assert(type_ == CMatrixTransformType::SCALE1 ||
-             type_ == CMatrixTransformType::SCALE2);
+    //---
 
+    double xscale() const {
+      assert(type_ == CMatrixTransformType::SCALE1 || type_ == CMatrixTransformType::SCALE2);
       return value(0);
     }
 
     double yscale() const {
-      assert(type_ == CMatrixTransformType::SCALE1 ||
-             type_ == CMatrixTransformType::SCALE2);
-
+      assert(type_ == CMatrixTransformType::SCALE1 || type_ == CMatrixTransformType::SCALE2);
       return value(1);
     }
 
+    //---
+
     double dx() const {
       assert(type_ == CMatrixTransformType::TRANSLATE);
-
       return value(0);
     }
 
     double dy() const {
       assert(type_ == CMatrixTransformType::TRANSLATE);
-
       return value(1);
     }
 
+    //---
+
     double xo() const {
       assert(type_ == CMatrixTransformType::ROTATE_ORIGIN);
-
       return value(1);
     }
 
     double yo() const {
       assert(type_ == CMatrixTransformType::ROTATE_ORIGIN);
-
       return value(2);
     }
 
+    //---
+
     double value(int i) const { return v_[i]; }
+    void setValue(int i, double v) { v_[i] = v; }
 
     const double *values() const { return &v_[0]; }
 
+    //---
+
+    void setDx(double v) {
+      assert(type_ == CMatrixTransformType::TRANSLATE);
+      setValue(0, v);
+    }
+
+    void setDy(double v) {
+      assert(type_ == CMatrixTransformType::TRANSLATE);
+      setValue(1, v);
+    }
+
+    void setXScale(double v) {
+      assert(type_ == CMatrixTransformType::SCALE1 || type_ == CMatrixTransformType::SCALE2);
+      setValue(0, v);
+    }
+
+    void setYScale(double v) {
+      assert(type_ == CMatrixTransformType::SCALE1 || type_ == CMatrixTransformType::SCALE2);
+      setValue(1, v);
+    }
+
+    void setAngle(double v) {
+      assert(type_ == CMatrixTransformType::ROTATE ||
+             type_ == CMatrixTransformType::ROTATE_ORIGIN ||
+             type_ == CMatrixTransformType::SKEWX ||
+             type_ == CMatrixTransformType::SKEWY);
+
+      setValue(0, v);
+    }
+
+    //---
+
     CMatrix2D rotateMatrix() const {
-      CMatrix2D m1 = CMatrix2D::translation(-v_[1], -v_[2]);
-      CMatrix2D m2 = CMatrix2D::rotation   ( v_[0]);
-      CMatrix2D m3 = CMatrix2D::translation( v_[1],  v_[2]);
+      auto m1 = CMatrix2D::translation(-v_[1], -v_[2]);
+      auto m2 = CMatrix2D::rotation   ( v_[0]);
+      auto m3 = CMatrix2D::translation( v_[1],  v_[2]);
 
       return m3*m2*m1;
     }
@@ -138,6 +174,8 @@ class CMatrixStack2D {
       }
     }
 
+    //---
+
     std::string name() const {
       switch (type_) {
         case CMatrixTransformType::TRANSLATE    : return "translate";
@@ -151,6 +189,8 @@ class CMatrixStack2D {
         default                                 : assert(false); return "";
       }
     }
+
+    //---
 
     void printValues(std::ostream &os, int n) const {
       for (int i = 0; i < n; ++i) {
@@ -189,19 +229,11 @@ class CMatrixStack2D {
     double               v_[NUM_VALUES];
   };
 
-  typedef std::vector<Transform> TransformStack;
+  using TransformStack = std::vector<Transform>;
 
   //---
 
  public:
-  CMatrixStack2D() { }
-
-  CMatrixStack2D(const CMatrix2D &m) {
-    transformStack_.push_back(Transform(m));
-  }
-
-  const TransformStack &transformStack() const { return transformStack_; }
-
   static Transform translateTransform(const CPoint2D &d) {
     return Transform(CMatrixTransformType::TRANSLATE, d.x, d.y);
   }
@@ -210,7 +242,38 @@ class CMatrixStack2D {
     return Transform(CMatrixTransformType::TRANSLATE, dx, dy);
   }
 
-  CMatrixStack2D &translate(const CPoint2D &d) {
+  static CMatrixStack2D translation(double dx, double dy) {
+    CMatrixStack2D m;
+    m.addTranslation(dx, dy);
+    return m;
+  }
+
+  static CMatrixStack2D scale(double sx, double sy) {
+    CMatrixStack2D m;
+    m.addScale(sx, sy);
+    return m;
+  }
+
+  static CMatrixStack2D rotation(double a) {
+    CMatrixStack2D m;
+    m.addRotation(a);
+    return m;
+  }
+
+  //---
+
+  // default is identity
+  CMatrixStack2D() { }
+
+  CMatrixStack2D(const CMatrix2D &m) {
+    transformStack_.push_back(Transform(m));
+  }
+
+  //---
+
+  const TransformStack &transformStack() const { return transformStack_; }
+
+  CMatrixStack2D &addTranslation(const CPoint2D &d) {
     transformStack_.push_back(translateTransform(d));
 
     mValid_ = false;
@@ -218,13 +281,15 @@ class CMatrixStack2D {
     return *this;
   }
 
-  CMatrixStack2D &translate(double dx, double dy) {
+  CMatrixStack2D &addTranslation(double dx, double dy) {
     transformStack_.push_back(translateTransform(dx, dy));
 
     mValid_ = false;
 
     return *this;
   }
+
+  //---
 
   static Transform scaleTransform(double s) {
     return Transform(CMatrixTransformType::SCALE1, s);
@@ -234,7 +299,7 @@ class CMatrixStack2D {
     return Transform(CMatrixTransformType::SCALE2, sx, sy);
   }
 
-  CMatrixStack2D &scale(double s) {
+  CMatrixStack2D &addScale(double s) {
     transformStack_.push_back(scaleTransform(s));
 
     mValid_ = false;
@@ -242,13 +307,15 @@ class CMatrixStack2D {
     return *this;
   }
 
-  CMatrixStack2D &scale(double sx, double sy) {
+  CMatrixStack2D &addScale(double sx, double sy) {
     transformStack_.push_back(scaleTransform(sx, sy));
 
     mValid_ = false;
 
     return *this;
   }
+
+  //---
 
   static Transform rotateTransform(double a, const CPoint2D &o) {
     return Transform(a, o);
@@ -258,7 +325,7 @@ class CMatrixStack2D {
     return Transform(CMatrixTransformType::ROTATE, a);
   }
 
-  CMatrixStack2D &rotate(double a) {
+  CMatrixStack2D &addRotation(double a) {
     transformStack_.push_back(rotateTransform(a));
 
     mValid_ = false;
@@ -266,7 +333,7 @@ class CMatrixStack2D {
     return *this;
   }
 
-  CMatrixStack2D &rotate(double a, const CPoint2D &o) {
+  CMatrixStack2D &addRotation(double a, const CPoint2D &o) {
     transformStack_.push_back(rotateTransform(a, o));
 
     mValid_ = false;
@@ -274,7 +341,9 @@ class CMatrixStack2D {
     return *this;
   }
 
-  CMatrixStack2D &skewX(double a) {
+  //---
+
+  CMatrixStack2D &addSkewX(double a) {
     transformStack_.push_back(Transform(CMatrixTransformType::SKEWX, a));
 
     mValid_ = false;
@@ -282,13 +351,15 @@ class CMatrixStack2D {
     return *this;
   }
 
-  CMatrixStack2D &skewY(double a) {
+  CMatrixStack2D &addSkewY(double a) {
     transformStack_.push_back(Transform(CMatrixTransformType::SKEWY, a));
 
     mValid_ = false;
 
     return *this;
   }
+
+  //---
 
   CMatrixStack2D &matrix(double m00, double m01, double m10, double m11, double tx, double ty) {
     CMatrix2D m;
@@ -322,19 +393,25 @@ class CMatrixStack2D {
     return transformStack_.empty();
   }
 
-  int length() const {
-    return int(transformStack_.size());
+  size_t length() const {
+    return transformStack_.size();
   }
 
-  const Transform &transform(int i) const {
-    return transformStack_[size_t(i)];
+  //---
+
+  const Transform &transform(uint i) const {
+    return transformStack_[i];
   }
 
-  void setTransform(int i, const Transform &t) {
-    assert(i >= 0 && i < int(transformStack_.size()));
+  void setTransform(uint i, const Transform &t) {
+    assert(size_t(i) < length());
 
-    transformStack_[size_t(i)] = t;
+    transformStack_[i] = t;
+
+    mValid_ = false;
   }
+
+  //---
 
   CMatrixStack2D &prepend(const CMatrixStack2D &m) {
     auto transformStack = m.transformStack_;
@@ -358,16 +435,61 @@ class CMatrixStack2D {
     return *this;
   }
 
+  //---
+
+  bool moveUp(uint ind) {
+    auto len = uint(length());
+
+    assert(ind < len);
+
+    if (ind == 0) return false;
+
+    std::swap(transformStack_[ind], transformStack_[ind - 1]);
+
+    mValid_ = false;
+
+    return true;
+  }
+
+  bool moveDown(uint ind) {
+    auto len = uint(length());
+
+    assert(ind < len);
+
+    if (ind == len - 1) return false;
+
+    std::swap(transformStack_[ind], transformStack_[ind + 1]);
+
+    mValid_ = false;
+
+    return true;
+  }
+
+  void remove(uint ind) {
+    auto len = uint(length());
+
+    assert(ind < len);
+
+    for (uint i = ind + 1; i < len; ++i)
+      transformStack_[i - 1] = transformStack_[i];
+
+    transformStack_.pop_back();
+
+    mValid_ = false;
+  }
+
+  //---
+
   const CMatrix2D &getMatrix() const {
     if (! mValid_) {
       auto *th = const_cast<CMatrixStack2D *>(this);
 
       th->m_.setIdentity();
 
-      auto num = transformStack_.size();
+      auto num = uint(length());
 
-      for (size_t i = 0; i < num; ++i) {
-        const Transform &t = transformStack_[i];
+      for (uint i = 0; i < num; ++i) {
+        const Transform &t = transform(i);
 
         th->m_ *= t.calcMatrix();
       }
@@ -381,6 +503,8 @@ class CMatrixStack2D {
   CMatrix2D getIMatrix() const {
     return getMatrix().inverse();
   }
+
+  //---
 
   void multiplyPoint(const CPoint2D &point1, CPoint2D &point2) const {
     getMatrix().multiplyPoint(point1, point2);
@@ -398,6 +522,8 @@ class CMatrixStack2D {
     getMatrix().preMultiplyPoint(xi, yi, xo, yo);
   }
 
+  //---
+
   friend std::ostream &operator<<(std::ostream &os, const CMatrixStack2D &rhs) {
     rhs.print(os);
 
@@ -413,10 +539,10 @@ class CMatrixStack2D {
   }
 
   void print(std::ostream &os) const {
-    auto num = transformStack_.size();
+    auto num = uint(length());
 
-    for (size_t i = 0; i < num; ++i) {
-      const Transform &t = transformStack_[i];
+    for (uint i = 0; i < num; ++i) {
+      const auto &t = transform(i);
 
       if (i > 0) os << " ";
 
