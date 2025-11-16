@@ -55,11 +55,11 @@ calc(double x, double y, double xr, double yr, double angle1, double angle2)
 
   double da = angle_diff_/num_beziers;
 
-  double rx1 = 4.0*xr_*tan(da*0.25)/3.0;
-  double ry1 = 4.0*yr_*tan(da*0.25)/3.0;
+  double rx1 = 4.0*xr_*std::tan(da*0.25)/3.0;
+  double ry1 = 4.0*yr_*std::tan(da*0.25)/3.0;
 
-  double s1 = sin(angle1_);
-  double c1 = cos(angle1_);
+  double s1 = std::sin(angle1_);
+  double c1 = std::cos(angle1_);
 
   double x1 = x_ + xr_*c1;
   double y1 = y_ + yr_*s1;
@@ -67,8 +67,8 @@ calc(double x, double y, double xr, double yr, double angle1, double angle2)
   for (uint i = 1; i <= num_beziers; ++i) {
     double angle = angle1_ + i*da;
 
-    double s2 = sin(angle);
-    double c2 = cos(angle);
+    double s2 = std::sin(angle);
+    double c2 = std::cos(angle);
 
     /*----*/
 
@@ -111,11 +111,11 @@ calcN(double x, double y, double xr, double yr, double angle1, double angle2)
 
   double da = angle_diff_/num_beziers;
 
-  double rx1 = 4.0*xr_*tan(da/4.0)/3.0;
-  double ry1 = 4.0*yr_*tan(da/4.0)/3.0;
+  double rx1 = 4.0*xr_*std::tan(da/4.0)/3.0;
+  double ry1 = 4.0*yr_*std::tan(da/4.0)/3.0;
 
-  double s1 = sin(angle1_);
-  double c1 = cos(angle1_);
+  double s1 = std::sin(angle1_);
+  double c1 = std::cos(angle1_);
 
   double x1 = x_ + xr_*c1;
   double y1 = y_ + xr_*s1;
@@ -123,8 +123,8 @@ calcN(double x, double y, double xr, double yr, double angle1, double angle2)
   for (uint i = 1; i <= num_beziers; ++i) {
     double angle = angle1_ - i*da;
 
-    double s2 = sin(angle);
-    double c2 = cos(angle);
+    double s2 = std::sin(angle);
+    double c2 = std::cos(angle);
 
     /*----*/
 

@@ -35,10 +35,10 @@ class C3Bezier2D {
   const CPoint2D &getControlPoint2() const { return p3_; }
   const CPoint2D &getLastPoint    () const { return p4_; }
 
-  void setFirstPoint   (const CPoint2D &p1) { p1_ = p1; }
-  void setControlPoint1(const CPoint2D &p2) { p2_ = p2; };
-  void setControlPoint2(const CPoint2D &p3) { p3_ = p3; };
-  void setLastPoint    (const CPoint2D &p4) { p4_ = p4; };
+  void setFirstPoint   (const CPoint2D &p1) { p1_ = p1; lengthValid_ = false; }
+  void setControlPoint1(const CPoint2D &p2) { p2_ = p2; lengthValid_ = false; }
+  void setControlPoint2(const CPoint2D &p3) { p3_ = p3; lengthValid_ = false; }
+  void setLastPoint    (const CPoint2D &p4) { p4_ = p4; lengthValid_ = false; }
 
   //---
 
@@ -61,6 +61,8 @@ class C3Bezier2D {
 
   void setPoints(const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p3, const CPoint2D &p4) {
     p1_ = p1; p2_ = p2; p3_ = p3; p4_ = p4;
+
+    lengthValid_ = false;
   }
 
   void getPoints(CPoint2D &p1, CPoint2D &p2, CPoint2D &p3, CPoint2D &p4) const {
@@ -69,11 +71,19 @@ class C3Bezier2D {
 
   //---
 
-  bool isBreak() const { return break_; }
-  void setBreak(bool b) { break_ = b; }
+  void flip() {
+    std::swap(p1_, p4_);
+    std::swap(p2_, p3_);
+  }
 
   //---
 
+  bool isBreak() const { return break_; }
+  void setBreak(bool b) { break_ = b; lengthValid_ = false; }
+
+  //---
+
+  // calc point from parametric value
   void calc(double t, double *x, double *y) const {
     CPoint2D p;
 
@@ -101,6 +111,7 @@ class C3Bezier2D {
 
   //---
 
+  // get parametric value of point
   bool interp(double x, double y, double *t) const {
     return interp(CPoint2D(x, y), t);
   }
@@ -171,6 +182,104 @@ class C3Bezier2D {
 
   //---
 
+  bool isMonotonicX() const {
+    return ((p1_.x <= p2_.x && p2_.x <= p3_.x && p3_.x <= p4_.x) ||
+            (p1_.x >= p2_.x && p2_.x >= p3_.x && p3_.x >= p4_.x));
+  }
+
+  bool isMonotonicY() const {
+    return ((p1_.y <= p2_.y && p2_.y <= p3_.y && p3_.y <= p4_.y) ||
+            (p1_.y >= p2_.y && p2_.y >= p3_.y && p3_.y >= p4_.y));
+  }
+
+  bool interpX(double y, double *x, int maxIter=100) const {
+    if (! isMonotonicY()) {
+      C3Bezier2D bezier1, bezier2;
+      split(bezier1, bezier2);
+
+      double x1, x2;
+      auto b1 = bezier1.interpX(y, &x1);
+      if (b1) { *x = x1; return true; };
+      auto b2 = bezier2.interpX(y, &x2);
+      if (b2) { *x = x2; return true; };
+
+      return false;
+    }
+
+    //---
+
+    int iter = 0;
+
+    double t1 = 0.0;
+    double t2 = 1.0;
+
+    auto t = (t1 + t2)/2.0;
+
+    auto p = calc(t);
+
+    while (std::fabs(p.y - y) > 1E-6) {
+      if (y < p.y) t2 = t;
+      else         t1 = t;
+
+      ++iter;
+
+      if (iter > maxIter)
+        return false;
+
+      t = (t1 + t2)/2.0;
+      p = calc(t);
+    }
+
+    *x = p.x;
+
+    return true;
+  }
+
+  bool interpY(double x, double *y, int maxIter=100) const {
+    if (! isMonotonicY()) {
+      C3Bezier2D bezier1, bezier2;
+      split(bezier1, bezier2);
+
+      double y1, y2;
+      auto b1 = bezier1.interpY(x, &y1);
+      if (b1) { *y = y1; return true; };
+      auto b2 = bezier2.interpY(x, &y2);
+      if (b2) { *y = y2; return true; };
+
+      return false;
+    }
+
+    //---
+
+    int iter = 0;
+
+    double t1 = 0.0;
+    double t2 = 1.0;
+
+    auto t = (t1 + t2)/2.0;
+
+    auto p = calc(t);
+
+    while (std::fabs(p.x - x) > 1E-6) {
+      if (x < p.x) t2 = t;
+      else         t1 = t;
+
+      ++iter;
+
+      if (iter > maxIter)
+        return false;
+
+      t = (t1 + t2)/2.0;
+      p = calc(t);
+    }
+
+    *y = p.y;
+
+    return true;
+  }
+
+  //---
+
   double gradientStart() const {
     //return CMathGen::atan2(p2_.x - p1_.x, p2_.y - p1_.y);
     return std::atan2(p2_.y - p1_.y, p2_.x - p1_.x);
@@ -224,11 +333,15 @@ class C3Bezier2D {
 
   //---
 
-  void split(C3Bezier2D &bezier1, C3Bezier2D &bezier2) const {
-    split(0.5, bezier1, bezier2);
+  // split bezier at parametric value
+  bool split(C3Bezier2D &bezier1, C3Bezier2D &bezier2) const {
+    return split(0.5, bezier1, bezier2);
   }
 
-  void split(double t, C3Bezier2D &bezier1, C3Bezier2D &bezier2) const {
+  bool split(double t, C3Bezier2D &bezier1, C3Bezier2D &bezier2) const {
+    if (t <= 0.0) return false;
+    if (t >= 1.0) return false;
+
     // split at t (0 - 1) of curve
     double u = 1.0 - t;
 
@@ -243,16 +356,17 @@ class C3Bezier2D {
 
     bezier1 = C3Bezier2D(p1_, p11, p21, p31);
     bezier2 = C3Bezier2D(p31, p22, p13, p4_);
+
+    return true;
   }
 
   bool split(const CPoint2D &p, C3Bezier2D &bezier1, C3Bezier2D &bezier2) const {
     double t;
 
-    if (! interp(p, &t)) return false;
+    if (! interp(p, &t))
+      return false;
 
-    split(t, bezier1, bezier2);
-
-    return true;
+    return split(t, bezier1, bezier2);
   }
 
   //---
@@ -601,20 +715,46 @@ class C3Bezier2D {
   //---
 
   double arcLength(double tol=1E-3) const {
-    double l1 = p1_.distanceTo(p4_);
-    double l2 = p1_.distanceTo(p2_) + p2_.distanceTo(p3_) + p3_.distanceTo(p4_);
+    if (! lengthValid_) {
+      double ll = p1_.distanceTo(p4_);
 
-    if (fabs(l2 - l1) < tol)
-      return l1;
+      double l1 = p1_.distanceTo(p2_);
+      double l2 = p2_.distanceTo(p3_);
+      double l3 = p3_.distanceTo(p4_);
+      double lb = l1 + l2 + l3;
 
-    C3Bezier2D bezier1, bezier2;
+      if (fabs(lb - ll) > tol) {
+        if      (l1 < tol)
+          length_ = C2Bezier2D(p2_, p3_, p4_).arcLength(tol);
+        else if (l3 < tol)
+          length_ = C2Bezier2D(p1_, p2_, p3_).arcLength(tol);
+        else {
+          double t = 0.5;
 
-    split(bezier1, bezier2);
+          C3Bezier2D bezier1, bezier2;
+          if (split(t, bezier1, bezier2))
+            length_ = bezier1.arcLength(tol) + bezier2.arcLength(tol);
+        }
+      }
+      else
+        length_ = ll;
 
-    return bezier1.arcLength(tol) + bezier2.arcLength(tol);
+      lengthValid_ = true;
+    }
+
+    return length_;
   }
 
   //---
+
+  std::string toString() const {
+    std::string str;
+    str += "[[" + std::to_string(p1_.x) + ", " + std::to_string(p1_.y) + "] [" +
+                  std::to_string(p2_.x) + ", " + std::to_string(p2_.y) + "] [" +
+                  std::to_string(p3_.x) + ", " + std::to_string(p3_.y) + "] [" +
+                  std::to_string(p4_.x) + ", " + std::to_string(p4_.y) + "]]";
+    return str;
+  }
 
   void print(std::ostream &os) const {
     os << "[[" << p1_.x << ", " << p1_.y << "] [" <<
@@ -632,6 +772,9 @@ class C3Bezier2D {
  private:
   CPoint2D p1_, p2_, p3_, p4_;
   bool     break_ { false };
+
+  mutable bool   lengthValid_ { false };
+  mutable double length_      { 0.0 };
 };
 
 #endif

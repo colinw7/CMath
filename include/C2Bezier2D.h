@@ -23,9 +23,9 @@ class C2Bezier2D {
   const CPoint2D &getControlPoint() const { return p2_; }
   const CPoint2D &getLastPoint   () const { return p3_; }
 
-  void setFirstPoint  (const CPoint2D &p1) { p1_ = p1; }
-  void setControlPoint(const CPoint2D &p2) { p2_ = p2; };
-  void setLastPoint   (const CPoint2D &p3) { p3_ = p3; };
+  void setFirstPoint  (const CPoint2D &p1) { p1_ = p1; lengthValid_ = false; }
+  void setControlPoint(const CPoint2D &p2) { p2_ = p2; lengthValid_ = false; }
+  void setLastPoint   (const CPoint2D &p3) { p3_ = p3; lengthValid_ = false; }
 
   //---
 
@@ -45,6 +45,8 @@ class C2Bezier2D {
 
   void setPoints(const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p3) {
     p1_ = p1; p2_ = p2; p3_ = p3;
+
+    lengthValid_ = false;
   }
 
   //---
@@ -79,7 +81,7 @@ class C2Bezier2D {
 
   bool interp(const CPoint2D &p, double *t) const {
     double t1 = (::fabs(p.x   - p1_.x) + ::fabs(p.y   - p1_.y))/
-           (::fabs(p3_.x - p1_.x) + ::fabs(p3_.y - p1_.y));
+                (::fabs(p3_.x - p1_.x) + ::fabs(p3_.y - p1_.y));
 
     CPoint2D pp;
 
@@ -196,17 +198,22 @@ class C2Bezier2D {
   //---
 
   double arcLength(double tol=1E-3) const {
-    double l1 = p1_.distanceTo(p3_);
-    double l2 = p1_.distanceTo(p2_) + p2_.distanceTo(p3_);
+    if (! lengthValid_) {
+      double l1 = p1_.distanceTo(p3_);
+      double l2 = p1_.distanceTo(p2_) + p2_.distanceTo(p3_);
 
-    if (fabs(l2 - l1) < tol)
-      return l1;
+      if (fabs(l2 - l1) < tol)
+        return l1;
 
-    C2Bezier2D bezier1, bezier2;
+      C2Bezier2D bezier1, bezier2;
+      split(bezier1, bezier2);
 
-    split(bezier1, bezier2);
+      length_ = bezier1.arcLength(tol) + bezier2.arcLength(tol);
 
-    return bezier1.arcLength(tol) + bezier2.arcLength(tol);
+      lengthValid_ = true;
+    }
+
+    return length_;
   }
 
   //---
@@ -225,6 +232,9 @@ class C2Bezier2D {
 
  private:
   CPoint2D p1_, p2_, p3_;
+
+  mutable bool   lengthValid_ { false };
+  mutable double length_      { 0.0 };
 };
 
 #endif

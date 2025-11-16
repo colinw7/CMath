@@ -516,9 +516,7 @@ class CQuaternion {
   }
 
   static void toMatrix(const CQuaternion &q, const CVector3D &v, CMatrix3D &matrix) {
-    CMatrix3D m;
-
-    q.toRotationMatrix(m);
+    q.toRotationMatrix(matrix);
 
     matrix.translate(v.getX(), v.getY(), v.getZ());
   }

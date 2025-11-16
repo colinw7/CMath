@@ -4,9 +4,12 @@
 #include <C3Bezier2D.h>
 #include <CArcToBezier.h>
 
+#include <algorithm>
+
 class CBezierPath {
  public:
   using Beziers = std::vector<C3Bezier2D>;
+  using Points  = std::vector<CPoint2D>;
 
  public:
   CBezierPath() { }
@@ -25,28 +28,39 @@ class CBezierPath {
 
   //---
 
-  void clear() { beziers_.clear(); closed_ = false; invalidate(); }
+  void clear() { beziers_.clear(); points_.clear(); closed_ = false; invalidate(); }
+
+  bool isEmpty() const { return (arcLength() <= 0.0); }
 
   //---
 
   void moveTo(const CPoint2D &p) {
-    lastPoint_ = p;
+    points_.push_back(p);
 
     invalidate();
   }
 
   void lineTo(const CPoint2D &p) {
-    beziers_.emplace_back(lastPoint_, lastPoint_, p, p);
+    beziers_.emplace_back(lastPoint(), lastPoint(), p, p);
 
-    lastPoint_ = p;
+    points_.push_back(p);
 
     invalidate();
   }
 
-  void cubicTo(const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p3) {
-    beziers_.emplace_back(lastPoint_, p1, p2, p3);
+  void quadTo(const CPoint2D &p1, const CPoint2D &p2) {
+    assert(false); // TODO
 
-    lastPoint_ = p3;
+    points_.push_back(p1);
+    points_.push_back(p2);
+  }
+
+  void cubicTo(const CPoint2D &p1, const CPoint2D &p2, const CPoint2D &p3) {
+    beziers_.emplace_back(lastPoint(), p1, p2, p3);
+
+    points_.push_back(p1);
+    points_.push_back(p2);
+    points_.push_back(p3);
 
     invalidate();
   }
@@ -58,7 +72,10 @@ class CBezierPath {
     for (const auto &b : beziers) {
       beziers_.push_back(b);
 
-      lastPoint_ = b.getLastPoint();
+      points_.push_back(b.getFirstPoint   ());
+      points_.push_back(b.getControlPoint1());
+      points_.push_back(b.getControlPoint2());
+      points_.push_back(b.getLastPoint    ());
     }
   }
 
@@ -323,6 +340,24 @@ class CBezierPath {
   //---
 
   CBezierPath split(double s, double e) const {
+    bool flip = false;
+
+    if (s > e) {
+      flip = true;
+
+      std::swap(s, e);
+    }
+
+    // none
+    if (s == e)
+      return CBezierPath();
+
+    // all
+    if (s <= 0.0 && e >= 1.0)
+      return *this;
+
+    //---
+
     std::vector<C3Bezier2D> beziers;
 
     auto l = arcLength();
@@ -344,36 +379,71 @@ class CBezierPath {
 
       if (! inside) {
         if (s1 >= l1 && s1 < l2) {
-          auto ts = (s1 - l1)/bl;
-
-          C3Bezier2D bezier1, bezier2;
-          b.split(ts, bezier1, bezier2);
-
           inside = true;
 
-          if (e1 >= l1 && e1 < l2) {
+          auto ts = (s1 - l1)/bl;
+
+          if (ts > 0.0) {
+            C3Bezier2D bezier1, bezier2;
+            auto rc = b.split(ts, bezier1, bezier2);
+            assert(rc);
+
             auto bl1 = bezier1.arcLength();
 
             l1 += bl1;
-            bl -= bl1;
 
-            auto te = (e1 - l1)/bl;
+            if (e1 >= l1 && e1 < l2) {
+              bl -= bl1;
 
-            C3Bezier2D bezier3, bezier4;
-            bezier2.split(te, bezier3, bezier4);
+              auto te = (e1 - l1)/bl;
 
-            if (isBreak)
-              bezier3.setBreak(true);
+              if (te < 1.0) {
+                C3Bezier2D bezier3, bezier4;
+                auto rc1 = bezier2.split(te, bezier3, bezier4);
+                assert(rc1);
 
-            beziers.push_back(bezier3);
+                if (isBreak)
+                  bezier3.setBreak(true);
 
-            break;
+                beziers.push_back(bezier3);
+              }
+              else
+                beziers.push_back(bezier2);
+
+              inside = false;
+
+              break;
+            }
+            else {
+              if (isBreak)
+                bezier2.setBreak(true);
+
+              beziers.push_back(bezier2);
+            }
           }
           else {
-            if (isBreak)
-              bezier2.setBreak(true);
+            if (e1 >= l1 && e1 < l2) {
+              auto te = (e1 - l1)/bl;
 
-            beziers.push_back(bezier2);
+              if (te < 1.0) {
+                C3Bezier2D bezier3, bezier4;
+                auto rc = b.split(te, bezier3, bezier4);
+                assert(rc);
+
+                if (isBreak)
+                  bezier3.setBreak(true);
+
+                beziers.push_back(bezier3);
+              }
+              else
+                beziers.push_back(b);
+
+              inside = false;
+
+              break;
+            }
+            else
+              beziers.push_back(b);
           }
         }
       }
@@ -381,13 +451,20 @@ class CBezierPath {
         if (e1 > l1 && e1 <= l2) {
           auto te = (e1 - l1)/bl;
 
-          C3Bezier2D bezier1, bezier2;
-          b.split(te, bezier1, bezier2);
+          if (te < 1.0) {
+            C3Bezier2D bezier1, bezier2;
+            auto rc = b.split(te, bezier1, bezier2);
+            assert(rc);
 
-          if (isBreak)
-            bezier1.setBreak(true);
+            if (isBreak)
+              bezier1.setBreak(true);
 
-          beziers.push_back(bezier1);
+            beziers.push_back(bezier1);
+          }
+          else
+            beziers.push_back(b);
+
+          inside = false;
 
           break;
         }
@@ -397,6 +474,20 @@ class CBezierPath {
       }
 
       l1 = l2;
+    }
+
+    if (inside) {
+      if (e1 >= l2)
+        inside = false;
+    }
+
+    assert(! inside);
+
+    if (flip) {
+      for (auto &b : beziers)
+        b.flip();
+
+      std::reverse(beziers.begin(), beziers.end());
     }
 
     return CBezierPath(beziers);
@@ -410,6 +501,125 @@ class CBezierPath {
 
     for (const auto &b : bezierPath.beziers_)
       beziers_.push_back(b);
+  }
+
+  //---
+
+  CBezierPath rounded(double round) const {
+    // compute center
+    CPoint2D c;
+
+    auto n = points_.size();
+
+    for (const auto &p : points_) {
+      c += p;
+    }
+
+    c /= double(n);
+
+    //---
+
+    // add round points
+    struct PolyPoint {
+      CPoint2D point;
+      CPoint2D lpoint;
+      CPoint2D rpoint;
+    };
+
+    std::vector<PolyPoint> points;
+
+    for (const auto &p : points_) {
+      auto v = CVector2D(c, p);
+      auto r = v.length();
+
+      PolyPoint po;
+
+      po.point = p;
+
+      auto g = v.perpendicular().normalized();
+
+      auto p1 = p - g*r*round;
+      auto p2 = p + g*r*round;
+
+      po.lpoint = p1;
+      po.rpoint = p2;
+
+      points.push_back(po);
+    }
+
+    //---
+
+    // build bezier
+    CBezierPath bezierPath;
+
+    const auto &p = points[n - 1];
+
+    bezierPath.moveTo(p.point);
+
+    for (size_t i1 = n - 1, i2 = 0; i2 < n; i1 = i2++) {
+      const auto &p1 = points[i1];
+      const auto &p2 = points[i2];
+
+      bezierPath.cubicTo(p1.rpoint, p2.lpoint, p2.point);
+    }
+
+    return bezierPath;
+  }
+
+  //---
+
+  CPoint2D calc(double t) const {
+    std::vector<C3Bezier2D> beziers;
+
+    auto l = arcLength();
+
+    auto tl = t*l;
+
+    double l1 = 0.0;
+    double l2 = 0.0;
+
+    for (const auto &b : beziers_) {
+      auto bl = b.arcLength();
+
+      l2 = l1 + bl;
+
+      if (tl >= l1 && tl < l2) {
+        auto ts = (tl - l1)/bl;
+
+        return b.calc(ts);
+      }
+
+      l1 = l2;
+    }
+
+    return CPoint2D(0, 0);
+  }
+
+  double gradient(double t) const {
+    std::vector<C3Bezier2D> beziers;
+
+    auto l = arcLength();
+
+    auto tl = t*l;
+
+    double l1 = 0.0;
+    double l2 = 0.0;
+
+    for (const auto &b : beziers_) {
+      auto bl = b.arcLength();
+
+      l2 = l1 + bl;
+
+      if (tl >= l1 && tl < l2) {
+        auto ts = (tl - l1)/bl;
+
+        return b.gradient(ts);
+      }
+
+      l1 = l2;
+    }
+
+    return 0.0;
   }
 
   //---
@@ -429,13 +639,43 @@ class CBezierPath {
     return bbox;
   }
 
-  const CPoint2D &lastPoint() const { return lastPoint_; }
+  const CPoint2D &lastPoint() const {
+    static CPoint2D s_p;
+    return (! points_.empty() ? points_.back() : s_p);
+  }
+
+  //---
+
+  friend std::ostream &operator<<(std::ostream &os, const CBezierPath &path) {
+    os << path.toString();
+    return os;
+  }
+
+  std::string toString() const {
+    std::string str = "(";
+
+    int i = 0;
+
+    for (const auto &b : beziers_) {
+      if (i > 0)
+        str += ", ";
+
+      str += b.toString();
+
+      ++i;
+    }
+
+    str += ")";
+
+    return str;
+  }
 
  private:
   Beziers beziers_;
   bool    closed_ { false };
 
-  CPoint2D       lastPoint_;
+  Points points_;
+
   mutable bool   lengthValid_ { false };
   mutable double length_      { 0.0 };
 };
