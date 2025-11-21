@@ -94,28 +94,42 @@ class CBezierPath {
 
     CBezierPath bezierPath;
 
-    bezierPath.moveTo(CPoint2D(p1.x + xr, p1.y));
+    if (xr > 0.0 || yr > 0.0) {
+      bezierPath.moveTo(CPoint2D(p1.x + xr, p1.y));
 
-    bezierPath.lineTo(CPoint2D(p2.x - xr, p1.y));
+      bezierPath.lineTo(CPoint2D(p2.x - xr, p1.y));
 
-    bezierPath.arc(CPoint2D(p2.x - xr, p1.y + yr), xr, yr, -M_PI/2.0, 0);
+      bezierPath.arc(CPoint2D(p2.x - xr, p1.y + yr), xr, yr, -M_PI/2.0, 0);
 
-    bezierPath.lineTo(CPoint2D(p2.x, p2.y - yr));
+      bezierPath.lineTo(CPoint2D(p2.x, p2.y - yr));
 
-    bezierPath.arc(CPoint2D(p2.x - xr, p2.y - yr), xr, yr, 0, M_PI/2.0);
+      bezierPath.arc(CPoint2D(p2.x - xr, p2.y - yr), xr, yr, 0, M_PI/2.0);
 
-    bezierPath.lineTo(CPoint2D(p1.x + xr, p2.y));
+      bezierPath.lineTo(CPoint2D(p1.x + xr, p2.y));
 
-    bezierPath.arc(CPoint2D(p1.x + xr, p2.y - yr), xr, yr, M_PI/2.0, M_PI);
+      bezierPath.arc(CPoint2D(p1.x + xr, p2.y - yr), xr, yr, M_PI/2.0, M_PI);
 
-    bezierPath.lineTo(CPoint2D(p1.x, p1.y + yr));
+      bezierPath.lineTo(CPoint2D(p1.x, p1.y + yr));
 
-    bezierPath.arc(CPoint2D(p1.x + xr, p1.y + yr), xr, yr, M_PI, 3.0*M_PI/2.0);
+      bezierPath.arc(CPoint2D(p1.x + xr, p1.y + yr), xr, yr, M_PI, 3.0*M_PI/2.0);
 
-    bezierPath.close();
+      bezierPath.close();
+    }
+    else {
+      bezierPath.moveTo(CPoint2D(p2.x, p1.y));
+      bezierPath.lineTo(CPoint2D(p2.x, p2.y));
+      bezierPath.lineTo(CPoint2D(p1.x, p2.y));
+      bezierPath.lineTo(CPoint2D(p1.x, p1.y));
+      bezierPath.lineTo(CPoint2D(p2.x, p1.y));
+
+      bezierPath.close();
+    }
 
     for (const auto &b : bezierPath.beziers_)
       beziers_.push_back(b);
+
+    for (const auto &b : bezierPath.points_)
+      points_.push_back(b);
   }
 
   void addRect(const CBBox2D &bbox) {
@@ -124,14 +138,18 @@ class CBezierPath {
 
     CBezierPath bezierPath;
 
-    bezierPath.moveTo(CPoint2D(p1.x, p1.y));
-    bezierPath.lineTo(CPoint2D(p2.x, p1.y));
+    bezierPath.moveTo(CPoint2D(p2.x, p1.y));
     bezierPath.lineTo(CPoint2D(p2.x, p2.y));
     bezierPath.lineTo(CPoint2D(p1.x, p2.y));
+    bezierPath.lineTo(CPoint2D(p1.x, p1.y));
+    bezierPath.lineTo(CPoint2D(p2.x, p1.y));
     bezierPath.close();
 
     for (const auto &b : bezierPath.beziers_)
       beziers_.push_back(b);
+
+    for (const auto &b : bezierPath.points_)
+      points_.push_back(b);
   }
 
   //---
@@ -140,6 +158,9 @@ class CBezierPath {
                    double innerRadius, double outerRadius,
                    double innerRoundness, double outerRoundness,
                    double rotation) {
+    if (numPoints <= 0)
+      return;
+
     //assert(innerRoundness >= 0.0 && innerRoundness <= 1.0);
     //assert(outerRoundness >= 0.0 && outerRoundness <= 1.0);
     innerRoundness = CMathUtil::clamp(innerRoundness, 0.0, 1.0);
@@ -162,7 +183,7 @@ class CBezierPath {
     for (int i = 0; i < numPoints; ++i) {
       PolyPoint pi, po;
 
-      po.angle = 2*i*da + M_PI/2.0 + rotation;
+      po.angle = 2*i*da - M_PI/2.0 + rotation;
       pi.angle = po.angle + da;
 
       auto ci = std::cos(pi.angle); auto si = std::sin(pi.angle);
@@ -233,6 +254,9 @@ class CBezierPath {
 
     for (const auto &b : bezierPath.beziers_)
       beziers_.push_back(b);
+
+    for (const auto &b : bezierPath.points_)
+      points_.push_back(b);
   }
 
   void addPolygon(const CPoint2D &center, int numPoints,
@@ -257,7 +281,7 @@ class CBezierPath {
     for (int i = 0; i < numPoints; ++i) {
       PolyPoint po;
 
-      po.angle = i*da + M_PI/2.0 + rotation;
+      po.angle = i*da - M_PI/2.0 + rotation;
 
       auto co = std::cos(po.angle); auto so = std::sin(po.angle);
 
@@ -320,6 +344,9 @@ class CBezierPath {
 
     for (const auto &b : bezierPath.beziers_)
       beziers_.push_back(b);
+
+    for (const auto &b : bezierPath.points_)
+      points_.push_back(b);
   }
 
   //---
@@ -340,6 +367,17 @@ class CBezierPath {
   //---
 
   CBezierPath split(double s, double e) const {
+    auto realEqI = [](double r1, double r2) {
+      return (std::fabs(r1 - r2) < 1E-9);
+    };
+
+    //---
+
+    auto nb = beziers_.size();
+    if (nb == 0) return CBezierPath();
+
+    //---
+
     bool flip = false;
 
     if (s > e) {
@@ -348,9 +386,21 @@ class CBezierPath {
       std::swap(s, e);
     }
 
+    //---
+
     // none
-    if (s == e)
+    if (realEqI(s, e))
       return CBezierPath();
+
+    auto l = arcLength();
+
+    auto s1 = s*l;
+    auto e1 = e*l;
+
+    if (realEqI(s1, e1))
+      return CBezierPath();
+
+    //---
 
     // all
     if (s <= 0.0 && e >= 1.0)
@@ -358,130 +408,141 @@ class CBezierPath {
 
     //---
 
+    struct SegmentData {
+      int    ind { -1 };
+      double pos { 0.0 };
+    };
+
+    auto seqmentInd = [&](double pos) {
+      SegmentData segmentData;
+
+      double l1 = 0.0;
+      double l2 = 0.0;
+
+      int i = 0;
+
+      for (const auto &b : beziers_) {
+        auto bl = b.arcLength();
+
+        if (realEqI(bl, 0.0))
+          continue;
+
+        l2 = l1 + bl;
+
+        if (pos >= l1 && pos < l2) {
+          segmentData.ind = i;
+          segmentData.pos = l1;
+
+          return segmentData;
+        }
+
+        l1 = l2;
+
+        ++i;
+      }
+
+      if      (pos >= l2) {
+        // end of last segment
+        segmentData.ind = i - 1;
+        segmentData.pos = l1;
+      }
+      else if (pos <= l1) {
+        // start of first segment
+        segmentData.ind = 0;
+        segmentData.pos = 0.0;
+      }
+      else
+        assert(false);
+
+      return segmentData;
+    };
+
+    auto is = seqmentInd(s1);
+    auto ie = seqmentInd(e1);
+
+    //---
+
     std::vector<C3Bezier2D> beziers;
 
-    auto l = arcLength();
+    if (is.ind == ie.ind) {
+      const auto &b = beziers_[is.ind];
 
-    auto s1 = s*l;
-    auto e1 = e*l;
-
-    double l1 = 0.0;
-    double l2 = 0.0;
-
-    bool inside = false;
-
-    for (const auto &b : beziers_) {
       auto bl = b.arcLength();
 
-      auto isBreak = b.isBreak();
+      auto ts = (s1 - is.pos)/bl;
 
-      l2 = l1 + bl;
+      if (ts > 0.0) {
+        C3Bezier2D bezier1, bezier2;
+        auto rc = b.split(ts, bezier1, bezier2);
+        assert(rc);
 
-      if (! inside) {
-        if (s1 >= l1 && s1 < l2) {
-          inside = true;
+        auto bl1 = bezier1.arcLength();
 
-          auto ts = (s1 - l1)/bl;
+        auto te = (e1 - (ie.pos + bl1))/(bl - bl1);
 
-          if (ts > 0.0) {
-            C3Bezier2D bezier1, bezier2;
-            auto rc = b.split(ts, bezier1, bezier2);
-            assert(rc);
+        if (te > 0.0 && te < 1.0) {
+          C3Bezier2D bezier3, bezier4;
+          auto rc1 = bezier2.split(te, bezier3, bezier4);
+          assert(rc1);
 
-            auto bl1 = bezier1.arcLength();
-
-            l1 += bl1;
-
-            if (e1 >= l1 && e1 < l2) {
-              bl -= bl1;
-
-              auto te = (e1 - l1)/bl;
-
-              if (te < 1.0) {
-                C3Bezier2D bezier3, bezier4;
-                auto rc1 = bezier2.split(te, bezier3, bezier4);
-                assert(rc1);
-
-                if (isBreak)
-                  bezier3.setBreak(true);
-
-                beziers.push_back(bezier3);
-              }
-              else
-                beziers.push_back(bezier2);
-
-              inside = false;
-
-              break;
-            }
-            else {
-              if (isBreak)
-                bezier2.setBreak(true);
-
-              beziers.push_back(bezier2);
-            }
-          }
-          else {
-            if (e1 >= l1 && e1 < l2) {
-              auto te = (e1 - l1)/bl;
-
-              if (te < 1.0) {
-                C3Bezier2D bezier3, bezier4;
-                auto rc = b.split(te, bezier3, bezier4);
-                assert(rc);
-
-                if (isBreak)
-                  bezier3.setBreak(true);
-
-                beziers.push_back(bezier3);
-              }
-              else
-                beziers.push_back(b);
-
-              inside = false;
-
-              break;
-            }
-            else
-              beziers.push_back(b);
-          }
+          beziers.push_back(bezier3);
         }
+        else if (te >= 1.0)
+          beziers.push_back(bezier2);
       }
       else {
-        if (e1 > l1 && e1 <= l2) {
-          auto te = (e1 - l1)/bl;
+        auto te = (e1 - ie.pos)/bl;
 
-          if (te < 1.0) {
-            C3Bezier2D bezier1, bezier2;
-            auto rc = b.split(te, bezier1, bezier2);
-            assert(rc);
+        if      (te > 0.0 && te < 1.0) {
+          C3Bezier2D bezier3, bezier4;
+          auto rc1 = b.split(te, bezier3, bezier4);
+          assert(rc1);
 
-            if (isBreak)
-              bezier1.setBreak(true);
-
-            beziers.push_back(bezier1);
-          }
-          else
-            beziers.push_back(b);
-
-          inside = false;
-
-          break;
+          beziers.push_back(bezier3);
         }
-        else {
+        else if (te >= 1.0)
           beziers.push_back(b);
-        }
+      }
+    }
+    else {
+      const auto &b1 = beziers_[is.ind];
+
+      auto bl1 = b1.arcLength();
+
+      auto ts = (s1 - is.pos)/bl1;
+
+      if (ts > 0.0) {
+        C3Bezier2D bezier1, bezier2;
+        auto rc = b1.split(ts, bezier1, bezier2);
+        assert(rc);
+
+        beziers.push_back(bezier2);
+      }
+      else
+        beziers.push_back(b1);
+
+      for (int i = is.ind + 1; i < ie.ind; ++i) {
+        const auto &b = beziers_[i];
+
+        beziers.push_back(b);
       }
 
-      l1 = l2;
-    }
+      const auto &b2 = beziers_[ie.ind];
 
-    if (inside) {
-      if (e1 >= l2)
-        inside = false;
-    }
+      auto bl2 = b2.arcLength();
 
-    assert(! inside);
+      auto te = (e1 - ie.pos)/bl2;
+
+      if      (te > 0.0 && te < 1.0) {
+        C3Bezier2D bezier3, bezier4;
+        auto rc1 = b2.split(te, bezier3, bezier4);
+        assert(rc1);
+
+        beziers.push_back(bezier3);
+      }
+      else if (te >= 1.0)
+        beziers.push_back(b2);
+    }
 
     if (flip) {
       for (auto &b : beziers)
@@ -510,6 +571,7 @@ class CBezierPath {
     CPoint2D c;
 
     auto n = points_.size();
+    if (n == 0) return CBezierPath();
 
     for (const auto &p : points_) {
       c += p;
@@ -538,8 +600,8 @@ class CBezierPath {
 
       auto g = v.perpendicular().normalized();
 
-      auto p1 = p - g*r*round;
-      auto p2 = p + g*r*round;
+      auto p1 = p + g*r*round;
+      auto p2 = p - g*r*round;
 
       po.lpoint = p1;
       po.rpoint = p2;

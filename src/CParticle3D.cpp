@@ -64,5 +64,8 @@ age()
 {
   for (auto *particle : getParticles()) {
     particle->incAge();
+
+    if (maxAge() > 0 && particle->getAge() > uint(maxAge()))
+      particle->setDead();
   }
 }

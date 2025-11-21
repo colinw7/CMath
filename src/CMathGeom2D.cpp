@@ -1308,8 +1308,8 @@ ArcThrough(double x1, double y1, double x2, double y2, double x3, double y3, dou
   double yd = 0.0;
 
   if (theta != M_PI)  {
-    xd = xr/tan(theta/2.0);
-    yd = yr/tan(theta/2.0);
+    xd = xr/std::tan(theta/2.0);
+    yd = yr/std::tan(theta/2.0);
   }
 
   *xt1 = x2 + xd*(x1 - x2)/d1;

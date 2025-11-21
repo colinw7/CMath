@@ -4,11 +4,12 @@ CParticle2D *
 CParticleSystem2D::
 addParticle()
 {
-  for (auto p1 = particles_.begin(); p1 != particles_.end(); ++p1)
-    if ((*p1)->isDead()) {
-      (*p1)->init();
-
-    return *p1;
+  // reuse dead particle
+  for (auto *particle : particles_) {
+    if (particle->isDead()) {
+      particle->init();
+      return particle;
+    }
   }
 
   auto *particle = createParticle();

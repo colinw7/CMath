@@ -21,21 +21,21 @@ double
 CMathGen::
 DSin(double angle)
 {
-  return sin(DEG_TO_RAD(angle));
+  return std::sin(DEG_TO_RAD(angle));
 }
 
 double
 CMathGen::
 DCos(double angle)
 {
-  return cos(DEG_TO_RAD(angle));
+  return std::cos(DEG_TO_RAD(angle));
 }
 
 double
 CMathGen::
 DTan(double angle)
 {
-  return tan(DEG_TO_RAD(angle));
+  return std::tan(DEG_TO_RAD(angle));
 }
 
 //------
