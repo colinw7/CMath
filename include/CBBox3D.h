@@ -218,6 +218,19 @@ class CBBox3D {
     return CBBox2D(CPoint2D(pmin_.x, pmin_.y), CPoint2D(pmax_.x, pmax_.y));
   }
 
+  std::vector<CPoint3D> points() const {
+    std::vector<CPoint3D> pts;
+    pts.push_back(CPoint3D(pmin_.x, pmin_.y, pmin_.z));
+    pts.push_back(CPoint3D(pmax_.x, pmin_.y, pmin_.z));
+    pts.push_back(CPoint3D(pmax_.x, pmax_.y, pmin_.z));
+    pts.push_back(CPoint3D(pmin_.x, pmax_.y, pmin_.z));
+    pts.push_back(CPoint3D(pmin_.x, pmin_.y, pmax_.z));
+    pts.push_back(CPoint3D(pmax_.x, pmin_.y, pmax_.z));
+    pts.push_back(CPoint3D(pmax_.x, pmax_.y, pmax_.z));
+    pts.push_back(CPoint3D(pmin_.x, pmax_.y, pmax_.z));
+    return pts;
+  }
+
  public:
   bool lineInteracts(const CPoint3D &l1, const CPoint3D &l2) const {
     // whole line outside (no overlap)

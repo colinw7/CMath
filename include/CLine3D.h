@@ -125,8 +125,8 @@ class CLine3D {
 
   //------
 
-  // intersect
-  IntersectType intersect(const CLine3D &line, double *t1, double *t2) {
+  // intersect line with line
+  IntersectType intersect(const CLine3D &line, double *t1, double *t2) const {
     double det = (v_.getX()*line.v_.getY() - v_.getY()*line.v_.getX());
 
     if (::fabs(det) == 0.0)
@@ -144,7 +144,8 @@ class CLine3D {
       return CMathGen::INTERSECT_OUTSIDE;
   }
 
-  IntersectType intersect(const CLine3D &line, CPoint3D &point) {
+  // intersect line with line
+  IntersectType intersect(const CLine3D &line, CPoint3D &point) const {
     double t1, t2;
 
     IntersectType type = intersect(line, &t1, &t2);

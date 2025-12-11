@@ -205,7 +205,7 @@ class CQuaternion {
     return lengthSqr();
   }
 
-  const CQuaternion &normalize() {
+  CQuaternion &normalize() {
     double l = length();
 
     if (l <= 0.0) {
@@ -226,7 +226,7 @@ class CQuaternion {
     return t.normalize();
   }
 
-  const CQuaternion &invert() {
+  CQuaternion &invert() {
     double l = dotProductSelf();
 
     if (l <= 0.0) {
@@ -247,7 +247,7 @@ class CQuaternion {
     return t.invert();
   }
 
-  const CQuaternion &conjugate() {
+  CQuaternion &conjugate() {
     v_ = -v_;
 
     return *this;
@@ -259,7 +259,7 @@ class CQuaternion {
     return t.conjugate();
   }
 
-  const CQuaternion &zero() {
+  CQuaternion &zero() {
     w_ = 0.0; v_.zero();
 
     return *this;
@@ -328,6 +328,12 @@ class CQuaternion {
     double i = 1.0 - 2.0*(v.x*v.x + v.y*v.y);
 
     matrix.setValues(a, b, c, d, e, f, g, h, i, 0.0, 0.0, 0.0);
+  }
+
+  static CQuaternion angleAxis(double angle, const CVector3D &axis) {
+    CQuaternion q;
+    q.fromAngleAxis(angle, axis);
+    return q;
   }
 
   void fromAngleAxis(double angle, const CPoint3D &axis) {

@@ -132,7 +132,7 @@ class CVector2D {
 
   // angle
   double angle() const {
-    return atan2(y_, x_);
+    return std::atan2(y_, x_);
   }
 
   //------

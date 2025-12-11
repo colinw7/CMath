@@ -64,7 +64,7 @@ class CPlane3D {
 
   //------
 
-  // intersect
+  // intersect plane and line
   CMathGen::IntersectType
   intersectLine(const CLine3D &line, double *iparam) const {
     if (! intersect(line, iparam)) {
@@ -81,22 +81,22 @@ class CPlane3D {
     }
   }
 
+  // intersect plane and line
   bool intersect(const CLine3D &line, double *iparam) const {
     const CVector3D &vector = line.vector();
 
     double dot_product1 = vector.dotProduct(normal_);
-
-    if (fabs(dot_product1) < 1E-6)
-      return false;
+    if (fabs(dot_product1) < 1E-6) return false; // parallel
 
     double dot_product2 = CVector3D::dotProduct(line.start(), normal_);
-    double dot_product3 = CVector3D::dotProduct(point_      , normal_);
+    double dot_product3 = CVector3D::dotProduct(point_      , normal_); // c_ ?
 
     *iparam = (dot_product3 - dot_product2)/dot_product1;
 
     return true;
   }
 
+  // intersect plane and plane
   bool intersect(const CPlane3D &plane, CLine3D &iline) const {
     const CVector3D &normal1 =       getNormal();
     const CVector3D &normal2 = plane.getNormal();
@@ -125,12 +125,13 @@ class CPlane3D {
     return true;
   }
 
+  // intersect plane and line
   bool intersect(const CLine3D &line, CPoint3D &ipoint, double iparam) const;
 
  private:
-  CPoint3D  point_;
-  CVector3D normal_;
-  double    c_;
+  CPoint3D  point_;     // center point
+  CVector3D normal_;    // normal
+  double    c_ { 0.0 }; // distance along normal
 };
 
 //------

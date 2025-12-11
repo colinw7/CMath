@@ -531,8 +531,8 @@ class CGLMatrix3D {
     dir.normalize();
     up1.normalize();
 
-    CGLVector3D right = dir.crossProduct(up1);
-    CGLVector3D newUp = right.crossProduct(dir);
+    auto right = dir  .crossProduct(up1);
+    auto newUp = right.crossProduct(dir);
 
     dir = -dir;
 
@@ -552,17 +552,24 @@ class CGLMatrix3D {
   }
 
   void setLookAt(const CPoint3D &eye, const CGLVector3D &dir, const CGLVector3D &up) {
-    CGLVector3D dir1 = dir.normalized();
-    CGLVector3D up1  = up .normalized();
+    auto dir1 = dir.normalized();
+    auto up1  = up .normalized();
 
-    CGLVector3D right = dir1 .crossProduct(up1 );
-    CGLVector3D newUp = right.crossProduct(dir1);
-
-    //dir1 = -dir1;
+    auto right = dir1 .crossProduct(up1 );
+    auto newUp = right.crossProduct(dir1);
 
     setColumn(0, right);
     setColumn(1, newUp);
     setColumn(2, -dir1);
+
+    setOuterTranslate(float(eye.x), float(eye.y), float(eye.z));
+  }
+
+  void setLookAt(const CPoint3D &eye, const CGLVector3D &dir, const CGLVector3D &up,
+                 const CGLVector3D &right) {
+    setColumn(0, right);
+    setColumn(1, up);
+    setColumn(2, -dir);
 
     setOuterTranslate(float(eye.x), float(eye.y), float(eye.z));
   }

@@ -36,7 +36,7 @@ class CMatrix3D {
     if (type == Type::IDENTITY)
       setIdentity();
     else
-      assert(false && "Bad CMatrix3D Type");
+      assert(false && "Bad Matrix Type");
   }
 
   CMatrix3D(double m00, double m01, double m02,
@@ -285,6 +285,10 @@ class CMatrix3D {
     return scale(s, s, s);
   }
 
+  static CMatrix3D scale(const CVector3D &s) {
+    return scale(s.getX(), s.getY(), s.getZ());
+  }
+
   static CMatrix3D scale(double sx, double sy, double sz) {
     CMatrix3D m;
 
@@ -449,7 +453,7 @@ class CMatrix3D {
     matrix3.setRotation(CMathGen::Z_AXIS_3D,  theta, handedness);
     matrix4.setRotation(CMathGen::Z_AXIS_3D, -theta, handedness);
 
-    double v = ::sqrt((x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1));
+    double v = std::sqrt((x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1));
 
     double beta = CMathGen::atan2(z2 - z1, v);
 
@@ -530,12 +534,28 @@ class CMatrix3D {
     setOuterTranslate(-eye.x, -eye.y, -eye.z);
   }
 
+  void setLookAt(const CPoint3D &eye, const CVector3D &dir, const CVector3D &up,
+                 const CVector3D &right) {
+    auto idir = -dir;
+
+    setRow(0, right);
+    setRow(1, up   );
+    setRow(2, idir );
+
+    //setOuterTranslate(-eye.x, -eye.y, -eye.z);
+
+    auto ex = right.dotProduct(eye);
+    auto ey = up   .dotProduct(eye);
+    auto ez = idir .dotProduct(eye);
+
+    setOuterTranslate(-ex, -ey, -ez);
+  }
+
   //----------
 
   void setEye(double x1, double y1, double z1, double x2, double y2, double z2,
               CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     double angle1, angle2, angle3;
-
     calcEye(x1, y1, z1, x2, y2, z2, &angle1, &angle2, &angle3);
 
     CMatrix3D matrix1, matrix2, matrix3, matrix4;
@@ -549,8 +569,7 @@ class CMatrix3D {
     *this = matrix4*(matrix3*(matrix2*matrix1));
   }
 
-  static void calcEye(double x1, double y1, double z1,
-                      double x2, double y2, double z2,
+  static void calcEye(double x1, double y1, double z1, double x2, double y2, double z2,
                       double *angle1, double *angle2, double *angle3) {
     double dx = x2 - x1;
     double dy = y2 - y1;
@@ -558,11 +577,11 @@ class CMatrix3D {
 
     *angle1 = CMathGen::atan2(-dx, -dy);
 
-    double v = ::sqrt(dx*dx + dy*dy);
+    double v = std::sqrt(dx*dx + dy*dy);
 
     *angle2 = CMathGen::atan2(-dz, v);
 
-    double w = ::sqrt(v*v + dz*dz);
+    double w = std::sqrt(v*v + dz*dz);
 
     *angle3 = CMathGen::atan2(-dx*w, dy*dz);
   }
@@ -932,19 +951,9 @@ class CMatrix3D {
     imatrix.m12_ = det2x2(m02_, m00_, m12_, m10_)*id;
     imatrix.m22_ = det2x2(m00_, m01_, m10_, m11_)*id;
 
-    double adjoint;
-
-    adjoint = det3x3(m01_, m02_, m03_, m11_, m12_, m13_, m21_, m22_, m23_);
-
-    imatrix.m03_ = -adjoint*id;
-
-    adjoint = det3x3(m02_, m03_, m00_, m12_, m13_, m10_, m22_, m23_, m20_);
-
-    imatrix.m13_ =  adjoint*id;
-
-    adjoint = det3x3(m03_, m00_, m01_, m13_, m10_, m11_, m23_, m20_, m21_);
-
-    imatrix.m23_ = -adjoint*id;
+    imatrix.m03_ = -det3x3(m01_, m02_, m03_, m11_, m12_, m13_, m21_, m22_, m23_)*id;
+    imatrix.m13_ =  det3x3(m02_, m03_, m00_, m12_, m13_, m10_, m22_, m23_, m20_)*id;
+    imatrix.m23_ = -det3x3(m03_, m00_, m01_, m13_, m10_, m11_, m23_, m20_, m21_)*id;
 
     imatrix.setBottomIdentity();
 
@@ -955,7 +964,7 @@ class CMatrix3D {
     CMatrix3D imatrix;
 
     if (! invert(imatrix))
-      assert(false && "Divide by 0.0");
+      assert(false && "Divide by zero");
 
     return imatrix;
   }
@@ -1022,7 +1031,7 @@ class CMatrix3D {
   //------
 
   static CMatrix3D *newIdentityMatrix() {
-    CMatrix3D *m = new CMatrix3D();
+    auto *m = new CMatrix3D();
 
     m->setIdentity();
 
@@ -1110,7 +1119,7 @@ class CMatrix3D {
   }
 
   CMatrix3D &operator-=(const CMatrix3D &b) {
-    m00_ -= b.m00_; m01_ -= b.m01_, m02_ -= b.m02_, m03_ -= b.m03_;
+    m00_ -= b.m00_; m01_ -= b.m01_; m02_ -= b.m02_; m03_ -= b.m03_;
     m10_ -= b.m10_; m11_ -= b.m11_; m12_ -= b.m12_; m13_ -= b.m13_;
     m20_ -= b.m20_; m21_ -= b.m21_; m22_ -= b.m22_; m23_ -= b.m23_;
 
@@ -1208,7 +1217,7 @@ class CMatrix3D {
     CMatrix3D bi;
 
     if (! b.invert(bi)) {
-      assert(false && "Divide by 0.0");
+      assert(false && "Divide by zero");
       return *this;
     }
 
@@ -1364,6 +1373,118 @@ class CMatrix3D {
 
   static double det2x2(double m00, double m01, double m10, double m11) {
     return m00*m11 - m01*m10;
+  }
+
+  //------
+
+ public:
+  static CMatrix3D perspective(double fov, double aspect, double near, double far) {
+    CMatrix3D m;
+
+    m.buildPerspective(fov, aspect, near, far);
+
+    return m;
+  }
+
+  /*! build perspective projection matrix
+      (near = -ve, far = -ve) look down negative Z-axis
+      (near = +ve, far = +ve) look down position Z-axis
+  */
+  CMatrix3D &buildPerspective(double fov, double aspect, double near, double far) {
+    // can't have near/far on other sides of origin
+    if (near*far <= 0) return *this;
+
+    if (near < 0) {
+      double tf2  = std::tan(0.5*CMathGen::DegToRad(fov));
+      double itf2 = 1.0/tf2;
+
+      double npf = near + far;
+      double ntf = near * far;
+
+      double d  = near - far;
+      double id = 1.0/d;
+
+      double a  = itf2/aspect;
+      double e  = itf2;
+      double i  = npf*id;
+      double tz = 2.0*ntf*id;
+
+      m00_ = a  ; m01_ = 0.0; m02_ = 0.0; m03_ = 0.0;
+      m10_ = 0.0; m11_ = e  ; m12_ = 0.0; m13_ = 0.0;
+      m20_ = 0.0; m21_ = 0.0; m22_ = i  ; m23_ = tz ;
+      m30_ = 0.0; m31_ = 0.0; m32_ = 1.0; m33_ = 0.0;
+    }
+    else {
+      double tf2  = std::tan(0.5*CMathGen::DegToRad(fov));
+      double itf2 = 1.0/tf2;
+
+      double ntf = near*far;
+
+      double d  = far - near;
+      double id = 1.0/d;
+
+      double a  = itf2/aspect;
+      double e  = itf2;
+      double i  = far*id;
+      double tz = -2.0*ntf*id;
+
+      m00_ = a  ; m01_ = 0.0; m02_ =  0.0; m03_ = 0.0;
+      m10_ = 0.0; m11_ = e  ; m12_ =  0.0; m13_ = 0.0;
+      m20_ = 0.0; m21_ = 0.0; m22_ = -i  ; m23_ = tz ;
+      m30_ = 0.0; m31_ = 0.0; m32_ = -1.0; m33_ = 0.0;
+    }
+
+    return *this;
+  }
+
+  CMatrix3D &buildOrtho(double left, double right, double bottom, double top,
+                        double near, double far) {
+    double w = right - left  ; double iw = 1.0/w;
+    double h = top   - bottom; double ih = 1.0/h;
+    double d = near  - far   ; double id = 1.0/d; // far - near ?
+
+    double rpl = right + left  ;
+    double tpb = top   + bottom;
+    double npf = near  + far   ;
+
+    double a = 2.0*iw;
+    double e = 2.0*ih;
+    double i = 2.0*id;
+
+    double tx = -rpl*iw;
+    double ty = -tpb*ih;
+    double tz =  npf*id;
+
+    setInnerScale(a, e, i);
+
+    setOuterTranslate(tx, ty, tz);
+
+    return *this;
+  }
+
+  CMatrix3D &buildFrustrum(double left, double right, double bottom, double top,
+                           double near, double far) {
+    double w = right - left  ; double iw = 1.0/w;
+    double h = top   - bottom; double ih = 1.0/h;
+    double d = near  - far   ; double id = 1.0/d; // far - near ?
+
+    double npf = near + far;
+    double ntf = near * far;
+
+    double a  = 2.0*near*iw;
+    double e  = 2.0*near*ih;
+    double i  = npf*id;
+
+    double c  = (right + left  )*iw;
+    double f  = (top   + bottom)*ih;
+    double tz = 2.0*ntf*id;
+
+    m00_ = a  , m01_ = 0.0, m02_ =  c  ; m03_ = 0.0;
+    m10_ = 0.0, m11_ = e  , m12_ =  f  ; m13_ = 0.0;
+    m20_ = 0.0, m21_ = 0.0, m22_ =  i  ; m23_ = tz ;
+    m30_ = 0.0, m31_ = 0.0, m32_ = -1.0; m33_ = 0.0;
+
+    return *this;
   }
 
  private:

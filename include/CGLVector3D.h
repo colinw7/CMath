@@ -27,6 +27,10 @@ class CGLVector3D {
    x_(x), y_(y), z_(z) {
   }
 
+  explicit CGLVector3D(const CVector3D &v) :
+   x_(float(v.getX())), y_(float(v.getY())), z_(float(v.getZ())) {
+  }
+
  ~CGLVector3D() { }
 
   //------

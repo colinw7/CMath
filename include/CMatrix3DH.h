@@ -5,6 +5,7 @@
 #include <CPoint3D.h>
 #include <CVector3D.h>
 #include <CMatrix3D.h>
+
 #include <cstring>
 
 /* Homogeneous 3D Matrix */
@@ -16,37 +17,24 @@
 
 class CMatrix3DH {
  public:
-  enum Type {
-    CMATRIX_3DH_IDENTITY
+  enum class Type {
+    IDENTITY
   };
-
- private:
-  double m00_, m01_, m02_, m03_;
-  double m10_, m11_, m12_, m13_;
-  double m20_, m21_, m22_, m23_;
-  double m30_, m31_, m32_, m33_;
 
  public:
   static CMatrix3DH identity() {
     CMatrix3DH m; m.setIdentity(); return m;
   }
 
+  //---
+
   // constructor/destructor
-  CMatrix3DH() :
-   m00_(0), m01_(0), m02_(0), m03_(0),
-   m10_(0), m11_(0), m12_(0), m13_(0),
-   m20_(0), m21_(0), m22_(0), m23_(0),
-   m30_(0), m31_(0), m32_(0), m33_(0) {
-  }
+  CMatrix3DH() { }
 
  ~CMatrix3DH() { }
 
-  explicit CMatrix3DH(Type type) :
-   m00_(0), m01_(0), m02_(0), m03_(0),
-   m10_(0), m11_(0), m12_(0), m13_(0),
-   m20_(0), m21_(0), m22_(0), m23_(0),
-   m30_(0), m31_(0), m32_(0), m33_(0) {
-    if (type == CMATRIX_3DH_IDENTITY)
+  explicit CMatrix3DH(Type type) {
+    if (type == Type::IDENTITY)
       setIdentity();
     else
       assert(false && "Bad Matrix Type");
@@ -55,10 +43,9 @@ class CMatrix3DH {
   CMatrix3DH(double m00, double m01, double m02,
              double m10, double m11, double m12,
              double m20, double m21, double m22) :
-   m00_(m00), m01_(m01), m02_(m02), m03_(0),
-   m10_(m10), m11_(m11), m12_(m12), m13_(0),
-   m20_(m20), m21_(m21), m22_(m22), m23_(0),
-   m30_(0  ), m31_(0  ), m32_(0  ), m33_(0) {
+   m00_(m00), m01_(m01), m02_(m02),
+   m10_(m10), m11_(m11), m12_(m12),
+   m20_(m20), m21_(m21), m22_(m22) {
     setOuterIdentity();
   }
 
@@ -67,8 +54,7 @@ class CMatrix3DH {
              double m20, double m21, double m22, double tx, double ty, double tz) :
    m00_(m00), m01_(m01), m02_(m02), m03_(tx),
    m10_(m10), m11_(m11), m12_(m12), m13_(ty),
-   m20_(m20), m21_(m21), m22_(m22), m23_(tz),
-   m30_(0  ), m31_(0  ), m32_(0  ), m33_(0 ) {
+   m20_(m20), m21_(m21), m22_(m22), m23_(tz) {
     setBottomIdentity();
   }
 
@@ -82,11 +68,7 @@ class CMatrix3DH {
    m30_(m30), m31_(m31), m32_(m32), m33_(m33) {
   }
 
-  CMatrix3DH(const double *m, uint n) :
-   m00_(0), m01_(0), m02_(0), m03_(0),
-   m10_(0), m11_(0), m12_(0), m13_(0),
-   m20_(0), m21_(0), m22_(0), m23_(0),
-   m30_(0), m31_(0), m32_(0), m33_(0) {
+  CMatrix3DH(const double *m, uint n) {
     if      (n == 9) {
       setValues(m[ 0], m[ 1], m[ 2],
                 m[ 3], m[ 4], m[ 5],
@@ -102,32 +84,51 @@ class CMatrix3DH {
 
       setBottomIdentity();
     }
-    else if (n == 16)
+    else if (n == 16) {
+#if 0
+      // byte order
+      memcpy(&m00_, m, 16*sizeof(double));
+#else
       setValues(m[ 0], m[ 1], m[ 2], m[ 3],
                 m[ 4], m[ 5], m[ 6], m[ 7],
                 m[ 8], m[ 9], m[10], m[11],
                 m[12], m[13], m[14], m[15]);
+#endif
+    }
     else
       assert(false && "Invalid size");
   }
 
+  CMatrix3DH(const CVector3D &v0, const CVector3D &v1, const CVector3D &v2) :
+   m00_(v0.getX()), m01_(v1.getX()), m02_(v2.getX()),
+   m10_(v0.getY()), m11_(v1.getY()), m12_(v2.getY()),
+   m20_(v0.getZ()), m21_(v1.getZ()), m22_(v2.getZ()) {
+    setOuterIdentity();
+  }
+
   CMatrix3DH(CMathGen::AxisType3D axis, double angle,
-              CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) :
-   m00_(0), m01_(0), m02_(0), m03_(0),
-   m10_(0), m11_(0), m12_(0), m13_(0),
-   m20_(0), m21_(0), m22_(0), m23_(0),
-   m30_(0), m31_(0), m32_(0), m33_(0) {
+             CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     setRotation(axis, angle, handedness);
+  }
+
+  explicit CMatrix3DH(const CMatrix3D &m) {
+    double v[16];
+    m.getValues(&v[0], 16);
+
+    setValues(v[ 0], v[ 1], v[ 2], v[ 3],
+              v[ 4], v[ 5], v[ 6], v[ 7],
+              v[ 8], v[ 9], v[10], v[11],
+              v[12], v[13], v[14], v[15]);
+  }
+
+  CMatrix3DH *dup() const {
+    return new CMatrix3DH(*this);
   }
 
   //------
 
   // copy operations
-  CMatrix3DH(const CMatrix3DH &a) :
-   m00_(0), m01_(0), m02_(0), m03_(0),
-   m10_(0), m11_(0), m12_(0), m13_(0),
-   m20_(0), m21_(0), m22_(0), m23_(0),
-   m30_(0), m31_(0), m32_(0), m33_(0) {
+  CMatrix3DH(const CMatrix3DH &a) {
     memcpy(&m00_, &a.m00_, 16*sizeof(double));
   }
 
@@ -139,16 +140,12 @@ class CMatrix3DH {
 
   //------
 
-  // output
+  // output (data order)
   void print(std::ostream &os) const {
-    os << "((" << m00_ << "," << m01_ << "," <<
-                  m02_ << "," << m03_ << "),";
-    os << " (" << m10_ << "," << m11_ << "," <<
-                  m12_ << "," << m13_ << "),";
-    os << " (" << m20_ << "," << m21_ << "," <<
-                  m22_ << "," << m23_ << "),";
-    os << " (" << m30_ << "," << m31_ << "," <<
-                  m32_ << "," << m33_ << "))";
+    os << "((" << m00_ << "," << m01_ << "," << m02_ << "," << m03_ << "),";
+    os << " (" << m10_ << "," << m11_ << "," << m12_ << "," << m13_ << "),";
+    os << " (" << m20_ << "," << m21_ << "," << m22_ << "," << m23_ << "),";
+    os << " (" << m30_ << "," << m31_ << "," << m32_ << "," << m33_ << "))";
   }
 
   friend std::ostream &operator<<(std::ostream &os, const CMatrix3DH &matrix) {
@@ -224,15 +221,21 @@ class CMatrix3DH {
     return lhs.cmp(rhs) >= 0;
   }
 
-  // TODO: isZero(), isIdentity()
-
   //------
+
+  // TODO: isZero()
 
   bool isIdentity() {
     return (m00_ == 1 && m01_ == 0 && m02_ == 0 && m03_ == 0 &&
             m10_ == 0 && m11_ == 1 && m12_ == 0 && m13_ == 0 &&
             m20_ == 0 && m21_ == 0 && m22_ == 1 && m23_ == 0 &&
             m30_ == 0 && m31_ == 0 && m32_ == 0 && m33_ == 1);
+  }
+
+  void setIdentity() {
+    setInnerIdentity();
+
+    setOuterIdentity();
   }
 
   //------
@@ -246,18 +249,22 @@ class CMatrix3DH {
 
   //------
 
-  void setIdentity() {
-    setInnerIdentity();
-
-    setOuterIdentity();
-  }
-
   static CMatrix3DH translation(double tx, double ty, double tz) {
     CMatrix3DH m;
 
     m.setTranslation(tx, ty, tz);
 
     return m;
+  }
+
+  CMatrix3DH &translated(double tx, double ty, double tz) {
+    CMatrix3DH m;
+
+    m.setTranslation(tx, ty, tz);
+
+    *this *= m;
+
+    return *this;
   }
 
   void setTranslation(double tx, double ty, double tz) {
@@ -278,12 +285,42 @@ class CMatrix3DH {
     setOuterTranslate(vector.getX(), vector.getY(), vector.getZ());
   }
 
+  CMatrix3DH &translate(double x, double y, double z) {
+    m03_ += x;
+    m13_ += y;
+    m23_ += z;
+
+    return *this;
+  }
+
+  void getTranslate(double *tx, double *ty, double *tz) {
+    *tx = m03_;
+    *ty = m13_;
+    *tz = m23_;
+  }
+
+  //----------
+
+  static CMatrix3DH scale(double s) {
+    return scale(s, s, s);
+  }
+
   static CMatrix3DH scale(double sx, double sy, double sz) {
     CMatrix3DH m;
 
     m.setScale(sx, sy, sz);
 
     return m;
+  }
+
+  CMatrix3DH &scaled(double sx, double sy, double sz) {
+    CMatrix3DH m;
+
+    m.setScale(sx, sy, sz);
+
+    *this *= m;
+
+    return *this;
   }
 
   void setScale(double s) {
@@ -298,6 +335,14 @@ class CMatrix3DH {
     setOuterIdentity();
   }
 
+  void getScale(double *sx, double *sy, double *sz) {
+    *sx = m00_;
+    *sy = m11_;
+    *sz = m22_;
+  }
+
+  //----------
+
   void setScaleTranslation(double s, double tx, double ty, double tz) {
     setInnerScale(s, s, s);
 
@@ -308,6 +353,43 @@ class CMatrix3DH {
     setInnerScale(sx, sy, sz);
 
     setOuterTranslate(tx, ty, tz);
+  }
+
+  //----------
+
+  static CMatrix3DH rotation(double rx, double ry, double rz) {
+    CMatrix3DH m;
+
+    m.setXYZRotation(rx, ry, rz);
+
+    return m;
+  }
+
+  static CMatrix3DH rotation(CMathGen::AxisType3D axis, double angle,
+                             CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
+    CMatrix3DH m;
+
+    m.setRotation(axis, angle, handedness);
+
+    return m;
+  }
+
+  static CMatrix3DH rotation(double theta, const CVector3D &u) {
+    CMatrix3DH m;
+
+    m.setRotation(theta, u);
+
+    return m;
+  }
+
+  CMatrix3DH &rotated(double theta, const CVector3D &u) {
+    CMatrix3DH m;
+
+    m.setRotation(theta, u);
+
+    *this *= m;
+
+    return *this;
   }
 
   void setRotation(CMathGen::AxisType3D axis, double angle,
@@ -324,12 +406,12 @@ class CMatrix3DH {
     double theta2 = 0.5*theta;
 
     // rotate around the line
-    double w = cos(theta2);
+    double w = std::cos(theta2);
 
-    //TODO: shouldn't have to normalize u
-    CVector3D v = u*sin(theta2);
+    // TODO: shouldn't have to normalize u
+    CVector3D v = u*std::sin(theta2);
 
-    //assign matrix
+    // assign matrix
     double x = v.getX(); double y = v.getY(); double z = v.getZ();
 
     double x2 = 2.0*x; double y2 = 2.0*y; double z2 = 2.0*z;
@@ -374,8 +456,9 @@ class CMatrix3DH {
     *this = xmatrix*ymatrix*zmatrix;
   }
 
-  void setGenRotation(double x1, double y1, double z1, double x2, double y2, double z2,
-                      double angle, CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
+  void setGenRotation(double x1, double y1, double z1,
+                      double x2, double y2, double z2, double angle,
+                      CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     CMatrix3DH matrix1, matrix2, matrix3, matrix4, matrix5, matrix6, matrix7;
 
     matrix1.setTranslation(-x1, -y1, -z1);
@@ -386,7 +469,7 @@ class CMatrix3DH {
     matrix3.setRotation(CMathGen::Z_AXIS_3D,  theta, handedness);
     matrix4.setRotation(CMathGen::Z_AXIS_3D, -theta, handedness);
 
-    double v = ::sqrt((x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1));
+    double v = std::sqrt((x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1));
 
     double beta = CMathGen::atan2(z2 - z1, v);
 
@@ -404,17 +487,14 @@ class CMatrix3DH {
 
     CVector3D a = axis.normalized();
 
-    double c = ::cos(angle);
-    double s = ::sin(angle);
+    double c = std::cos(angle);
+    double s = std::sin(angle);
 
     double c1 = 1.0 - c;
 
-    double axx = a.getX()*a.getX();
-    double axy = a.getX()*a.getY();
-    double axz = a.getX()*a.getZ();
-    double ayy = a.getY()*a.getY();
-    double ayz = a.getY()*a.getZ();
-    double azz = a.getZ()*a.getZ();
+    double axx = a.getX()*a.getX(); double axy = a.getX()*a.getY(); double axz = a.getX()*a.getZ();
+                                    double ayy = a.getY()*a.getY(); double ayz = a.getY()*a.getZ();
+                                                                    double azz = a.getZ()*a.getZ();
 
     double axs = a.getX()*s; double ays = a.getY()*s; double azs = a.getZ()*s;
 
@@ -429,6 +509,8 @@ class CMatrix3DH {
       m20_ = axz*c1 - ays; m21_ = ayz*c1 + axs; m22_ = azz*c1 + c  ;
     }
   }
+
+  //----------
 
   void setLookAt(const CPoint3D &eye, const CPoint3D &center) {
     CVector3D dir(eye, center);
@@ -445,7 +527,7 @@ class CMatrix3DH {
   void setLookAt(const CPoint3D &eye, const CVector3D &dir) {
     CVector3D dir1 = dir.normalized();
 
-    CVector3D up(0,0,1);
+    CVector3D up(0, 0, 1);
 
     CVector3D up1 = up - (up.dotProduct(dir1))*dir1;
 
@@ -459,19 +541,37 @@ class CMatrix3DH {
     CVector3D right = dir1 .crossProduct(up1 );
     CVector3D newUp = right.crossProduct(dir1);
 
-    //dir1 = -dir1;
+    dir1 = -dir1;
 
     setColumn(0, right);
     setColumn(1, newUp);
     setColumn(2, dir1 );
 
-    setOuterTranslate(eye.x, eye.y, eye.z);
+    setOuterTranslate(-eye.x, -eye.y, -eye.z);
   }
+
+  void setLookAt(const CPoint3D &eye, const CVector3D &dir, const CVector3D &up,
+                 const CVector3D &right) {
+    auto idir = -dir;
+
+    setRow(0, right);
+    setRow(1, up   );
+    setRow(2, idir );
+
+    //setOuterTranslate(-eye.x, -eye.y, -eye.z);
+
+    auto ex = right.dotProduct(eye);
+    auto ey = up   .dotProduct(eye);
+    auto ez = idir .dotProduct(eye);
+
+    setOuterTranslate(-ex, -ey, -ez);
+  }
+
+  //----------
 
   void setEye(double x1, double y1, double z1, double x2, double y2, double z2,
               CMathGen::Handedness handedness = CMathGen::RIGHT_HANDEDNESS) {
     double angle1, angle2, angle3;
-
     calcEye(x1, y1, z1, x2, y2, z2, &angle1, &angle2, &angle3);
 
     CMatrix3DH matrix1, matrix2, matrix3, matrix4;
@@ -493,30 +593,32 @@ class CMatrix3DH {
 
     *angle1 = CMathGen::atan2(-dx, -dy);
 
-    double v = ::sqrt(dx*dx + dy*dy);
+    double v = std::sqrt(dx*dx + dy*dy);
 
     *angle2 = CMathGen::atan2(-dz, v);
 
-    double w = ::sqrt(v*v + dz*dz);
+    double w = std::sqrt(v*v + dz*dz);
 
     *angle3 = CMathGen::atan2(-dx*w, dy*dz);
   }
 
+  //----------
+
   void setValues(double m00, double m01, double m02,
                  double m10, double m11, double m12,
                  double m20, double m21, double m22) {
-    m00_ = m00, m01_ = m01, m02_ = m02;
-    m10_ = m10, m11_ = m11, m12_ = m12;
-    m20_ = m20, m21_ = m21, m22_ = m22;
+    m00_ = m00; m01_ = m01; m02_ = m02;
+    m10_ = m10; m11_ = m11; m12_ = m12;
+    m20_ = m20; m21_ = m21; m22_ = m22;
 
     setOuterIdentity();
   }
 
   void setValues(double m00, double m01, double m02, double m10, double m11, double m12,
                  double m20, double m21, double m22, double tx , double ty , double tz ) {
-    m00_ = m00, m01_ = m01, m02_ = m02, m03_ = tx;
-    m10_ = m10, m11_ = m11, m12_ = m12, m13_ = ty;
-    m20_ = m20, m21_ = m21, m22_ = m22, m23_ = tz;
+    m00_ = m00; m01_ = m01; m02_ = m02; m03_ = tx;
+    m10_ = m10; m11_ = m11; m12_ = m12; m13_ = ty;
+    m20_ = m20; m21_ = m21; m22_ = m22; m23_ = tz;
 
     setBottomIdentity();
   }
@@ -529,6 +631,14 @@ class CMatrix3DH {
     m10_ = m10; m11_ = m11; m12_ = m12; m13_ = m13;
     m20_ = m20; m21_ = m21; m22_ = m22; m23_ = m23;
     m30_ = m30; m31_ = m31; m32_ = m32; m33_ = m33;
+  }
+
+  void setValues(const CVector3D &v0, const CVector3D &v1, const CVector3D &v2) {
+    m00_ = v0.getX(); m01_ = v1.getX(); m02_ = v2.getX();
+    m10_ = v0.getY(); m11_ = v1.getY(); m12_ = v2.getY();
+    m20_ = v0.getZ(); m21_ = v1.getZ(); m22_ = v2.getZ();
+
+    setOuterIdentity();
   }
 
   void getValues(double *m00, double *m01, double *m02,
@@ -573,21 +683,42 @@ class CMatrix3DH {
       v[ 0] = m00_; v[ 1] = m01_; v[ 2] = m02_;
       v[ 3] = m10_; v[ 4] = m11_; v[ 5] = m12_;
       v[ 6] = m20_; v[ 7] = m21_; v[ 8] = m22_;
-      v[ 9] = m03_; v[10] = m13_; v[11] = m23_;
+      v[ 9] = m03_; v[10] = m13_; v[11] = m23_; // tx, ty, tz
     }
     else if (n == 16) {
+#if 0
+      // data order
+      memcpy(v, &m00_, 16*sizeof(double);
+#else
       v[ 0] = m00_; v[ 1] = m01_; v[ 2] = m02_; v[ 3] = m03_;
       v[ 4] = m10_; v[ 5] = m11_; v[ 6] = m12_; v[ 7] = m13_;
       v[ 8] = m20_; v[ 9] = m21_; v[10] = m22_; v[11] = m23_;
       v[12] = m30_; v[13] = m31_; v[14] = m32_; v[15] = m33_;
+#endif
     }
     else
       assert(false && "Invalid size");
   }
 
+  void getValuesI(double *v, int n) const {
+    assert(n == 16);
+
+    // transposed
+    v[ 0] = m00_; v[ 1] = m10_; v[ 2] = m20_; v[ 3] = m30_;
+    v[ 4] = m01_; v[ 5] = m11_; v[ 6] = m21_; v[ 7] = m31_;
+    v[ 8] = m02_; v[ 9] = m12_; v[10] = m22_; v[11] = m32_;
+    v[12] = m03_; v[13] = m13_; v[14] = m23_; v[15] = m33_;
+  }
+
   //---------
 
   const double *getData() const { return &m00_; }
+
+  void setData(double *data) {
+    memcpy(&m00_, data, 16*sizeof(double));
+  }
+
+  //---------
 
   void setColumn(uint c, double x, double y, double z) {
     assert(c < 4);
@@ -603,6 +734,10 @@ class CMatrix3DH {
     double *m = &(&m00_)[c];
 
     m[0] = x, m[4] = y, m[8] = z, m[12] = w;
+  }
+
+  void setColumn(uint c, const CPoint3D &point) {
+    setColumn(c, point.x, point.y, point.z);
   }
 
   void setColumn(uint c, const CVector3D &vector) {
@@ -632,6 +767,34 @@ class CMatrix3DH {
     if (y) *y = m[ 4];
     if (z) *z = m[ 8];
     if (w) *w = m[12];
+  }
+
+  void getColumn(uint c, CPoint3D &point) {
+    assert(c < 4);
+
+    double *m = columnData(c);
+
+    point.x = m[0];
+    point.y = m[4];
+    point.z = m[8];
+  }
+
+  void getColumn(uint c, CVector3D &vector) {
+    assert(c < 4);
+
+    double *m = columnData(c);
+
+    vector = CVector3D(m[0], m[4], m[8]);
+  }
+
+  void getColumns(CVector3D &u, CVector3D &v, CVector3D &w) {
+    getColumn(0, u);
+    getColumn(1, v);
+    getColumn(2, w);
+  }
+
+  double *columnData(uint c) {
+    return &(&m00_)[c];
   }
 
   //---------
@@ -681,15 +844,40 @@ class CMatrix3DH {
     if (w) *w = m[3];
   }
 
+  void getRow(uint r, CPoint3D &point) {
+    assert(r < 4);
+
+    double *m = rowData(r);
+
+    point.x = m[0];
+    point.y = m[1];
+    point.z = m[2];
+  }
+
+  void getRow(uint r, CVector3D &vector) {
+    assert(r < 4);
+
+    double *m = rowData(r);
+
+    vector = CVector3D(m[0], m[1], m[2]);
+  }
+
+  double *rowData(uint r) {
+    return &(&m00_)[r*4];
+  }
+
   //---------
 
-  void multiplyPoint(double xi, double yi, double zi, double *xo, double *yo, double *zo) const {
+  // CPoint3D can be expressed as a 1x4 matrix (x, y, z, 1)
+  void multiplyPoint(double xi, double yi, double zi,
+                     double *xo, double *yo, double *zo) const {
     *xo = m00_*xi + m01_*yi + m02_*zi + m03_;
     *yo = m10_*xi + m11_*yi + m12_*zi + m13_;
     *zo = m20_*xi + m21_*yi + m22_*zi + m23_;
 
     double w = m30_*xi + m31_*yi + m32_*zi + m33_;
 
+    // normalize
     if (w > 1E-6) {
       double iw = 1.0/w;
 
@@ -714,6 +902,7 @@ class CMatrix3DH {
 
     double w = m30_*ipoint.x + m31_*ipoint.y + m32_*ipoint.z + m33_;
 
+    // normalize
     double iw = (fabs(w) > 1E-6 ? 1.0/w : 1.0);
 
     opoint.x = x*iw;
@@ -730,6 +919,7 @@ class CMatrix3DH {
 
     double w = m30_*ipoint.x + m31_*ipoint.y + m32_*ipoint.z + m33_;
 
+    // normalize
     double iw = (fabs(w) > 1E-6 ? 1.0/w : 1.0);
 
     opoint.x = x*iw;
@@ -737,6 +927,51 @@ class CMatrix3DH {
     opoint.z = z*iw;
 
     return opoint;
+  }
+
+  void preMultiplyPoint(double xi, double yi, double zi,
+                        double *xo, double *yo, double *zo) const {
+    *xo = m00_*xi + m10_*yi + m20_*zi;
+    *yo = m01_*xi + m11_*yi + m21_*zi;
+    *zo = m02_*xi + m12_*yi + m22_*zi;
+
+    double w = m03_*xi + m13_*yi + m23_*zi + m33_;
+
+    // normalize
+    double iw = (fabs(w) > 1E-6 ? 1.0/w : 1.0);
+
+    *xo *= iw;
+    *yo *= iw;
+    *xo *= iw;
+  }
+
+  void preMultiplyPoint(double xi, double yi, double zi, double wi,
+                        double *xo, double *yo, double *zo, double *wo) const {
+    *xo = m00_*xi + m10_*yi + m20_*zi + m30_*wi;
+    *yo = m01_*xi + m11_*yi + m21_*zi + m31_*wi;
+    *zo = m02_*xi + m12_*yi + m22_*zi + m32_*wi;
+    *wo = m03_*xi + m13_*yi + m23_*zi + m33_*wi;
+  }
+
+  void preMultiplyPoint(const CPoint3D &ipoint, CPoint3D &opoint) const {
+    opoint.x = m00_*ipoint.x + m10_*ipoint.y + m20_*ipoint.z;
+    opoint.y = m01_*ipoint.x + m11_*ipoint.y + m21_*ipoint.z;
+    opoint.z = m02_*ipoint.x + m12_*ipoint.y + m22_*ipoint.z;
+
+    double w = m03_*ipoint.x + m13_*ipoint.y + m23_*ipoint.z + m33_;
+
+    // normalize
+    double iw = (fabs(w) > 1E-6 ? 1.0/w : 1.0);
+
+    opoint *= iw;
+  }
+
+  // CVector3D can be expressed as a 1x4 matrix (x, y, z, 0)
+  void multiplyVector(double xi, double yi, double zi,
+                      double *xo, double *yo, double *zo) const {
+    *xo = m00_*xi + m01_*yi + m02_*zi;
+    *yo = m10_*xi + m11_*yi + m12_*zi;
+    *zo = m20_*xi + m21_*yi + m22_*zi;
   }
 
   void multiplyVector(const CVector3D &ivector, CVector3D &ovector) const {
@@ -767,40 +1002,6 @@ class CMatrix3DH {
     return ovector;
   }
 
-  void preMultiplyPoint(double xi, double yi, double zi, double *xo, double *yo, double *zo) const {
-    *xo = m00_*xi + m10_*yi + m20_*zi;
-    *yo = m01_*xi + m11_*yi + m21_*zi;
-    *zo = m02_*xi + m12_*yi + m22_*zi;
-
-    double w = m03_*xi + m13_*yi + m23_*zi + m33_;
-
-    double iw = (fabs(w) > 1E-6 ? 1.0/w : 1.0);
-
-    *xo *= iw;
-    *yo *= iw;
-    *xo *= iw;
-  }
-
-  void preMultiplyPoint(double xi, double yi, double zi, double wi,
-                        double *xo, double *yo, double *zo, double *wo) const {
-    *xo = m00_*xi + m10_*yi + m20_*zi + m30_*wi;
-    *yo = m01_*xi + m11_*yi + m21_*zi + m31_*wi;
-    *zo = m02_*xi + m12_*yi + m22_*zi + m32_*wi;
-    *wo = m03_*xi + m13_*yi + m23_*zi + m33_*wi;
-  }
-
-  void preMultiplyPoint(const CPoint3D &ipoint, CPoint3D &opoint) const {
-    opoint.x = m00_*ipoint.x + m10_*ipoint.y + m20_*ipoint.z;
-    opoint.y = m01_*ipoint.x + m11_*ipoint.y + m21_*ipoint.z;
-    opoint.z = m02_*ipoint.x + m12_*ipoint.y + m22_*ipoint.z;
-
-    double w = m03_*ipoint.x + m13_*ipoint.y + m23_*ipoint.z + m33_;
-
-    double iw = (fabs(w) > 1E-6 ? 1.0/w : 1.0);
-
-    opoint *= iw;
-  }
-
   void preMultiplyVector(const CVector3D &ivector, CVector3D &ovector) const {
     double ix, iy, iz;
 
@@ -811,14 +1012,6 @@ class CMatrix3DH {
     double oz = m02_*ix + m12_*iy + m22_*iz;
 
     ovector.setXYZ(ox, oy, oz);
-  }
-
-  CMatrix3DH &translate(double x, double y, double z) {
-    m03_ += x;
-    m13_ += y;
-    m23_ += z;
-
-    return *this;
   }
 
   //------
@@ -850,57 +1043,25 @@ class CMatrix3DH {
 
     double id = 1.0/d;
 
-    imatrix.m00_ =  id*det3x3(m11_, m12_, m13_,
-                              m21_, m22_, m23_,
-                              m31_, m32_, m33_);
-    imatrix.m10_ = -id*det3x3(m10_, m12_, m13_,
-                              m20_, m22_, m23_,
-                              m30_, m32_, m33_);
-    imatrix.m20_ =  id*det3x3(m10_, m11_, m13_,
-                              m20_, m21_, m23_,
-                              m30_, m31_, m33_);
-    imatrix.m30_ = -id*det3x3(m10_, m11_, m12_,
-                              m20_, m21_, m22_,
-                              m30_, m31_, m32_);
+    imatrix.m00_ =  id*det3x3(m11_, m12_, m13_, m21_, m22_, m23_, m31_, m32_, m33_);
+    imatrix.m10_ = -id*det3x3(m10_, m12_, m13_, m20_, m22_, m23_, m30_, m32_, m33_);
+    imatrix.m20_ =  id*det3x3(m10_, m11_, m13_, m20_, m21_, m23_, m30_, m31_, m33_);
+    imatrix.m30_ = -id*det3x3(m10_, m11_, m12_, m20_, m21_, m22_, m30_, m31_, m32_);
 
-    imatrix.m01_ = -id*det3x3(m01_, m02_, m03_,
-                              m21_, m22_, m23_,
-                              m31_, m32_, m33_);
-    imatrix.m11_ =  id*det3x3(m00_, m02_, m03_,
-                              m20_, m22_, m23_,
-                              m30_, m32_, m33_);
-    imatrix.m21_ = -id*det3x3(m00_, m01_, m03_,
-                              m20_, m21_, m23_,
-                              m30_, m31_, m33_);
-    imatrix.m31_ =  id*det3x3(m00_, m01_, m02_,
-                              m20_, m21_, m22_,
-                              m30_, m31_, m32_);
+    imatrix.m01_ = -id*det3x3(m01_, m02_, m03_, m21_, m22_, m23_, m31_, m32_, m33_);
+    imatrix.m11_ =  id*det3x3(m00_, m02_, m03_, m20_, m22_, m23_, m30_, m32_, m33_);
+    imatrix.m21_ = -id*det3x3(m00_, m01_, m03_, m20_, m21_, m23_, m30_, m31_, m33_);
+    imatrix.m31_ =  id*det3x3(m00_, m01_, m02_, m20_, m21_, m22_, m30_, m31_, m32_);
 
-    imatrix.m02_ =  id*det3x3(m01_, m02_, m03_,
-                              m11_, m12_, m13_,
-                              m31_, m32_, m33_);
-    imatrix.m12_ = -id*det3x3(m00_, m02_, m03_,
-                              m10_, m12_, m13_,
-                              m30_, m32_, m33_);
-    imatrix.m22_ =  id*det3x3(m00_, m01_, m03_,
-                              m10_, m11_, m13_,
-                              m30_, m31_, m33_);
-    imatrix.m32_ = -id*det3x3(m00_, m01_, m02_,
-                              m10_, m11_, m12_,
-                              m30_, m31_, m32_);
+    imatrix.m02_ =  id*det3x3(m01_, m02_, m03_, m11_, m12_, m13_, m31_, m32_, m33_);
+    imatrix.m12_ = -id*det3x3(m00_, m02_, m03_, m10_, m12_, m13_, m30_, m32_, m33_);
+    imatrix.m22_ =  id*det3x3(m00_, m01_, m03_, m10_, m11_, m13_, m30_, m31_, m33_);
+    imatrix.m32_ = -id*det3x3(m00_, m01_, m02_, m10_, m11_, m12_, m30_, m31_, m32_);
 
-    imatrix.m03_ = -id*det3x3(m01_, m02_, m03_,
-                              m11_, m12_, m13_,
-                              m21_, m22_, m23_);
-    imatrix.m13_ =  id*det3x3(m00_, m02_, m03_,
-                              m10_, m12_, m13_,
-                              m20_, m22_, m23_);
-    imatrix.m23_ = -id*det3x3(m00_, m01_, m03_,
-                              m10_, m11_, m13_,
-                              m20_, m21_, m23_);
-    imatrix.m33_ =  id*det3x3(m00_, m01_, m02_,
-                              m10_, m11_, m12_,
-                              m20_, m21_, m22_);
+    imatrix.m03_ = -id*det3x3(m01_, m02_, m03_, m11_, m12_, m13_, m21_, m22_, m23_);
+    imatrix.m13_ =  id*det3x3(m00_, m02_, m03_, m10_, m12_, m13_, m20_, m22_, m23_);
+    imatrix.m23_ = -id*det3x3(m00_, m01_, m03_, m10_, m11_, m13_, m20_, m21_, m23_);
+    imatrix.m33_ =  id*det3x3(m00_, m01_, m02_, m10_, m11_, m12_, m20_, m21_, m22_);
 
     return true;
   }
@@ -914,6 +1075,8 @@ class CMatrix3DH {
     return imatrix;
   }
 
+  //------
+
   double determinant() const {
     return
       (m00_*det3x3(m11_, m12_, m13_, m21_, m22_, m23_, m31_, m32_, m33_) -
@@ -922,6 +1085,8 @@ class CMatrix3DH {
        m03_*det3x3(m10_, m11_, m12_, m20_, m21_, m22_, m30_, m31_, m32_));
   }
 
+  //------
+
   void normalize() {
     double d = determinant();
 
@@ -929,6 +1094,14 @@ class CMatrix3DH {
 
     for (int i = 0; i < 9; ++i)
       (&m00_)[i] *= id;
+  }
+
+  CMatrix3DH normalized() {
+    CMatrix3DH nmatrix = *this;
+
+    nmatrix.normalize();
+
+    return nmatrix;
   }
 
   //------
@@ -953,20 +1126,11 @@ class CMatrix3DH {
     imatrix.m12_ = -id*det2x2(m00_, m02_, m10_, m12_);
     imatrix.m22_ =  id*det2x2(m00_, m01_, m10_, m11_);
 
-    imatrix.m03_ = -id*det3x3(m01_, m02_, m03_,
-                              m11_, m12_, m13_,
-                              m21_, m22_, m23_);
-    imatrix.m13_ =  id*det3x3(m00_, m02_, m03_,
-                              m10_, m12_, m13_,
-                              m20_, m22_, m23_);
-    imatrix.m23_ = -id*det3x3(m00_, m01_, m03_,
-                              m10_, m11_, m13_,
-                              m20_, m21_, m23_);
+    imatrix.m03_ = -id*det3x3(m01_, m02_, m03_, m11_, m12_, m13_, m21_, m22_, m23_);
+    imatrix.m13_ =  id*det3x3(m00_, m02_, m03_, m10_, m12_, m13_, m20_, m22_, m23_);
+    imatrix.m23_ = -id*det3x3(m00_, m01_, m03_, m10_, m11_, m13_, m20_, m21_, m23_);
 
-    imatrix.m30_ = 0;
-    imatrix.m31_ = 0;
-    imatrix.m32_ = 0;
-    imatrix.m33_ = 1;
+    imatrix.setBottomIdentity();
 
     return true;
   }
@@ -997,16 +1161,6 @@ class CMatrix3DH {
 
   //------
 
-  const CMatrix3DH &rotate(double theta, const CVector3D &u) {
-    CMatrix3DH m; m.setRotation(theta, u);
-
-    *this *= m;
-
-    return *this;
-  }
-
-  //------
-
   void setTransform(double xmin1, double ymin1, double zmin1,
                     double xmax1, double ymax1, double zmax1,
                     double xmin2, double ymin2, double zmin2,
@@ -1027,7 +1181,7 @@ class CMatrix3DH {
   //------
 
   static CMatrix3DH *newIdentityMatrix() {
-    CMatrix3DH *m = new CMatrix3DH();
+    auto *m = new CMatrix3DH();
 
     m->setIdentity();
 
@@ -1273,102 +1427,6 @@ class CMatrix3DH {
 
   //------
 
-  /*! build perspective projection matrix
-      (near = -ve, far = -ve) look down negative Z-axis
-      (near = +ve, far = +ve) look down position Z-axis
-  */
-  void buildPerspective(double fov, double aspect, double near, double far) {
-    // can't have near/far on other sides of origin
-    if (near*far <= 0) return;
-
-    if (near < 0) {
-      double tf2  = tan(0.5*CMathGen::DegToRad(fov));
-      double itf2 = 1.0/tf2;
-
-      double npf = near + far;
-      double ntf = near * far;
-
-      double d  = near - far;
-      double id = 1.0/d;
-
-      double a  = itf2/aspect;
-      double e  = itf2;
-      double i  = npf*id;
-      double tz = 2.0*ntf*id;
-
-      m00_ = a  , m01_ = 0.0, m02_ =  0.0; m03_ = 0.0;
-      m10_ = 0.0, m11_ = e  , m12_ =  0.0; m13_ = 0.0;
-      m20_ = 0.0, m21_ = 0.0, m22_ =  i  ; m23_ = tz ;
-      m30_ = 0.0, m31_ = 0.0, m32_ = -1.0; m33_ = 0.0;
-    }
-    else {
-      double tf2  = tan(0.5*CMathGen::DegToRad(fov));
-      double itf2 = 1.0/tf2;
-
-      double ntf = near*far;
-
-      double d  = far - near;
-      double id = 1.0/d;
-
-      double a  = itf2/aspect;
-      double e  = itf2;
-      double i  = far*id;
-      double tz = -ntf*id;
-
-      m00_ = a  , m01_ = 0.0, m02_ = 0.0; m03_ = 0.0;
-      m10_ = 0.0, m11_ = e  , m12_ = 0.0; m13_ = 0.0;
-      m20_ = 0.0, m21_ = 0.0, m22_ = i  ; m23_ = tz ;
-      m30_ = 0.0, m31_ = 0.0, m32_ = 1.0; m33_ = 0.0;
-    }
-  }
-
-  void buildOrtho(double left, double right, double bottom, double top, double near, double far) {
-    double w = right - left  ; double iw = 1.0/w;
-    double h = top   - bottom; double ih = 1.0/h;
-    double d = near  - far   ; double id = 1.0/d; // far - near ?
-
-    double rpl = right + left  ;
-    double tpb = top   + bottom;
-    double npf = near  + far   ;
-
-    double a = 2.0*iw;
-    double e = 2.0*ih;
-    double i = 2.0*id;
-
-    double tx = -rpl*iw;
-    double ty = -tpb*ih;
-    double tz =  npf*id;
-
-    setInnerScale(a, e, i);
-
-    setOuterTranslate(tx, ty, tz);
-  }
-
-  void buildFrustrum(double left, double right, double bottom, double top,
-                     double near, double far) {
-    double w = right - left  ; double iw = 1.0/w;
-    double h = top   - bottom; double ih = 1.0/h;
-    double d = near  - far   ; double id = 1.0/d; // far - near ?
-
-    double npf = near + far;
-    double ntf = near * far;
-
-    double a  = 2.0*near*iw;
-    double e  = 2.0*near*ih;
-    double i  = npf*id;
-
-    double c  = (right + left  )*iw;
-    double f  = (top   + bottom)*ih;
-    double tz = 2.0*ntf*id;
-
-    m00_ = a  , m01_ = 0.0, m02_ =  c  ; m03_ = 0.0;
-    m10_ = 0.0, m11_ = e  , m12_ =  f  ; m13_ = 0.0;
-    m20_ = 0.0, m21_ = 0.0, m22_ =  i  ; m23_ = tz ;
-    m30_ = 0.0, m31_ = 0.0, m32_ = -1.0; m33_ = 0.0;
-  }
-
-  //------
-
  private:
   void setInnerIdentity() {
     m00_ = 1.0, m01_ = 0.0, m02_ = 0.0;
@@ -1383,8 +1441,8 @@ class CMatrix3DH {
   }
 
   void setInnerRotationRHS(CMathGen::AxisType3D axis, double angle) {
-    double c = ::cos(angle);
-    double s = ::sin(angle);
+    double c = std::cos(angle);
+    double s = std::sin(angle);
 
     if      (axis == CMathGen::X_AXIS_3D) {
       m00_ = 1.0; m01_ = 0.0; m02_ = 0.0;
@@ -1404,8 +1462,8 @@ class CMatrix3DH {
   }
 
   void setInnerRotationLHS(CMathGen::AxisType3D axis, double angle) {
-    double c = ::cos(angle);
-    double s = ::sin(angle);
+    double c = std::cos(angle);
+    double s = std::sin(angle);
 
     if      (axis == CMathGen::X_AXIS_3D) {
       m00_ = 1.0; m01_ = 0.0; m02_ = 0.0;
@@ -1440,14 +1498,138 @@ class CMatrix3DH {
     m30_ = 0.0, m31_ = 0.0, m32_ = 0.0, m33_ = 1.0;
   }
 
-  static double det3x3(double a, double b, double c, double d, double e,
-                       double f, double g, double h, double i) {
-    return a*(e*i - f*h) - b*(d*i - f*g) + c*(d*h - e*g);
+  //---
+
+  static double det3x3(double m00, double m01, double m02,
+                       double m10, double m11, double m12,
+                       double m20, double m21, double m22) {
+    return m00*(m11*m22 - m12*m21) -
+           m01*(m10*m22 - m12*m20) +
+           m02*(m10*m21 - m11*m20);
   }
 
-  static double det2x2(double a, double b, double c, double d) {
-    return a*c - b*d;
+  static double det2x2(double m00, double m01, double m10, double m11) {
+    return m00*m11 - m01*m10;
   }
+
+  //------
+
+ public:
+  static CMatrix3DH perspective(double fov, double aspect, double near, double far) {
+    CMatrix3DH m;
+
+    m.buildPerspective(fov, aspect, near, far);
+
+    return m;
+  }
+
+  /*! build perspective projection matrix
+      (near = -ve, far = -ve) look down negative Z-axis
+      (near = +ve, far = +ve) look down position Z-axis
+  */
+  CMatrix3DH &buildPerspective(double fov, double aspect, double near, double far) {
+    // can't have near/far on other sides of origin
+    if (near*far <= 0) return *this;
+
+    if (near < 0) {
+      double tf2  = std::tan(0.5*CMathGen::DegToRad(fov));
+      double itf2 = 1.0/tf2;
+
+      double npf = near + far;
+      double ntf = near * far;
+
+      double d  = near - far;
+      double id = 1.0/d;
+
+      double a  = itf2/aspect;
+      double e  = itf2;
+      double i  = npf*id;
+      double tz = 2.0*ntf*id;
+
+      m00_ = a  ; m01_ = 0.0; m02_ = 0.0; m03_ = 0.0;
+      m10_ = 0.0; m11_ = e  ; m12_ = 0.0; m13_ = 0.0;
+      m20_ = 0.0; m21_ = 0.0; m22_ = i  ; m23_ = tz ;
+      m30_ = 0.0; m31_ = 0.0; m32_ = 1.0; m33_ = 0.0;
+    }
+    else {
+      double tf2  = std::tan(0.5*CMathGen::DegToRad(fov));
+      double itf2 = 1.0/tf2;
+
+      double ntf = near*far;
+
+      double d  = far - near;
+      double id = 1.0/d;
+
+      double a  = itf2/aspect;
+      double e  = itf2;
+      double i  = far*id;
+      double tz = -2.0*ntf*id;
+
+      m00_ = a  ; m01_ = 0.0; m02_ =  0.0; m03_ = 0.0;
+      m10_ = 0.0; m11_ = e  ; m12_ =  0.0; m13_ = 0.0;
+      m20_ = 0.0; m21_ = 0.0; m22_ = -i  ; m23_ = tz ;
+      m30_ = 0.0; m31_ = 0.0; m32_ = -1.0; m33_ = 0.0;
+    }
+
+    return *this;
+  }
+
+  CMatrix3DH &buildOrtho(double left, double right, double bottom, double top,
+                         double near, double far) {
+    double w = right - left  ; double iw = 1.0/w;
+    double h = top   - bottom; double ih = 1.0/h;
+    double d = near  - far   ; double id = 1.0/d; // far - near ?
+
+    double rpl = right + left  ;
+    double tpb = top   + bottom;
+    double npf = near  + far   ;
+
+    double a = 2.0*iw;
+    double e = 2.0*ih;
+    double i = 2.0*id;
+
+    double tx = -rpl*iw;
+    double ty = -tpb*ih;
+    double tz =  npf*id;
+
+    setInnerScale(a, e, i);
+
+    setOuterTranslate(tx, ty, tz);
+
+    return *this;
+  }
+
+  CMatrix3DH &buildFrustrum(double left, double right, double bottom, double top,
+                            double near, double far) {
+    double w = right - left  ; double iw = 1.0/w;
+    double h = top   - bottom; double ih = 1.0/h;
+    double d = near  - far   ; double id = 1.0/d; // far - near ?
+
+    double npf = near + far;
+    double ntf = near * far;
+
+    double a  = 2.0*near*iw;
+    double e  = 2.0*near*ih;
+    double i  = npf*id;
+
+    double c  = (right + left  )*iw;
+    double f  = (top   + bottom)*ih;
+    double tz = 2.0*ntf*id;
+
+    m00_ = a  , m01_ = 0.0, m02_ =  c  ; m03_ = 0.0;
+    m10_ = 0.0, m11_ = e  , m12_ =  f  ; m13_ = 0.0;
+    m20_ = 0.0, m21_ = 0.0, m22_ =  i  ; m23_ = tz ;
+    m30_ = 0.0, m31_ = 0.0, m32_ = -1.0; m33_ = 0.0;
+
+    return *this;
+  }
+
+ private:
+  // row major ( m <row> <column> )
+  double m00_ { 0.0 }, m01_ { 0.0 }, m02_ { 0.0 }, m03_ { 0.0 }; // row 0
+  double m10_ { 0.0 }, m11_ { 0.0 }, m12_ { 0.0 }, m13_ { 0.0 }; // row 1
+  double m20_ { 0.0 }, m21_ { 0.0 }, m22_ { 0.0 }, m23_ { 0.0 }; // row 2
+  double m30_ { 0.0 }, m31_ { 0.0 }, m32_ { 0.0 }, m33_ { 0.0 }; // row 3
 };
 
 #endif

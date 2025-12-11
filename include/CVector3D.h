@@ -30,21 +30,6 @@ class CVector3D {
 
   //------
 
-  // copy operations
-  CVector3D(const CVector3D &vector) :
-   x_(vector.x_), y_(vector.y_), z_(vector.z_), normalized_(vector.normalized_) {
-  }
-
-  CVector3D &operator=(const CVector3D &v) {
-    x_ = v.x_; y_ = v.y_; z_ = v.z_;
-
-    normalized_ = v.normalized_;
-
-    return *this;
-  }
-
-  //------
-
   // output
   void print(std::ostream &os) const {
     os << "(" << x_ << "," << y_ << "," << z_ << ")";
