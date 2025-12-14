@@ -273,10 +273,14 @@ class CMatrix3D {
     return *this;
   }
 
-  void getTranslate(double *tx, double *ty, double *tz) {
+  void getTranslate(double *tx, double *ty, double *tz) const {
     *tx = m03_;
     *ty = m13_;
     *tz = m23_;
+  }
+
+  void getTranslate(CPoint3D &t) const {
+    t = CPoint3D(m03_, m13_, m23_);
   }
 
   //----------
@@ -323,6 +327,10 @@ class CMatrix3D {
     *sx = m00_;
     *sy = m11_;
     *sz = m22_;
+  }
+
+  void getScale(CPoint3D &t) const {
+    t = CPoint3D(m00_, m11_, m22_);
   }
 
   //----------
@@ -410,6 +418,14 @@ class CMatrix3D {
 
     setValues(a, b, c, d, e, f, g, h, i, 0.0, 0.0, 0.0);
   }
+
+  void getRotation(CPoint3D &p) const {
+    p.x = std::acos(m11_);
+    p.y = std::acos(m00_);
+    p.z = std::acos(m22_);
+  }
+
+  //---
 
   void setRotationTranslation(CMathGen::AxisType3D axis, double angle,
                               double tx, double ty, double tz,
