@@ -562,7 +562,7 @@ class CQuaternion {
   }
 
  private:
-  double    w_;
+  double    w_ { 0.0 };
   CVector3D v_;
 };
 
