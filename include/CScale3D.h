@@ -11,6 +11,10 @@ class CScale3D {
    x_(x), y_(y), z_(z) {
   }
 
+  explicit CScale3D(const CPoint3D &p) :
+   x_(p.x), y_(p.y), z_(p.z) {
+  }
+
   const CMatrix3D &matrix() const {
     if (! matrixValid_) {
       auto *th = const_cast<CScale3D *>(this);

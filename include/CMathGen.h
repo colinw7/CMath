@@ -283,6 +283,9 @@ std::pair<bool, T> interpRangeSet(int ir, const U &f, const std::vector<T> &rang
   if (nr == 0)
     return RVal(false, T());
 
+  if (ir == 0 && nr == 1 && f == 0.0)
+    return RVal(true, rangeSet[ir]);
+
   if (ir < 0 || ir >= int(nr - 1))
     return RVal(false, T());
 

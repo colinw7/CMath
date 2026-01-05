@@ -39,6 +39,8 @@ class CSize2D {
 
   double area() const { assert(set_); return width_*height_; }
 
+  CPoint2D point() const { return CPoint2D(width_, height_); }
+
   // m*size
   friend CSize2D operator*(double m, const CSize2D &size) {
     assert(size.set_);

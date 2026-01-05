@@ -13,8 +13,14 @@ class CRotate3D {
    w_(w), x_(x), y_(y), z_(z) {
   }
 
+  explicit CRotate3D(const CPoint4D &p) :
+   w_(p.w), x_(p.x), y_(p.y), z_(p.z) {
+    assert(p == point());
+  }
+
   explicit CRotate3D(const CQuaternion &q) :
-    w_(q.getW()), x_(q.getX()), y_(q.getY()), z_(q.getZ()) {
+   w_(q.getW()), x_(q.getX()), y_(q.getY()), z_(q.getZ()) {
+    assert(q == quaternion());
   }
 
   const CMatrix3D &matrix() const {
@@ -31,7 +37,7 @@ class CRotate3D {
     return matrix_;
   }
 
-  double w() const { return z_; }
+  double w() const { return w_; }
   void setW(double r) { w_ = r; matrixValid_ = false; }
 
   double x() const { return x_; }
@@ -43,7 +49,9 @@ class CRotate3D {
   double z() const { return z_; }
   void setZ(double r) { z_ = r; matrixValid_ = false; }
 
-  CPoint4D point() const { return CPoint4D(w_, x_, y_, z_); }
+  CPoint4D point() const { return CPoint4D(x_, y_, z_, w_); }
+
+  CQuaternion quaternion() const { return CQuaternion(w_, x_, y_, z_); }
 
  private:
   double w_ { 0.0 };
