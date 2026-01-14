@@ -175,6 +175,29 @@ class CLine3D {
     return p1_ + t*v_;
   }
 
+  bool pointDistance(const CPoint3D &point, double *dist) {
+    CVector3D pl(point, p0_);
+
+    CVector3D l(p0_, p1_);
+
+    double u1 = pl.dotProduct(l);
+    double u2 = l .lengthSqr();
+
+    if (u2 <= 0.0)
+      return false;
+
+    double u = u1/u2;
+
+    if (u < 0.0 || u > 1.0)
+      return false;
+
+    CPoint3D intersection(p0_ + u*l);
+
+    *dist = point.distanceTo(intersection);
+
+    return true;
+  }
+
  private:
   CPoint3D  p0_;
   CPoint3D  p1_;

@@ -1574,6 +1574,15 @@ class CMatrix3DH {
     return *this;
   }
 
+  static CMatrix3DH ortho(double left, double right, double bottom, double top,
+                          double near, double far) {
+    CMatrix3DH m;
+
+    m.buildOrtho(left, right, bottom, top, near, far);
+
+    return m;
+  }
+
   CMatrix3DH &buildOrtho(double left, double right, double bottom, double top,
                          double near, double far) {
     double w = right - left  ; double iw = 1.0/w;

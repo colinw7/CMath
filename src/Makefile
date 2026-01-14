@@ -35,6 +35,7 @@ CMathPoly2D.cpp \
 CMathRand.cpp \
 CMathRound.cpp \
 COffsetBezier.cpp \
+COrientedBBox3D.cpp \
 CParticle2D.cpp \
 CParticle3D.cpp \
 CPrime.cpp \

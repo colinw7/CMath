@@ -369,35 +369,51 @@ bool
 CMathGeom3D::
 PointLineDistance(const CPoint3D &point, const CLine3D &line, double *dist)
 {
-  CVector3D pl(point, line.start());
+  auto rc = true;
+
+  CVector3D pl(line.start(), point);
 
   CVector3D l = line.vector();
 
   double u1 = pl.dotProduct(l);
   double u2 = l .lengthSqr();
 
-  if (u2 <= 0.0)
-    return false;
+  if (u2 <= 0.0) {
+    auto dist1 = PointPointDistance(point, line.start());
+    auto dist2 = PointPointDistance(point, line.start());
 
-  double u = u1/u2;
+    *dist = std::min(dist1, dist2);
 
-  if (u < 0.0 || u > 1.0)
-    return false;
+    rc = false;
+  }
+  else {
+    double u = u1/u2;
 
-  CPoint3D intersection(line.start() + u*l);
+    if      (u < 0.0) {
+      *dist = PointPointDistance(point, line.start());
+      rc = false;
+    }
+    else if (u > 1.0) {
+      *dist = PointPointDistance(point, line.end());
+      rc = false;
+    }
+    else {
+      auto intersection = line.start() + u*l;
 
-  *dist = PointPointDistance(point, intersection);
+      *dist = PointPointDistance(point, intersection);
+    }
+  }
 
-  return true;
+  return rc;
 }
 
 double
 CMathGeom3D::
 PointPointDistance(const CPoint3D &point1, const CPoint3D &point2)
 {
-  return sqrt((point1.x - point2.x)*(point1.x - point2.x) +
-              (point1.y - point2.y)*(point1.y - point2.y) +
-              (point1.z - point2.z)*(point1.z - point2.z));
+  return std::sqrt((point1.x - point2.x)*(point1.x - point2.x) +
+                   (point1.y - point2.y)*(point1.y - point2.y) +
+                   (point1.z - point2.z)*(point1.z - point2.z));
 }
 
 bool
