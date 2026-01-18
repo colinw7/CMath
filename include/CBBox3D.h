@@ -170,13 +170,13 @@ class CBBox3D {
   }
 
   double volume() const {
-    CVector3D diag = getSize();
+    auto diag = getSize();
 
     return diag.getX()*diag.getY()*diag.getZ();
   }
 
   CMathGen::AxisType3D maxAxis() const {
-    CVector3D diag = getSize();
+    auto diag = getSize();
 
     if      (diag.getX() > diag.getY() && diag.getX() > diag.getZ())
       return CMathGen::X_AXIS_3D;
