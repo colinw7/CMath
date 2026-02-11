@@ -56,6 +56,12 @@ class CTriangle2D {
     *v = (b2 != 0 ? b1/b2 : 0.0);
   }
 
+  CPoint2D barycentericPoint(double u, double v) const {
+    double w = 1 - u - v;
+
+    return u*point1_ + v*point2_ + w*point3_;
+  }
+
  private:
   CPoint2D point1_;
   CPoint2D point2_;

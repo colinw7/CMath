@@ -224,11 +224,11 @@ class CVector3D {
   }
 
   bool isZero() const {
-    return CMathUtil::realEq(lengthSqr(), 0);
+    return CMathUtil::realEq(lengthSqr(), 0.0);
   }
 
   bool isUnit() const {
-    return CMathUtil::realEq(lengthSqr(), 1);
+    return CMathUtil::realEq(lengthSqr(), 1.0);
   }
 
   //------
@@ -542,6 +542,24 @@ class CVector3D {
 
   static CVector3D normal(const CVector3D &vector1, const CVector3D &vector2) {
     return vector1.normal(vector2);
+  }
+
+  //------
+
+  CVector3D cos() const {
+    return CVector3D(std::cos(x_), std::cos(y_), std::cos(z_));
+  }
+
+  CVector3D sin() const {
+    return CVector3D(std::sin(x_), std::sin(y_), std::sin(z_));
+  }
+
+  CVector3D abs() const {
+    return CVector3D(std::abs(x_), std::abs(y_), std::abs(z_));
+  }
+
+  CVector3D max(const CVector3D &v) const {
+    return CVector3D(std::max(x_, v.x_), std::max(y_, v.y_), std::max(z_, v.z_));
   }
 
   //------

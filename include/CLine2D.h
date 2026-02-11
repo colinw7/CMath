@@ -242,6 +242,57 @@ class CLine2D : public CShape2D {
       return (p.y - p1_.y)/dy;
   }
 
+  //---
+
+  bool pointDistance(const CPoint2D &point, double *dist) const {
+    auto pointPointDistance = [](const CPoint2D &point1, const CPoint2D &point2) {
+      double dx = point1.x - point2.x;
+      double dy = point1.y - point2.y;
+
+      return std::hypot(dx, dy);
+    };
+
+    CVector2D pl(start(), point);
+
+    auto l = vector();
+
+    double u1 = pl.dotProduct(l);
+    double u2 = l .lengthSqr(); // l.dotProduct(l)
+
+    if (isSegment()) {
+      if (u2 <= 0.0) {
+        *dist = pointPointDistance(point, start());
+        return false;
+      }
+    }
+    else {
+      if (u2 == 0.0)
+        return 0.0;
+    }
+
+    double u = u1/u2;
+
+    if (isSegment()) {
+      if (u < 0.0) {
+        *dist = pointPointDistance(point, start());
+        return false;
+      }
+
+      if (u > 1.0) {
+        *dist = pointPointDistance(point, end());
+        return false;
+      }
+    }
+
+    auto intersection = start() + u*l;
+
+    *dist = pointPointDistance(point, intersection);
+
+    return true;
+  }
+
+  //---
+
   void print(std::ostream &os) const {
     os << p1_ << " " << p2_;
   }
@@ -263,7 +314,6 @@ class CLine2D : public CShape2D {
                               const CPoint2D &point3) {
     return (point2.x - point1.x)*(point3.y - point1.y) -
            (point3.x - point1.x)*(point2.y - point1.y);
-
   }
 
  private:

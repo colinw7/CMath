@@ -9,7 +9,7 @@
 
 class CSquare3D : public CShape3D {
  public:
-  typedef std::vector<CPoint3D> PointList;
+  using PointList = std::vector<CPoint3D>;
 
   struct Size {
     double s1, s2;

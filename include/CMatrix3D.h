@@ -1408,22 +1408,25 @@ class CMatrix3D {
   */
   CMatrix3D &buildPerspective(double fov, double aspect, double near, double far) {
     // can't have near/far on other sides of origin
-    if (near*far <= 0) return *this;
+    if (near*far <= 0) {
+      //assert(false);
+      return *this;
+    }
 
     if (near < 0) {
-      double tf2  = std::tan(0.5*CMathGen::DegToRad(fov));
-      double itf2 = 1.0/tf2;
+      auto tf2  = std::tan(0.5*CMathGen::DegToRad(fov));
+      auto itf2 = 1.0/tf2;
 
-      double npf = near + far;
-      double ntf = near * far;
+      auto npf = near + far;
+      auto ntf = near * far;
 
-      double d  = near - far;
-      double id = 1.0/d;
+      auto d  = near - far;
+      auto id = 1.0/d;
 
-      double a  = itf2/aspect;
-      double e  = itf2;
-      double i  = npf*id;
-      double tz = 2.0*ntf*id;
+      auto a  = itf2/aspect;
+      auto e  = itf2;
+      auto i  = npf*id;
+      auto tz = 2.0*ntf*id;
 
       m00_ = a  ; m01_ = 0.0; m02_ = 0.0; m03_ = 0.0;
       m10_ = 0.0; m11_ = e  ; m12_ = 0.0; m13_ = 0.0;
@@ -1431,18 +1434,18 @@ class CMatrix3D {
       m30_ = 0.0; m31_ = 0.0; m32_ = 1.0; m33_ = 0.0;
     }
     else {
-      double tf2  = std::tan(0.5*CMathGen::DegToRad(fov));
-      double itf2 = 1.0/tf2;
+      auto tf2  = std::tan(0.5*CMathGen::DegToRad(fov));
+      auto itf2 = 1.0/tf2;
 
-      double ntf = near*far;
+      auto ntf = near*far;
 
-      double d  = far - near;
-      double id = 1.0/d;
+      auto d  = far - near;
+      auto id = 1.0/d;
 
-      double a  = itf2/aspect;
-      double e  = itf2;
-      double i  = far*id;
-      double tz = -2.0*ntf*id;
+      auto a  = itf2/aspect;
+      auto e  = itf2;
+      auto i  = far*id;
+      auto tz = -2.0*ntf*id;
 
       m00_ = a  ; m01_ = 0.0; m02_ =  0.0; m03_ = 0.0;
       m10_ = 0.0; m11_ = e  ; m12_ =  0.0; m13_ = 0.0;
@@ -1455,21 +1458,21 @@ class CMatrix3D {
 
   CMatrix3D &buildOrtho(double left, double right, double bottom, double top,
                         double near, double far) {
-    double w = right - left  ; double iw = 1.0/w;
-    double h = top   - bottom; double ih = 1.0/h;
-    double d = near  - far   ; double id = 1.0/d; // far - near ?
+    auto w = right - left  ; auto iw = 1.0/w;
+    auto h = top   - bottom; auto ih = 1.0/h;
+    auto d = near  - far   ; auto id = 1.0/d; // far - near ?
 
-    double rpl = right + left  ;
-    double tpb = top   + bottom;
-    double npf = near  + far   ;
+    auto rpl = right + left  ;
+    auto tpb = top   + bottom;
+    auto npf = near  + far   ;
 
-    double a = 2.0*iw;
-    double e = 2.0*ih;
-    double i = 2.0*id;
+    auto a = 2.0*iw;
+    auto e = 2.0*ih;
+    auto i = 2.0*id;
 
-    double tx = -rpl*iw;
-    double ty = -tpb*ih;
-    double tz =  npf*id;
+    auto tx = -rpl*iw;
+    auto ty = -tpb*ih;
+    auto tz =  npf*id;
 
     setInnerScale(a, e, i);
 
@@ -1480,20 +1483,20 @@ class CMatrix3D {
 
   CMatrix3D &buildFrustrum(double left, double right, double bottom, double top,
                            double near, double far) {
-    double w = right - left  ; double iw = 1.0/w;
-    double h = top   - bottom; double ih = 1.0/h;
-    double d = near  - far   ; double id = 1.0/d; // far - near ?
+    auto w = right - left  ; auto iw = 1.0/w;
+    auto h = top   - bottom; auto ih = 1.0/h;
+    auto d = near  - far   ; auto id = 1.0/d; // far - near ?
 
-    double npf = near + far;
-    double ntf = near * far;
+    auto npf = near + far;
+    auto ntf = near * far;
 
-    double a  = 2.0*near*iw;
-    double e  = 2.0*near*ih;
-    double i  = npf*id;
+    auto a  = 2.0*near*iw;
+    auto e  = 2.0*near*ih;
+    auto i  = npf*id;
 
-    double c  = (right + left  )*iw;
-    double f  = (top   + bottom)*ih;
-    double tz = 2.0*ntf*id;
+    auto c  = (right + left  )*iw;
+    auto f  = (top   + bottom)*ih;
+    auto tz = 2.0*ntf*id;
 
     m00_ = a  , m01_ = 0.0, m02_ =  c  ; m03_ = 0.0;
     m10_ = 0.0, m11_ = e  , m12_ =  f  ; m13_ = 0.0;

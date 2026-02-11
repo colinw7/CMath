@@ -398,7 +398,7 @@ class CGLMatrix3D {
     float d =         xy2 + wz2 ; float e = 1.0f - (xx2 + zz2); float f =         yz2 - wx2 ;
     float g =         xz2 - wy2 ; float h =         yz2 + wx2 ; float i = 1.0f - (xx2 + yy2);
 
-    setValues(a, b, c, d, e, f, g, h, i, 0.0, 0.0, 0.0);
+    setValues(a, b, c, d, e, f, g, h, i, 0.0f, 0.0f, 0.0f);
 
     return *this;
   }
@@ -1025,7 +1025,7 @@ class CGLMatrix3D {
   bool invert(CGLMatrix3D &imatrix) const {
     float d = determinant();
 
-    if (::fabs(d) == 0.0)
+    if (::fabs(d) == 0.0f)
       return false;
 
     float id = 1.0f/d;
@@ -1118,7 +1118,7 @@ class CGLMatrix3D {
   bool affineInvert(CGLMatrix3D &imatrix) const {
     float d = affineDeterminant();
 
-    if (::fabs(d) == 0.0)
+    if (::fabs(d) == 0.0f)
       return false;
 
     float id = 1.0f/d;
@@ -1228,7 +1228,7 @@ class CGLMatrix3D {
   static bool solveAXeqB(const CGLMatrix3D &a, CPoint3D &x, const CPoint3D &b) {
     float det_a = a.determinant();
 
-    if (::fabs(det_a) == 0.0)
+    if (::fabs(det_a) == 0.0f)
       return false;
 
     float idet_a = 1.0f/det_a;
@@ -1476,7 +1476,10 @@ class CGLMatrix3D {
   */
   CGLMatrix3D &buildPerspective(float fov, float aspect, float near, float far) {
     // can't have near/far on other sides of origin
-    if (near*far <= 0) return *this;
+    if (near*far <= 0) {
+      //assert(false);
+      return *this;
+    }
 
     if (near < 0) {
       float tf2  = float(std::tan(0.5*CMathGen::DegToRad(fov)));
@@ -1493,10 +1496,10 @@ class CGLMatrix3D {
       float i  = npf*id;
       float tz = 2.0f*ntf*id;
 
-      m00_ = a  , m01_ = 0.0, m02_ = 0.0 ; m03_ = 0.0;
-      m10_ = 0.0, m11_ = e  , m12_ = 0.0 ; m13_ = 0.0;
-      m20_ = 0.0, m21_ = 0.0, m22_ = i   ; m23_ = tz ;
-      m30_ = 0.0, m31_ = 0.0, m32_ = 1.0f; m33_ = 0.0;
+      m00_ = a   , m01_ = 0.0f, m02_ = 0.0f; m03_ = 0.0f;
+      m10_ = 0.0f, m11_ = e   , m12_ = 0.0f; m13_ = 0.0f;
+      m20_ = 0.0f, m21_ = 0.0f, m22_ = i   ; m23_ = tz  ;
+      m30_ = 0.0f, m31_ = 0.0f, m32_ = 1.0f; m33_ = 0.0f;
     }
     else {
       float tf2  = float(std::tan(0.5*CMathGen::DegToRad(fov)));
@@ -1512,10 +1515,10 @@ class CGLMatrix3D {
       float i  = far*id;
       float tz = -2.0f*ntf*id;
 
-      m00_ = a  , m01_ = 0.0, m02_ =  0.0 ; m03_ = 0.0;
-      m10_ = 0.0, m11_ = e  , m12_ =  0.0 ; m13_ = 0.0;
-      m20_ = 0.0, m21_ = 0.0, m22_ = -i   ; m23_ = tz ;
-      m30_ = 0.0, m31_ = 0.0, m32_ = -1.0f; m33_ = 0.0;
+      m00_ = a   , m01_ = 0.0f, m02_ =  0.0f; m03_ = 0.0f;
+      m10_ = 0.0f, m11_ = e   , m12_ =  0.0f; m13_ = 0.0f;
+      m20_ = 0.0f, m21_ = 0.0f, m22_ = -i   ; m23_ = tz  ;
+      m30_ = 0.0f, m31_ = 0.0f, m32_ = -1.0f; m33_ = 0.0f;
     }
 
     return *this;
@@ -1569,10 +1572,10 @@ class CGLMatrix3D {
     float f  = (top   + bottom)*ih;
     float tz = 2.0f*ntf*id;
 
-    m00_ = a  , m01_ = 0.0, m02_ =  c   ; m03_ = 0.0;
-    m10_ = 0.0, m11_ = e  , m12_ =  f   ; m13_ = 0.0;
-    m20_ = 0.0, m21_ = 0.0, m22_ =  i   ; m23_ = tz ;
-    m30_ = 0.0, m31_ = 0.0, m32_ = -1.0f; m33_ = 0.0;
+    m00_ = a   , m01_ = 0.0f, m02_ =  c   ; m03_ = 0.0f;
+    m10_ = 0.0f, m11_ = e   , m12_ =  f   ; m13_ = 0.0f;
+    m20_ = 0.0f, m21_ = 0.0f, m22_ =  i   ; m23_ = tz  ;
+    m30_ = 0.0f, m31_ = 0.0f, m32_ = -1.0f; m33_ = 0.0f;
   }
 
   //------
@@ -1684,10 +1687,10 @@ class CGLMatrix3D {
  private:
   // column major ( m <column> <row> )
   //   transposed data order to CMatrix3D
-  float m00_ { 0.0 }, m10_ { 0.0 }, m20_ { 0.0 }, m30_ { 0.0 }; // column 0
-  float m01_ { 0.0 }, m11_ { 0.0 }, m21_ { 0.0 }, m31_ { 0.0 }; // column 1
-  float m02_ { 0.0 }, m12_ { 0.0 }, m22_ { 0.0 }, m32_ { 0.0 }; // column 2
-  float m03_ { 0.0 }, m13_ { 0.0 }, m23_ { 0.0 }, m33_ { 0.0 }; // column 3
+  float m00_ { 0.0f }, m10_ { 0.0f }, m20_ { 0.0f }, m30_ { 0.0f }; // column 0
+  float m01_ { 0.0f }, m11_ { 0.0f }, m21_ { 0.0f }, m31_ { 0.0f }; // column 1
+  float m02_ { 0.0f }, m12_ { 0.0f }, m22_ { 0.0f }, m32_ { 0.0f }; // column 2
+  float m03_ { 0.0f }, m13_ { 0.0f }, m23_ { 0.0f }, m33_ { 0.0f }; // column 3
 };
 
 #endif
