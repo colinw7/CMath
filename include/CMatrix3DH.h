@@ -525,7 +525,7 @@ class CMatrix3DH {
   }
 
   void setLookAt(const CPoint3D &eye, const CVector3D &dir) {
-    CVector3D dir1 = dir.normalized();
+    auto dir1 = dir.normalized();
 
     CVector3D up(0, 0, 1);
 
@@ -535,11 +535,11 @@ class CMatrix3DH {
   }
 
   void setLookAt(const CPoint3D &eye, const CVector3D &dir, const CVector3D &up) {
-    CVector3D dir1 = dir.normalized();
-    CVector3D up1  = up .normalized();
+    auto dir1 = dir.normalized();
+    auto up1  = up .normalized();
 
-    CVector3D right = dir1 .crossProduct(up1 );
-    CVector3D newUp = right.crossProduct(dir1);
+    auto right = dir1 .crossProduct(up1 );
+    auto newUp = right.crossProduct(dir1);
 
     dir1 = -dir1;
 

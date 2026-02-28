@@ -292,6 +292,26 @@ std::pair<bool, T> interpRangeSet(int ir, const U &f, const std::vector<T> &rang
   return RVal(true, rangeSet[ir] + f*(rangeSet[ir + 1] - rangeSet[ir]));
 }
 
+template <typename T, typename U=double>
+std::pair<bool, T> interpRangeSetDiscreet(int ir, const U &f, const std::vector<T> &rangeSet) {
+  using RVal = std::pair<bool, T>;
+
+  auto nr = rangeSet.size();
+  if (nr == 0)
+    return RVal(false, T());
+
+  if (ir == 0 && nr == 1 && f == 0.0)
+    return RVal(true, rangeSet[ir]);
+
+  if (ir < 0 || ir >= int(nr - 1))
+    return RVal(false, T());
+
+  if (f < 0.5)
+    return RVal(true, rangeSet[ir    ]);
+  else
+    return RVal(true, rangeSet[ir + 1]);
+}
+
 }
 
 #endif

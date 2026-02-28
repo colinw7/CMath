@@ -887,7 +887,7 @@ class CVector3D {
   }
 
  private:
-  double x_ { 0 }, y_ { 0 }, z_ { 0 };
+  double x_ { 0.0 }, y_ { 0.0 }, z_ { 0.0 };
   bool   normalized_ { false };
 };
 

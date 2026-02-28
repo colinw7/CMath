@@ -6,7 +6,7 @@
 struct vec2 {
   vec2() { }
 
-  vec2(double r) :
+  explicit vec2(double r) :
    x(r), y(r) {
   }
 
@@ -23,6 +23,12 @@ struct vec2 {
   friend vec2 operator-(const vec2 &lhs, const vec2 &rhs) {
     return vec2(lhs.x - rhs.x, lhs.y - rhs.y);
   }
+
+  friend vec2 operator-(const vec2 &lhs, double rhs) {
+    return vec2(lhs.x - rhs, lhs.y - rhs);
+  }
+
+  //---
 
   friend vec2 operator+(const vec2 &lhs, const vec2 &rhs) {
     return vec2(lhs.x + rhs.x, lhs.y + rhs.y);
@@ -52,9 +58,8 @@ struct vec2 {
 
   double &operator[](int i) { return (&x)[i]; }
 
-  vec2 xy() const { return *this; }
-
-  //---
+  vec2 xy() const { return vec2(x, y); }
+  vec2 yx() const { return vec2(y, x); }
 
   //---
 
@@ -69,6 +74,10 @@ struct vec2 {
   }
 
   vec2 max(double f) const { return max(vec2(f, f)); }
+
+  //---
+
+  vec2 abs() const { return vec2(std::abs(x), std::abs(y)); }
 
   //---
 

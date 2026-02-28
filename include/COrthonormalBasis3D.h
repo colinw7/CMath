@@ -207,49 +207,33 @@ class COrthonormalBasis3D {
   // Right-Handed Rotation about X axis
   void rotateAboutX(double a) {
     CMatrix3D r;
-
     r.setRotation(CMathGen::X_AXIS_3D, a);
 
-    m_ *= r;
-
-    m_.getColumns(u_, v_, w_);
-
-    u_.normalize(); v_.normalize(); w_.normalize();
+    setMatrix(m_*r);
   }
 
   // Right-Handed Rotation about Y axis
   void rotateAboutY(double a) {
     CMatrix3D r;
-
     r.setRotation(CMathGen::Y_AXIS_3D, a);
 
-    m_ *= r;
-
-    m_.getColumns(u_, v_, w_);
-
-    u_.normalize(); v_.normalize(); w_.normalize();
+    setMatrix(m_*r);
   }
 
   // Right-Handed Rotation about Z axis
   void rotateAboutZ(double a) {
     CMatrix3D r;
-
     r.setRotation(CMathGen::Z_AXIS_3D, a);
 
-    m_ *= r;
-
-    m_.getColumns(u_, v_, w_);
-
-    u_.normalize(); v_.normalize(); w_.normalize();
+    setMatrix(m_*r);
   }
 
   // rotate the basis about the unit axis u by theta (radians)
   void rotate(double theta, const CVector3D &u) {
     CMatrix3D r;
-
     r.setRotation(theta, u);
 
-    m_ *= r;
+    setMatrix(m_*r);
   }
 
   // rotate, length of da is theta, unit direction of da is u
@@ -298,6 +282,15 @@ class COrthonormalBasis3D {
     basis.print(os);
 
     return os;
+  }
+
+ private:
+  void setMatrix(const CMatrix3D &m) {
+    m_ = m;
+
+    m_.getColumns(u_, v_, w_);
+
+    u_.normalize(); v_.normalize(); w_.normalize();
   }
 
  private:

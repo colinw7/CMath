@@ -40,6 +40,10 @@ struct vec3 {
 
   //---
 
+  vec3 operator-() {
+    return vec3(-x, -y, -z);
+  }
+
   friend vec3 operator-(const vec3 &lhs, double rhs) {
     return vec3(lhs.x - rhs, lhs.y - rhs, lhs.z - rhs);
   }
@@ -66,6 +70,10 @@ struct vec3 {
     return vec3(f*v.x, f*v.y, f*v.z);
   }
 
+  friend vec3 operator*(const vec3 &lhs, const vec3 &rhs) {
+    return vec3(lhs.x*rhs.x, lhs.y*rhs.y, lhs.z*rhs.z);
+  }
+
   //---
 
   vec3 &operator/=(double f) {
@@ -74,6 +82,10 @@ struct vec3 {
 
   friend vec3 operator/(const vec3 &v, double f) {
     return vec3(v.x/f, v.y/f, v.z/f);
+  }
+
+  friend vec3 operator/(const vec3 &lhs, const vec3 &rhs) {
+    return vec3(lhs.x/rhs.x, lhs.y/rhs.y, lhs.z/rhs.z);
   }
 
   //---
@@ -114,6 +126,10 @@ struct vec3 {
 
   // dot product
   double dot(const vec3 &v) const { return (x*v.x + y*v.y + z*v.z); }
+
+  //---
+
+  vec3 sqrt() { return vec3(std::sqrt(x), std::sqrt(y), std::sqrt(z)); }
 
   //---
 

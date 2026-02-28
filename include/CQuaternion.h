@@ -2,6 +2,7 @@
 #define CQUATERNION_H
 
 #include <CMatrix3D.h>
+#include <CMatrix3DH.h>
 #include <CPoint3D.h>
 #include <CVector3D.h>
 
@@ -94,6 +95,16 @@ class CQuaternion {
     double irhs = 1.0/rhs;
 
     return *this *= irhs;
+  }
+
+  friend CVector3D operator*(const CVector3D &v, const CQuaternion &q) {
+    auto tmp0 = q.conjugated();
+    auto qv   = CQuaternion(v);
+    auto tmp1 = tmp0*qv;
+
+    auto result = tmp1*q;
+
+    return CVector3D(result.getX(), result.getY(), result.getZ());
   }
 
   //----------
@@ -208,20 +219,21 @@ class CQuaternion {
   CQuaternion &normalize() {
     double l = length();
 
-    if (l <= 0.0) {
-      assert(false && "Divide by zero");
-      return *this;
+    if (l > 0.0) {
+      double li = 1.0/l;
+
+      w_ *= li; v_ *= li;
     }
-
-    double li = 1.0/l;
-
-    w_ *= li; v_ *= li;
+    else {
+      w_ = 1.0;
+      v_ = CVector3D();
+    }
 
     return *this;
   }
 
   CQuaternion normalized() const {
-    CQuaternion t = *this;
+    auto t = *this;
 
     return t.normalize();
   }
@@ -254,7 +266,7 @@ class CQuaternion {
   }
 
   CQuaternion conjugated() const {
-    CQuaternion t = *this;
+    auto t = *this;
 
     return t.conjugate();
   }
@@ -281,7 +293,7 @@ class CQuaternion {
     double trace = a + e + i + 1.0;
 
     if (trace > 0.0) {
-      double s = 0.5/std::sqrt(trace);
+      auto s = 0.5/std::sqrt(trace);
 
       w_ = trace*s;
       v_ = CVector3D(h - f, c - g, d - b)*s;
@@ -315,7 +327,23 @@ class CQuaternion {
   }
 
   void toRotationMatrix(CMatrix3D &matrix) const {
-    CPoint3D v = v_.point();
+    auto v = v_.point();
+
+    double a = 1.0 - 2.0*(v.y*v.y + v.z*v.z);
+    double b =       2.0*(v.x*v.y -  w_*v.z);
+    double c =       2.0*(v.x*v.z +  w_*v.y);
+    double d =       2.0*(v.x*v.y +  w_*v.z);
+    double e = 1.0 - 2.0*(v.x*v.x + v.z*v.z);
+    double f =       2.0*(v.y*v.z -  w_*v.x);
+    double g =       2.0*(v.x*v.z -  w_*v.y);
+    double h =       2.0*(v.y*v.z +  w_*v.x);
+    double i = 1.0 - 2.0*(v.x*v.x + v.y*v.y);
+
+    matrix.setValues(a, b, c, d, e, f, g, h, i, 0.0, 0.0, 0.0);
+  }
+
+  void toRotationMatrix(CMatrix3DH &matrix) const {
+    auto v = v_.point();
 
     double a = 1.0 - 2.0*(v.y*v.y + v.z*v.z);
     double b =       2.0*(v.x*v.y -  w_*v.z);
@@ -540,7 +568,7 @@ class CQuaternion {
       }
     }
 
-    return CQuaternion(0.0, 0.0, 0.0, 0.0);
+    return CQuaternion(1.0, 0.0, 0.0, 0.0);
   }
 
   CQuaternion exp() const {
@@ -554,7 +582,7 @@ class CQuaternion {
       return CQuaternion(std::cos(angle), coeff*v_);
     }
 
-    return CQuaternion(0.0, 0.0, 0.0, 0.0);
+    return CQuaternion(1.0, 0.0, 0.0, 0.0);
   }
 
   void print(std::ostream &os) const {

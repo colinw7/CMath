@@ -30,18 +30,6 @@ class CCoordFrame3D {
    origin_(origin), basis_(basis) {
   }
 
-  CCoordFrame3D(const CCoordFrame3D &coord_frame) :
-    origin_(coord_frame.origin_),
-    basis_ (coord_frame.basis_ ) {
-  }
-
-  CCoordFrame3D &operator=(const CCoordFrame3D &coord_frame) {
-    origin_ = coord_frame.origin_;
-    basis_  = coord_frame.basis_ ;
-
-    return *this;
-  }
-
   void init() {
     origin_ = CPoint3D(0, 0, 0);
     basis_  = COrthonormalBasis3D(CVector3D(1, 0, 0), CVector3D(0, 1, 0), CVector3D(0, 0, 1));
@@ -164,10 +152,8 @@ class CCoordFrame3D {
     os << "(" << basis_ << "), (" << origin_ << ")";
   }
 
-  friend std::ostream &operator<<(std::ostream &os,
-                                  const CCoordFrame3D &frame) {
+  friend std::ostream &operator<<(std::ostream &os, const CCoordFrame3D &frame) {
     frame.print(os);
-
     return os;
   }
 
