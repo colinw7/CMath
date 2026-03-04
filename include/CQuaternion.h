@@ -648,6 +648,9 @@ inline interpRangeSet<CQuaternion, double>(int ir, const double &f,
   if (nr == 0)
     return RVal(false, CQuaternion());
 
+  if (ir == 0 && nr == 1 && f == 0.0)
+    return RVal(true, rangeSet[ir]);
+
   if (ir < 0 || ir >= int(nr - 1))
     return RVal(false, CQuaternion());
 

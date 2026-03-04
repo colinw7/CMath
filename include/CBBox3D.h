@@ -194,6 +194,7 @@ class CBBox3D {
   double getYSize() const { return (pmax_.y - pmin_.y); }
   double getZSize() const { return (pmax_.z - pmin_.z); }
 
+  double getMinSize() const { return std::min(std::min(getXSize(), getYSize()), getZSize()); }
   double getMaxSize() const { return std::max(std::max(getXSize(), getYSize()), getZSize()); }
 
   double getRadius() const {
