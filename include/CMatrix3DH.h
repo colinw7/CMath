@@ -1427,6 +1427,13 @@ class CMatrix3DH {
 
   //------
 
+ public:
+  void setOuterTranslate(double tx, double ty, double tz) {
+    m03_ = tx; m13_ = ty; m23_ = tz;
+
+    setBottomIdentity();
+  }
+
  private:
   void setInnerIdentity() {
     m00_ = 1.0, m01_ = 0.0, m02_ = 0.0;
@@ -1484,12 +1491,6 @@ class CMatrix3DH {
 
   void setOuterIdentity() {
     m03_ = 0.0; m13_ = 0.0; m23_ = 0.0;
-
-    setBottomIdentity();
-  }
-
-  void setOuterTranslate(double tx, double ty, double tz) {
-    m03_ = tx; m13_ = ty; m23_ = tz;
 
     setBottomIdentity();
   }

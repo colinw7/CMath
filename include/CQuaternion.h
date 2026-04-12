@@ -38,6 +38,8 @@ class CQuaternion {
   void setY(double y) { v_.setY(y); }
   void setZ(double z) { v_.setZ(z); }
 
+  void setXYZ(const CVector3D &v) { v_ = v; }
+
   CQuaternion &operator=(const CQuaternion &q) {
     w_ = q.w_; v_ = q.v_;
 
@@ -98,6 +100,7 @@ class CQuaternion {
   }
 
   friend CVector3D operator*(const CVector3D &v, const CQuaternion &q) {
+#if 0
     auto tmp0 = q.conjugated();
     auto qv   = CQuaternion(v);
     auto tmp1 = tmp0*qv;
@@ -105,6 +108,28 @@ class CQuaternion {
     auto result = tmp1*q;
 
     return CVector3D(result.getX(), result.getY(), result.getZ());
+#else
+    CVector3D vector;
+    auto num12 = q.getX() + q.getX();
+    auto num2  = q.getY() + q.getY();
+    auto num   = q.getZ() + q.getZ();
+
+    auto num11 = q.getW()*num12; auto num10 = q.getW()*num2; auto num9 = q.getW()*num;
+    auto num8  = q.getX()*num12; auto num7  = q.getX()*num2; auto num6 = q.getX()*num;
+    auto num5  = q.getY()*num2 ; auto num4  = q.getY()*num ; auto num3 = q.getZ()*num;
+
+    auto num15 = ((v.x()*((1.0 - num5) - num3)) +
+                  (v.y()*(num7 - num9)))        +
+                  (v.z()*(num6 + num10));
+    auto num14 = ((v.x()*(num7 + num9))          +
+                  (v.y()*((1.0 - num8) - num3))) +
+                  (v.z()*(num4 - num11));
+    auto num13 = ((v.x()*(num6 - num10))        +
+                  (v.y()*(num4 + num11)))       +
+                  (v.z()*((1.0 - num8) - num5));
+
+    return CVector3D(num15, num14, num13);
+#endif
   }
 
   //----------
@@ -475,8 +500,7 @@ class CQuaternion {
       return lerp(t, p, q1);
   }
 
-  static CQuaternion slerpNoInvert(double t, const CQuaternion &p,
-                                    const CQuaternion &q) {
+  static CQuaternion slerpNoInvert(double t, const CQuaternion &p, const CQuaternion &q) {
     double c = p.dotProduct(q);
 
     double tol = double(95)/100;
@@ -537,14 +561,42 @@ class CQuaternion {
   static CQuaternion rotationArc(const CVector3D &v0, const CVector3D &v1) {
     CQuaternion q;
 
-    CVector3D c = v0.crossProduct(v1);
-    double    d = v0.dotProduct(v1);
-    double    s = std::sqrt((1.0 + d)*2.0);
+    auto c = v0.crossProduct(v1);
+    auto d = v0.dotProduct(v1);
+
+#if 0
+    double s = std::sqrt((1.0 + d)*2.0);
 
     double s1 = 1.0/s;
 
     q.v_ = c*s1;
-    q.w_ = s / 2.0;
+    q.w_ = s/2.0;
+#else
+#if 0
+    q.setXYZ(c);
+
+    q.w_ = d + length(q);
+#else
+#if 0
+    q.setXYZ(c);
+
+    auto k = std::sqrt(v0.lengthSqr()*v1.lengthSqr());
+
+    q.w_ = d + k;
+#else
+    auto k = std::sqrt(v0.lengthSqr()*v1.lengthSqr());
+
+    if (d/k == -1) {
+      // 180 degree rotation around any orthogonal vector
+      return CQuaternion(0, v1.orthogonal().normalized());
+    }
+
+    q = CQuaternion(d + k, c);
+#endif
+#endif
+#endif
+
+    q.normalize();
 
     return q;
   }

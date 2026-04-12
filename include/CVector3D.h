@@ -643,6 +643,19 @@ class CVector3D {
 
   //------
 
+  CVector3D orthogonal() const {
+    auto x = std::abs(this->x());
+    auto y = std::abs(this->y());
+    auto z = std::abs(this->z());
+
+    auto other = (x < y ? (x < z ?
+      CVector3D(1, 0, 0) : CVector3D(0, 0, 1)) : (y < z ? CVector3D(0, 1, 0) : CVector3D(0, 0, 1)));
+
+    return crossProduct(other);
+  }
+
+  //------
+
 #if 0
   void getBarycentrics(const CVector3D &vector1, const CVector3D &vector2,
                        const CVector3D &vector3, const CVector3D &vector4,
