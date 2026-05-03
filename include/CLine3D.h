@@ -176,7 +176,7 @@ class CLine3D {
   }
 
   bool pointDistance(const CPoint3D &point, double *dist) {
-    CVector3D pl(point, p0_);
+    CVector3D pl(p0_, point);
 
     CVector3D l(p0_, p1_);
 
