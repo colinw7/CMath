@@ -1,11 +1,11 @@
-#ifndef CPOLYGON_ORIENTATION_H
-#define CPOLYGON_ORIENTATION_H
+#ifndef CPolygonOrientation_H
+#define CPolygonOrientation_H
 
-enum CPolygonOrientation {
-  CPOLYGON_ORIENTATION_UNKNOWN          =  0,
-  CPOLYGON_ORIENTATION_CLOCKWISE        = -1,
-  CPOLYGON_ORIENTATION_ANTICLOCKWISE    =  1,
-  CPOLYGON_ORIENTATION_COUNTERCLOCKWISE = CPOLYGON_ORIENTATION_ANTICLOCKWISE
+enum class CPolygonOrientation {
+  UNKNOWN          =  0,
+  CLOCKWISE        = -1,
+  ANTICLOCKWISE    =  1,
+  COUNTERCLOCKWISE = ANTICLOCKWISE
 };
 
 #endif

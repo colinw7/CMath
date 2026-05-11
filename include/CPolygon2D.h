@@ -335,7 +335,7 @@ class CPolygon2D : public CShape2D {
     arraySet_ = false;
   }
 
-  int orientation() const {
+  CPolygonOrientation orientation() const {
     initArray();
 
     uint n = uint(points_.size());

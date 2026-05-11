@@ -57,12 +57,11 @@ calc(const std::vector<CPoint2D> &points, std::vector<uint> &poly_inds)
       for (ind3 = 0; ind3 < num_points; ++ind3) {
         if (ind3 == ind2 || ind3 == ind1) continue;
 
-        CPolygonOrientation orient =
-          CMathGeom2D::PolygonOrientation(points[ind1].x, points[ind1].y,
-                                          points[ind2].x, points[ind2].y,
-                                          points[ind3].x, points[ind3].y);
+        auto orient = CMathGeom2D::PolygonOrientation(points[ind1].x, points[ind1].y,
+                                                      points[ind2].x, points[ind2].y,
+                                                      points[ind3].x, points[ind3].y);
 
-        if (orient < 0)
+        if (orient == CPolygonOrientation::CLOCKWISE)
           break;
       }
 

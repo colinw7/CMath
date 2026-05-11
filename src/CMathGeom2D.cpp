@@ -225,7 +225,7 @@ IntersectPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint
     int index1 = 0;
 
     if (absfv1 >= EPSILON_E6)
-      index1 = CMathGen::sign(fv1)*orient2;
+      index1 = CMathGen::sign(fv1)*int(orient2);
 
     int ni1 = 0;
 
@@ -238,7 +238,7 @@ IntersectPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint
       int index2 = 0;
 
       if (absfv2 >= EPSILON_E6)
-        index2 = CMathGen::sign(fv2)*orient2;
+        index2 = CMathGen::sign(fv2)*int(orient2);
 
       // add start point
       if (index1 >= 0)
@@ -411,7 +411,7 @@ CutPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &p
     int index1 = 0;
 
     if (absfv1 >= EPSILON_E6)
-      index1 = CMathGen::sign(fv1)*orient2;
+      index1 = CMathGen::sign(fv1)*int(orient2);
 
     int ni1 = 0;
 
@@ -424,7 +424,7 @@ CutPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &p
       int index2 = 0;
 
       if (absfv2 >= EPSILON_E6)
-        index2 = CMathGen::sign(fv2)*orient2;
+        index2 = CMathGen::sign(fv2)*int(orient2);
 
       // add start point to inside
       if (index1 >= 0)
@@ -641,7 +641,7 @@ AddPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &p
       int index1 = 0;
 
       if (absfv1 >= EPSILON_E6)
-        index1 = CMathGen::sign(fv1)*orient2;
+        index1 = CMathGen::sign(fv1)*int(orient2);
 
       // calc side of line for second point
       AddPoint &v2     = apoints1[j2];
@@ -651,7 +651,7 @@ AddPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &p
       int index2 = 0;
 
       if (absfv2 >= EPSILON_E6)
-        index2 = CMathGen::sign(fv2)*orient2;
+        index2 = CMathGen::sign(fv2)*int(orient2);
 
       // add intersection point (if changed sides)
       if (index1 != 0 && index1 != index2 && index2 != 0) {
@@ -715,7 +715,7 @@ AddPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &p
       int index1 = 0;
 
       if (absfv1 >= EPSILON_E6)
-        index1 = CMathGen::sign(fv1)*orient2;
+        index1 = CMathGen::sign(fv1)*int(orient2);
 
       // calc side of line for second point
       AddPoint &v2     = apoints2[i2];
@@ -725,7 +725,7 @@ AddPolygons(const std::vector<CPoint2D> &points1, const std::vector<CPoint2D> &p
       int index2 = 0;
 
       if (absfv2 >= EPSILON_E6)
-        index2 = CMathGen::sign(fv2)*orient2;
+        index2 = CMathGen::sign(fv2)*int(orient2);
 
       // add intersection point (if changed sides)
       if (index1 != 0 && index1 != index2 && index2 != 0) {
@@ -891,9 +891,9 @@ CMathGeom2D::
 PointInsideConvex(const CPoint2D &point, const CPoint2D *points, uint num_points)
 {
   auto orient = PolygonOrientation(points, num_points);
-  if (orient == CPOLYGON_ORIENTATION_UNKNOWN) return false; // degenerate
+  if (orient == CPolygonOrientation::UNKNOWN) return false; // degenerate
 
-  if (orient == CPOLYGON_ORIENTATION_ANTICLOCKWISE) {
+  if (orient == CPolygonOrientation::ANTICLOCKWISE) {
     // iterate forwards through polygon lines (i1 -> i2)
     int i1 = num_points - 1;
 
@@ -941,9 +941,9 @@ CMathGeom2D::
 PointInsideConvex(double x, double y, const double *px, const double *py, uint np)
 {
   auto orient = PolygonOrientation(px, py, np);
-  if (orient == CPOLYGON_ORIENTATION_UNKNOWN) return false; // degenerate
+  if (orient == CPolygonOrientation::UNKNOWN) return false; // degenerate
 
-  if (orient == CPOLYGON_ORIENTATION_ANTICLOCKWISE) {
+  if (orient == CPolygonOrientation::ANTICLOCKWISE) {
     // iterate forwards through polygon lines (i1 -> i2)
     int i1 = np - 1;
 
@@ -1191,11 +1191,12 @@ CMathGeom2D::
 PointInsideConvex1(double x, double y, const double *xp, const double *yp, uint np)
 {
   auto orient = PolygonOrientation(xp, yp, np);
-  if (orient == CPOLYGON_ORIENTATION_UNKNOWN) return false; // degenerate
+  if (orient == CPolygonOrientation::UNKNOWN) return false; // degenerate
 
   double d = (y - yp[0])*(xp[1] - xp[0]) - (x - xp[0])*(yp[1] - yp[0]);
 
-  return ((d < 0 && orient < 0) || (d > 0 && orient > 0)); // TODO: test
+  return ((d < 0 && orient == CPolygonOrientation::CLOCKWISE) ||
+          (d > 0 && orient == CPolygonOrientation::ANTICLOCKWISE)); // TODO: test
 }
 
 //-------
@@ -1607,13 +1608,13 @@ PolygonOrientation(const double *x, const double *y, uint num_xy)
   while (i < (int) num_xy) {
     auto orient = PolygonOrientation(x[i - 2], y[i - 2], x[i - 1], y[i - 1], x[i], y[i]);
 
-    if (orient != CPOLYGON_ORIENTATION_UNKNOWN)
+    if (orient != CPolygonOrientation::UNKNOWN)
       return orient;
 
     ++i;
   }
 
-  return CPOLYGON_ORIENTATION_UNKNOWN;
+  return CPolygonOrientation::UNKNOWN;
 }
 
 //! Orientation on polygon - clockwise/anti-clockwise
@@ -1626,13 +1627,13 @@ PolygonOrientation(const int *x, const int *y, uint num_xy)
   while (i < (int) num_xy) {
     auto orient = PolygonOrientation(x[i - 2], y[i - 2], x[i - 1], y[i - 1], x[i], y[i]);
 
-    if (orient != CPOLYGON_ORIENTATION_UNKNOWN)
+    if (orient != CPolygonOrientation::UNKNOWN)
       return orient;
 
     ++i;
   }
 
-  return CPOLYGON_ORIENTATION_UNKNOWN;
+  return CPolygonOrientation::UNKNOWN;
 }
 
 //! Orientation on polygon - clockwise/anti-clockwise
@@ -1645,13 +1646,13 @@ PolygonOrientation(const CPoint2D *points, uint num_points)
   while (i < (int) num_points) {
     auto orient = PolygonOrientation(points[i - 2], points[i - 1], points[i]);
 
-    if (orient != CPOLYGON_ORIENTATION_UNKNOWN)
+    if (orient != CPolygonOrientation::UNKNOWN)
       return orient;
 
     ++i;
   }
 
-  return CPOLYGON_ORIENTATION_UNKNOWN;
+  return CPolygonOrientation::UNKNOWN;
 }
 
 //! Orientation on polygon - clockwise/anti-clockwise
@@ -1666,13 +1667,13 @@ PolygonOrientation(const std::vector<CPoint2D> &points)
   while (i < (int) num_points) {
     auto orient = PolygonOrientation(points[i - 2], points[i - 1], points[i]);
 
-    if (orient != CPOLYGON_ORIENTATION_UNKNOWN)
+    if (orient != CPolygonOrientation::UNKNOWN)
       return orient;
 
     ++i;
   }
 
-  return CPOLYGON_ORIENTATION_UNKNOWN;
+  return CPolygonOrientation::UNKNOWN;
 }
 
 //! Orientation on polygon - clockwise/anti-clockwise
