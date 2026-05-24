@@ -16,6 +16,10 @@ namespace CMathGeom3D {
     PolygonOrientation(const CPoint3D &point1, const CPoint3D &point2,
                        const CPoint3D &point3, const CPoint3D &eye);
 
+  bool LineLineIntersect(const CPoint3D &p1, const CPoint3D &p2,
+                         const CPoint3D &p3, const CPoint3D &p4,
+                         CPoint3D &pa, CPoint3D &pb, double &mua, double &mub);
+
   bool LinePlaneIntersect(double line_x1, double line_y1, double line_z1,
                           double line_x2, double line_y2, double line_z2,
                           double plane_x, double plane_y, double plane_z, double plane_c,

@@ -137,8 +137,7 @@ class CLine3D {
     *t2 = (     v_.getX()*(p0_.y - line.p0_.y) -
                 v_.getY()*(p0_.x - line.p0_.x))/det;
 
-    if (*t1 >= 0.0 && *t1 <= 1.0 &&
-        *t2 >= 0.0 && *t2 <= 1.0)
+    if (*t1 >= 0.0 && *t1 <= 1.0 && *t2 >= 0.0 && *t2 <= 1.0)
       return CMathGen::INTERSECT_INSIDE;
     else
       return CMathGen::INTERSECT_OUTSIDE;

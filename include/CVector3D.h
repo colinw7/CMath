@@ -408,7 +408,7 @@ class CVector3D {
     return *this;
   }
 
-  CVector3D operator*(const CVector3D &rhs) {
+  CVector3D operator*(const CVector3D &rhs) const {
     CVector3D t(*this);
 
     t *= rhs;
