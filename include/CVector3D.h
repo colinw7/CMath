@@ -105,6 +105,8 @@ class CVector3D {
     normalized_ = false;
   }
 
+  //---
+
   // more get accessors
   bool getNormalized() const {
     return normalized_;
@@ -173,10 +175,10 @@ class CVector3D {
     return lhs.cmp(rhs) >= 0;
   }
 
-  bool eq(const CVector3D &rhs) const {
-    return fabs(x_ - rhs.x_) < 1E-6 &&
-           fabs(y_ - rhs.y_) < 1E-6 &&
-           fabs(z_ - rhs.z_) < 1E-6;
+  bool eq(const CVector3D &rhs, double tol=1E-6) const {
+    return std::abs(x_ - rhs.x_) < tol &&
+           std::abs(y_ - rhs.y_) < tol &&
+           std::abs(z_ - rhs.z_) < tol;
   }
 
   //------
@@ -299,13 +301,13 @@ class CVector3D {
   //------
 
   double getDistance(const CVector3D &vector) const {
-    CVector3D diff = *this - vector;
+    auto diff = *this - vector;
 
     return diff.length();
   }
 
   double getDistanceSqr(const CVector3D &vector) const {
-    CVector3D diff = *this - vector;
+    auto diff = *this - vector;
 
     return diff.lengthSqr();
   }
@@ -329,8 +331,8 @@ class CVector3D {
   double minComponent() { return std::min(std::min(x_, y_), z_); }
   double maxComponent() { return std::max(std::max(x_, y_), z_); }
 
-  double minAbsComponent() { return std::min(std::min(::fabs(x_), ::fabs(y_)), ::fabs(z_)); }
-  double maxAbsComponent() { return std::max(std::max(::fabs(x_), ::fabs(y_)), ::fabs(z_)); }
+  double minAbsComponent() { return std::min(std::min(std::abs(x_), std::abs(y_)), std::abs(z_)); }
+  double maxAbsComponent() { return std::max(std::max(std::abs(x_), std::abs(y_)), std::abs(z_)); }
 
   //------
 
@@ -476,7 +478,7 @@ class CVector3D {
   }
 
   static double absDotProduct(const CVector3D &v1, const CVector3D &v2) {
-    return ::fabs(dotProduct(v1, v2));
+    return std::abs(dotProduct(v1, v2));
   }
 
   //------
@@ -598,7 +600,7 @@ class CVector3D {
       return;
     }
 
-    if (::fabs(vector1.x_) > ::fabs(vector1.y_)) {
+    if (std::abs(vector1.x_) > std::abs(vector1.y_)) {
       double ilen = 1.0/std::sqrt(vector1.x_*vector1.x_ + vector1.z_*vector1.z_);
 
       *vector2 = CVector3D(-vector1.z_*ilen, 0.0, vector1.x_*ilen);
@@ -672,7 +674,7 @@ class CVector3D {
 
     for (int i = 0; i < 3; ++i)
       for (int j = 0; j < 3; ++j)
-        maxval = max(maxval, ::fabs(diff[i][j]));
+        maxval = max(maxval, std::abs(diff[i][j]));
 
     // scale down only large data
     if (maxval > 1.0) {
@@ -688,7 +690,7 @@ class CVector3D {
     CVector3D c20 = diff[2].crossProduct(diff[0]);
     CVector3D c01 = diff[0].crossProduct(diff[1]);
 
-    if (::fabs(det) > 1E-6 ) {
+    if (std::abs(det) > 1E-6 ) {
       double idet = 1.0/det;
 
       barycentric[0] = diff[3].dotProduct(c12)*idet;

@@ -25,16 +25,15 @@ class CArray2D {
 
   typedef CArray1D<T, false> slice_type;
 
- private:
-  T          *data_;
-  index_type  d1_;
-  index_type  d2_;
-  size_type   size_;
-
  public:
+  CArray2D() { }
+
   CArray2D(value_type *data, index_type d1, index_type d2) :
    data_(data), d1_(d1), d2_(d2), size_(d1*d2) {
-    if (OWNER) assert(false && "Not Owner");
+    if (OWNER)
+      allocate(size_, data);
+    else
+      data_ = data;
   }
 
   CArray2D(index_type d1, index_type d2) :
@@ -51,10 +50,30 @@ class CArray2D {
     allocate(size_, idata);
   }
 
- private:
-  CArray2D(const CArray2D &array);
+  CArray2D(const CArray2D &array) :
+   d1_(array.d1_), d2_(array.d2_), size_(array.d1_*array.d2_) {
+    if (OWNER)
+      allocate(size_, array.data_);
+    else
+      data_ = array.data_;
+  }
 
-  CArray2D &operator=(const CArray2D &array);
+  CArray2D &operator=(const CArray2D &array) {
+    if (OWNER)
+      deallocate();
+
+    d1_ = array.d1_;
+    d2_ = array.d2_;
+
+    size_ = d1_*d2_;
+
+    if (OWNER)
+      allocate(size_, array.data_);
+    else
+      data_ = array.data_;
+
+    return *this;
+  }
 
  public:
  ~CArray2D() {
@@ -63,15 +82,25 @@ class CArray2D {
   }
 
  private:
-  void allocate(size_type size_) {
+  void allocate(size_type size) {
+    size_ = size;
     data_ = new T [size_];
   }
 
-  void allocate(size_type size_, value_type idata) {
+  void allocate(size_type size, value_type idata) {
+    size_ = size;
     data_ = new T [size_];
 
     for (size_type i = 0; i < size_; ++i)
       data_[i] = idata;
+  }
+
+  void allocate(size_type size, value_type *data) {
+    size_ = size;
+    data_ = new T [size_];
+
+    for (size_type i = 0; i < size_; ++i)
+      data_[i] = data[i];
   }
 
   void deallocate() {
@@ -95,6 +124,14 @@ class CArray2D {
   const slice_type operator[](index_type ind) const {
     return slice_type(&data_[ind*d2_], d2_);
   }
+
+  index_type dim(index_type i) const {
+    if (i == 0) return d1_;
+    if (i == 1) return d2_;
+    else assert(false);
+  }
+
+  const T *data() const { return data_; }
 
   void print(std::ostream &os) const {
     os << "[";
@@ -120,9 +157,29 @@ class CArray2D {
     return os;
   }
 
-  value_type at(index_type i1, index_type i2) {
+  value_type at(index_type i1, index_type i2) const {
+    return get(i1, i2);
+  }
+
+  value_type get(index_type i1, index_type i2) const {
+    assert(validIndex(i1, i2));
     return data_[i1*d2_ + i2];
   }
+
+  void set(index_type i1, index_type i2, const value_type &v) {
+    assert(validIndex(i1, i2));
+    data_[i1*d2_ + i2] = v;
+  }
+
+  bool validIndex(index_type i1, index_type i2) const {
+    return (i1 < d1_ && i2 < d2_);
+  }
+
+ private:
+  T          *data_ { nullptr };
+  index_type  d1_   { 0 };
+  index_type  d2_   { 0 };
+  size_type   size_ { 0 };
 };
 
 #endif

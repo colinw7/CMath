@@ -1593,19 +1593,19 @@ class CMatrix3DH {
                          double near, double far) {
     auto w = right - left  ; auto iw = 1.0/w;
     auto h = top   - bottom; auto ih = 1.0/h;
-    auto d = near  - far   ; auto id = 1.0/d; // far - near ?
+    auto d = far   - near  ; auto id = 1.0/d; // far - near ?
 
     auto rpl = right + left  ;
     auto tpb = top   + bottom;
-    auto npf = near  + far   ;
+    auto fpn = far   + near  ;
 
-    auto a = 2.0*iw;
-    auto e = 2.0*ih;
-    auto i = 2.0*id;
+    auto a =  2.0*iw;
+    auto e =  2.0*ih;
+    auto i = -2.0*id;
 
     auto tx = -rpl*iw;
     auto ty = -tpb*ih;
-    auto tz =  npf*id;
+    auto tz = -fpn*id;
 
     setInnerScale(a, e, i);
 

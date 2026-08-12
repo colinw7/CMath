@@ -61,11 +61,13 @@ class CArray1D {
   }
 
  private:
-  void allocate(size_type size_) {
+  void allocate(size_type size) {
+    size_ = size;
     data_ = new T [size_];
   }
 
-  void allocate(size_type size_, value_type idata) {
+  void allocate(size_type size, value_type idata) {
+    size_ = size;
     data_ = new T [size_];
 
     for (size_type i = 0; i < size_; ++i)
