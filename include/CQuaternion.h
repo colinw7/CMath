@@ -458,6 +458,21 @@ class CQuaternion {
     v_ = CVector3D(x, y, z);
   }
 
+  void toEuler(double &pitch, double &yaw, double &roll) const {
+    auto xx = this->getX();
+    auto yy = this->getY();
+    auto zz = this->getZ();
+    auto ww = this->getW();
+
+    auto xsq = xx*xx;
+    auto ysq = yy*yy;
+    auto zsq = zz*zz;
+
+    pitch =  std::atan2(2.0*(xx*ww - yy*zz), 1.0f - 2.0*(xsq + zsq));
+    yaw   =  std::atan2(2.0*(yy*ww + xx*zz), 1.0f - 2.0*(ysq + zsq));
+    roll  = -std::asin (2.0*(xx*yy + zz*ww));
+  }
+
   static CQuaternion lerp(double t, const CQuaternion &p, const CQuaternion &q) {
     CQuaternion r = p + t*(q - p);
 

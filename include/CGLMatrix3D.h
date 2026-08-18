@@ -3,6 +3,7 @@
 
 #include <CMathGen.h>
 #include <CMatrix3D.h>
+#include <CMatrix3DH.h>
 #include <CPoint3D.h>
 #include <CGLVector3D.h>
 #include <cstring>
@@ -1670,6 +1671,13 @@ class CGLMatrix3D {
                      m10_, m11_, m12_, m13_,
                      m20_, m21_, m22_, m23_,
                      m30_, m31_, m32_, m33_);
+  }
+
+  CMatrix3DH toCMatrixH() const {
+    return CMatrix3DH(m00_, m01_, m02_, m03_,
+                      m10_, m11_, m12_, m13_,
+                      m20_, m21_, m22_, m23_,
+                      m30_, m31_, m32_, m33_);
   }
 
   static CGLMatrix3D fromCMatrix(const CMatrix3D &m) {
