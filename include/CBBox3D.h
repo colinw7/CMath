@@ -329,6 +329,14 @@ class CBBox3D {
     return os;
   }
 
+  friend bool operator==(const CBBox3D &lhs, const CBBox3D &rhs) {
+    return (lhs.pmin_ == rhs.pmin_ && lhs.pmax_ == rhs.pmax_);
+  }
+
+  friend bool operator!=(const CBBox3D &lhs, const CBBox3D &rhs) {
+    return (lhs.pmin_ != rhs.pmin_ || lhs.pmax_ != rhs.pmax_);
+  }
+
  protected:
   CPoint3D pmin_;
   CPoint3D pmax_;
