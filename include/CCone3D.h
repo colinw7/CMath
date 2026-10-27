@@ -117,7 +117,7 @@ class CCone3D : public CShape3D {
     dpdu = CShape3D::transformFrom(dpdu);
     dpdv = CShape3D::transformFrom(dpdv);
 
-    CVector3D n = dpdu.crossProduct(dpdv).unit();
+    auto n = dpdu.crossProduct(dpdv).unit();
 
     return n;
   }
@@ -136,7 +136,7 @@ class CCone3D : public CShape3D {
       double h2 = height_*height_;
       double r2 = radius_*radius_;
 
-      double area = phi_max_*h2*sqrt(h2 + r2)/(2.0*radius_);
+      double area = phi_max_*h2*std::sqrt(h2 + r2)/(2.0*radius_);
 
       CCone3D *th = const_cast<CCone3D *>(this);
 
@@ -185,7 +185,7 @@ class CCone3D : public CShape3D {
   }
 
   double getPhi(const CPoint3D &point) const {
-    double phi = atan2(point.y, point.x);
+    double phi = std::atan2(point.y, point.x);
 
     if (phi < 0.0) phi += 2.0*M_PI;
 
@@ -197,7 +197,7 @@ class CCone3D : public CShape3D {
   double height_ { 1.0 }; //! Height h
 
   // limits
-  double phi_max_ { 360.0 }; //! Angle/Sweep Max
+  double phi_max_ { 2*M_PI }; //! Angle/Sweep Max (radians)
 
   std::optional<double> area_;
 };
