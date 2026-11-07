@@ -878,7 +878,7 @@ class CMatrix3DH {
     double w = m30_*xi + m31_*yi + m32_*zi + m33_;
 
     // normalize
-    if (w > 1E-6) {
+    if (fabs(w) > 1E-6) {
       double iw = 1.0/w;
 
       *xo *= iw;
