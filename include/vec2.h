@@ -2,6 +2,7 @@
 #define vec2_H
 
 #include <cmath>
+#include <iostream>
 
 struct vec2 {
   vec2() { }
@@ -79,11 +80,20 @@ struct vec2 {
 
   vec2 abs() const { return vec2(std::abs(x), std::abs(y)); }
 
+  vec2 floor() const { return vec2(std::floor(x), std::floor(y)); }
+
   //---
 
-  double length() const { return std::sqrt(x*x + y*y); }
+  double length() const { return std::hypot(x, y); }
 
   double dot(const vec2 &v) const { return (x*v.x + y*v.y); }
+
+  //---
+
+  friend std::ostream &operator<<(std::ostream &os, const vec2 &v) {
+    os << v.x << " " << v.y;
+    return os;
+  }
 
   //---
 

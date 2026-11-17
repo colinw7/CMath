@@ -1290,27 +1290,29 @@ getNaN()
   return r;
 }
 
+//---
+
 static double
 noiseFade(double t)
 {
-  return t * t * t * (t * (t * 6 - 15) + 10);
+  return t*t*t*(t*(t*6 - 15) + 10);
 }
 
 static double
 noiseLerp(double t, double a, double b)
 {
-  return a + t * (b - a);
+  return a + t*(b - a);
 }
 
 static double
 noiseGrad(int hash, double x, double y, double z)
 {
-  int h = hash & 15;                      // CONVERT LO 4 BITS OF HASH CODE
+  int h = hash & 15; // CONVERT LO 4 BITS OF HASH CODE
 
-  double u = h<8 ? x : y,                 // INTO 12 GRADIENT DIRECTIONS.
-         v = h<4 ? y : h==12||h==14 ? x : z;
+  double u = (h <8 ? x : y), // INTO 12 GRADIENT DIRECTIONS.
+         v = (h <4 ? y : (h == 12 || h == 14 ? x : z));
 
-  return ((h&1) == 0 ? u : -u) + ((h&2) == 0 ? v : -v);
+  return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
 }
 
 static int permutation[] =
@@ -1346,7 +1348,7 @@ noiseInit()
 
 double
 CMathGen::
-noise(double x, double y, double z)
+perlinNoise(double x, double y, double z)
 {
   noiseInit();
 
@@ -1362,16 +1364,16 @@ noise(double x, double y, double z)
          v = noiseFade(y), // FOR EACH OF X,Y,Z.
          w = noiseFade(z);
 
-  int A = p[X  ]+Y, AA = p[A]+Z, AB = p[A+1]+Z, // HASH COORDINATES OF
-      B = p[X+1]+Y, BA = p[B]+Z, BB = p[B+1]+Z; // THE 8 CUBE CORNERS,
+  int A = p[X    ] + Y, AA = p[A] + Z, AB = p[A + 1] + Z, // HASH COORDINATES OF
+      B = p[X + 1] + Y, BA = p[B] + Z, BB = p[B + 1] + Z; // THE 8 CUBE CORNERS,
 
   return noiseLerp(w,
-    noiseLerp(v, noiseLerp(u, noiseGrad(p[AA  ], x  , y  , z   ),  // AND ADD
-                              noiseGrad(p[BA  ], x-1, y  , z   )), // BLENDED
-                 noiseLerp(u, noiseGrad(p[AB  ], x  , y-1, z   ),  // RESULTS
-                              noiseGrad(p[BB  ], x-1, y-1, z   ))),// FROM  8
-    noiseLerp(v, noiseLerp(u, noiseGrad(p[AA+1], x  , y  , z-1 ),  // CORNERS
-                              noiseGrad(p[BA+1], x-1, y  , z-1 )), // OF CUBE
-                 noiseLerp(u, noiseGrad(p[AB+1], x  , y-1, z-1 ),
-                              noiseGrad(p[BB+1], x-1, y-1, z-1 ))));
+    noiseLerp(v, noiseLerp(u, noiseGrad(p[AA    ], x    , y    , z    ),  // AND ADD
+                              noiseGrad(p[BA    ], x - 1, y    , z    )), // BLENDED
+                 noiseLerp(u, noiseGrad(p[AB    ], x    , y - 1, z    ),  // RESULTS
+                              noiseGrad(p[BB    ], x - 1, y - 1, z    ))),// FROM  8
+    noiseLerp(v, noiseLerp(u, noiseGrad(p[AA + 1], x    , y    , z - 1),  // CORNERS
+                              noiseGrad(p[BA + 1], x - 1, y    , z - 1)), // OF CUBE
+                 noiseLerp(u, noiseGrad(p[AB + 1], x    , y - 1, z - 1),
+                              noiseGrad(p[BB + 1], x - 1, y - 1, z - 1))));
 }

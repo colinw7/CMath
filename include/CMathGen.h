@@ -222,7 +222,9 @@ void getXYVals(double *x, double *y, int num_xy,
 
 double getNaN();
 
-double noise(double x, double y, double z);
+//---
+
+double perlinNoise(double x, double y, double z);
 
 //-----
 

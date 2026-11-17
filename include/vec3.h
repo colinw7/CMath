@@ -62,6 +62,10 @@ struct vec3 {
     x *= f; y *= f; z *= f; return *this;
   }
 
+  vec3 &operator*=(const vec3 &v) {
+    x *= v.x; y *= v.y; z *= v.z; return *this;
+  }
+
   friend vec3 operator*(const vec3 &v, double f) {
     return vec3(v.x*f, v.y*f, v.z*f);
   }
@@ -99,10 +103,15 @@ struct vec3 {
   vec3 zxy() const { return vec3(z, x, y); }
 
   void setXY(const vec2 &v) { x = v.x; y = v.y; }
+  void setYZ(const vec2 &v) { y = v.y; z = v.y; }
 
   //---
 
   vec3 abs() const { return vec3(std::abs(x), std::abs(y), std::abs(z)); }
+
+  vec3 floor() const { return vec3(std::floor(x), std::floor(y), std::floor(z)); }
+
+  vec3 fract() const { return vec3(CMathUtil::fract(x), CMathUtil::fract(y), CMathUtil::fract(z)); }
 
   //---
 
@@ -142,8 +151,8 @@ struct vec3 {
   //---
 
   vec3 mix(const vec3 &v, double f) const {
-    auto rmix = [](double x, double y, double f) {
-      return (x*(1.0 - f) + y*f);
+    auto rmix = [](double x1, double y1, double f1) {
+      return (x1*(1.0 - f1) + y1*f1);
     };
 
     return vec3(rmix(x, v.x, f), rmix(y, v.y, f), rmix(z, v.z, f));
@@ -158,6 +167,13 @@ struct vec3 {
     auto factor = 1.0/len;
 
     return vec3(x*factor, y*factor, z*factor);
+  }
+
+  //---
+
+  friend std::ostream &operator<<(std::ostream &os, const vec3 &v) {
+    os << v.x << " " << v.y << " " << v.z;
+    return os;
   }
 
   //---
